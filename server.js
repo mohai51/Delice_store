@@ -4,7 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
-const { connectDB } = require('./src/config/db');
+const { connectDB, getIsConnected } = require('./src/config/db');
 const storefrontRoutes = require('./src/routes/storefrontRoutes');
 const adminRoutes = require('./src/routes/adminRoutes');
 const storeService = require('./src/services/storeService');
@@ -12,6 +12,18 @@ const seedInitialContent = require('./src/scripts/seed');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Auto-connect database for serverless environments (e.g. Vercel)
+app.use(async (req, res, next) => {
+  if (!getIsConnected()) {
+    try {
+      await connectDB();
+    } catch (err) {
+      console.error('[DB] Serverless connection error:', err.message);
+    }
+  }
+  next();
+});
 
 // Security & Body Parsers
 app.use(cors({
@@ -145,16 +157,18 @@ async function startServer() {
   await connectDB();
   await seedInitialContent();
 
-  app.listen(PORT, () => {
-    console.log('========================================================');
-    console.log(`  DÉLICE Haute Parfumerie E-Commerce System`);
-    console.log(`  Market: Bangladesh | Currency: BDT (৳)`);
-    console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log('========================================================');
-    console.log(`  Storefront: http://localhost:${PORT}`);
-    console.log(`  Admin Panel: http://localhost:${PORT}/admin`);
-    console.log('========================================================');
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+      console.log('========================================================');
+      console.log(`  DÉLICE Haute Parfumerie E-Commerce System`);
+      console.log(`  Market: Bangladesh | Currency: BDT (৳)`);
+      console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log('========================================================');
+      console.log(`  Storefront: http://localhost:${PORT}`);
+      console.log(`  Admin Panel: http://localhost:${PORT}/admin`);
+      console.log('========================================================');
+    });
+  }
 }
 
 startServer();
