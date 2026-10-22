@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DÉLICE — Quiet Luxury Haute Parfumerie Bangladesh</title>
+  <meta name="description" content="Discover DÉLICE. Quiet luxury fragrances distilled in Grasse, bottled for the discerning connoisseur in Bangladesh. Pure essence, sublime restraint.">
+  <link rel="canonical" href="http://localhost:4000/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DÉLICE — Quiet Luxury Haute Parfumerie Bangladesh">
+  <meta property="og:description" content="Haute perfumery crafted in Grasse and bottled for discerning souls in Bangladesh.">
+  <meta property="og:image" content="/images/hero-desktop.jpg">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  <!-- Structured Data (JSON-LD) for Local Business & Fragrance Store -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "PerfumeStore",
+    "name": "DÉLICE Parfums",
+    "description": "Quiet luxury haute fragrances crafted in Grasse and delivered across Bangladesh.",
+    "url": "http://localhost:4000",
+    "currenciesAccepted": "BDT",
+    "paymentAccepted": "Cash on Delivery, bKash",
+    "priceRange": "৳৳৳",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Dhaka",
+      "addressRegion": "Gulshan",
+      "addressCountry": "BD"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- 1. ANNOUNCEMENT BAR (Controlled by Admin) -->
+  <div id="announcement-bar" class="announcement-bar">
+    <span id="announcement-text">Complimentary white-glove courier across Bangladesh on orders over ৳5,000</span>
+    &nbsp;—&nbsp;<a href="#collection" id="announcement-link">Discover Now</a>
+  </div>
+
+  <!-- 2. SITE HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-wordmark" aria-label="DÉLICE Home">
+        DÉLICE<span>.</span>
+      </a>
+
+      <nav class="nav-desktop" aria-label="Main Navigation">
+        <a href="#collection" class="nav-link">Shop Collection</a>
+        <a href="#story" class="nav-link">Our Story</a>
+        <a href="/track-order" class="nav-link">Track Order</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="cart-trigger" aria-label="Open Shopping Bag">
+          <span class="cart-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span class="cart-count" style="display: none;">0</span>
+          </span>
+          <span class="cart-label" style="display: none;">Bag</span>
+        </button>
+
+        <button class="mobile-menu-btn" aria-label="Open mobile menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="3" y1="7" x2="21" y2="7"></line>
+            <line x1="3" y1="17" x2="21" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="brand-wordmark" style="font-size: 1.4rem;">DÉLICE<span>.</span></span>
+        <button id="mobile-nav-close" style="background:none; border:none; font-size:1.6rem; cursor:pointer;" aria-label="Close menu">&times;</button>
+      </div>
+      <div class="mobile-nav-links">
+        <a href="#collection" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">The Collection</a>
+        <a href="#story" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">Our Story</a>
+        <a href="/cart" class="mobile-nav-link">Shopping Bag</a>
+        <a href="/track-order" class="mobile-nav-link">Track Order</a>
+        <a href="/admin/login" class="mobile-nav-link" style="font-size: 1rem; color: var(--color-muted); margin-top: 24px;">Admin Portal</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- 3. HERO SECTION -->
+    <section id="hero" class="hero-section">
+      <div class="hero-media-wrapper">
+        <img 
+          id="hero-img" 
+          class="hero-image" 
+          src="/images/hero-desktop.jpg" 
+          alt="DÉLICE Haute Parfumerie signature bottle"
+          style="object-position: 50% 50%;"
+        >
+        <div class="hero-overlay"></div>
+      </div>
+      <div class="container">
+        <div class="hero-content">
+          <p class="hero-tagline">Haute Parfumerie Bangladesh</p>
+          <h1 id="hero-headline" class="hero-headline">A Signature, Remembered.</h1>
+          <p id="hero-description" class="hero-description">
+            Quiet luxury fragrances distilled in Grasse, bottled for the discerning connoisseur in Bangladesh.
+          </p>
+          <a id="hero-cta" href="#collection" class="btn btn-primary">Discover DÉLICE</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SIGNATURE COLLECTION SECTION -->
+    <section id="collection" class="section">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow">The Signature Collection</p>
+          <h2 class="section-title">Olfactory Poise</h2>
+          <p class="section-subtitle">
+            Artisanal extraits and eaux de parfum, matured in numbered casks. Bottled with meticulous precision.
+          </p>
+        </div>
+
+        <div id="products-grid" class="products-grid">
+          <!-- Dynamically populated or rendered -->
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--color-muted);">
+            <p>Loading curated fragrance editions...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. BRAND STORY SECTION -->
+    <section id="story" class="section story-section">
+      <div class="container">
+        <div class="story-grid">
+          <div class="story-content">
+            <p class="section-eyebrow" id="story-subtitle">Raw Essence, Sublime Restraint</p>
+            <h2 class="section-title" id="story-title" style="margin-bottom: 24px;">The Philosophy of Quiet Luxury</h2>
+            <p id="story-p1">
+              At DÉLICE, perfume is neither an ornament nor an imposition. It is an intimate aura, composed of rare raw botanicals and precious resins harvested by historic French distillers.
+            </p>
+            <p id="story-p2">
+              Each batch is matured in small casks to allow subtle nuances to harmonize, honoring centuries of Grasse craftsmanship while attuned to the tropical cadence of Bangladesh.
+            </p>
+            <div style="margin-top: 32px;">
+              <a href="#collection" class="btn btn-text">Explore The Compositions &rarr;</a>
+            </div>
+          </div>
+          <div class="story-media">
+            <img id="story-img" src="/images/brand-story.jpg" alt="Atelier formulation desk with rare essences and tinctures">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. CUSTOMER EXPERIENCES (Strictly genuine/approved, hidden until approved) -->
+    <section id="experiences" class="section experiences-section" style="display: none;">
+      <div class="container">
+        <div class="section-header">
+          <p class="section-eyebrow" id="exp-subtitle">Verified Patron Reflections</p>
+          <h2 class="section-title" id="exp-title">Customer Impressions</h2>
+        </div>
+        <div id="experiences-grid" class="experiences-grid">
+          <!-- Populated only if real verified reviews exist -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 7. FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="brand-wordmark">DÉLICE<span>.</span></span>
+          <p id="footer-about">
+            Quiet luxury haute perfumery. Formulated with artistic restraint, bottled for discerning patrons in Bangladesh.
+          </p>
+          <div style="margin-top: 20px; font-size: 0.85rem; color: #888;">
+            <p id="footer-phone" style="color: #bbb; margin-bottom: 4px;">Concierge: +880 1712 000 000</p>
+            <p id="footer-email" style="color: #bbb;">Email: concierge@deliceparfums.com</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Boutique</h4>
+          <ul class="footer-links">
+            <li><a href="#collection" class="footer-link">The Collection</a></li>
+            <li><a href="#story" class="footer-link">Brand Philosophy</a></li>
+            <li><a href="/track-order" class="footer-link">Track Your Order</a></li>
+            <li><a href="/cart" class="footer-link">View Bag</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Client Services</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link" data-policy="delivery">Delivery Information</a></li>
+            <li><a href="#" class="footer-link" data-policy="returns">Returns & Exchanges</a></li>
+            <li><a href="#" class="footer-link" data-policy="privacy">Privacy Discretion</a></li>
+            <li><a href="#" class="footer-link" data-policy="terms">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-heading">Patron Dispatch</h4>
+          <p style="font-size: 0.85rem; color: #999; margin-bottom: 12px;">
+            Receive private notifications of limited cask releases.
+          </p>
+          <form class="footer-newsletter-form" onsubmit="event.preventDefault(); window.Delice.showToast('Thank you for subscribing to the DÉLICE dispatch.'); this.reset();">
+            <input type="email" class="footer-newsletter-input" placeholder="Your email address" required aria-label="Email address for newsletter">
+            <button type="submit" class="footer-newsletter-btn" aria-label="Subscribe">Join</button>
+          </form>
+          <div style="margin-top: 18px; font-size: 0.75rem; color: #777;">
+            Discretion guaranteed. No spam, ever.
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; <span id="current-year">2026</span> DÉLICE Parfums Bangladesh. All rights reserved.
+        </div>
+        <div style="display: flex; gap: 20px;">
+          <span>Official Currency: BDT (৳)</span>
+          <a href="/admin/login" style="color: #666;">Admin Portal</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- CART DRAWER COMPONENT -->
+  <div id="drawer-backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+  <aside id="cart-drawer" class="cart-drawer" aria-label="Shopping Bag">
+    <div class="drawer-header">
+      <h3 class="drawer-title">Shopping Bag</h3>
+      <button id="cart-drawer-close" class="drawer-close-btn" aria-label="Close Shopping Bag">&times;</button>
+    </div>
+    <div id="cart-drawer-items" class="drawer-body">
+      <!-- Items dynamically populated -->
+    </div>
+    <div class="drawer-footer">
+      <div class="drawer-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cart-drawer-subtotal" class="drawer-subtotal-val">৳0</span>
+      </div>
+      <p class="drawer-note">
+        Taxes included. Delivery charges and courtesies calculated during checkout.
+      </p>
+      <a id="cart-drawer-checkout-btn" href="/checkout" class="btn btn-primary" style="width: 100%;">
+        Proceed to Checkout
+      </a>
+    </div>
+  </aside>
+
+  <!-- POLICY MODAL WINDOW -->
+  <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h3 id="modal-title" class="serif-font" style="font-size: 1.4rem;">Concierge Information</h3>
+        <button id="modal-close-btn" style="background:none; border:none; font-size:1.6rem; cursor:pointer;" aria-label="Close modal">&times;</button>
+      </div>
+      <div id="modal-body-content" class="modal-body">
+        Loading...
+      </div>
+    </div>
+  </div>
+
+  <!-- STOREFRONT JAVASCRIPT & PAGE INITIALIZER -->
+  <script src="/js/storefront.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+
+      // Fetch published homepage and products
+      try {
+        const res = await fetch('/api/storefront/homepage');
+        const data = await res.json();
+        const { homepage, featuredProducts } = data;
+
+        // 1. Announcement Bar
+        if (homepage.announcementBar && homepage.announcementBar.enabled) {
+          document.getElementById('announcement-bar').style.display = 'block';
+          document.getElementById('announcement-text').textContent = homepage.announcementBar.text;
+          if (homepage.announcementBar.linkUrl) {
+            document.getElementById('announcement-link').href = homepage.announcementBar.linkUrl;
+          }
+        } else {
+          document.getElementById('announcement-bar').style.display = 'none';
+        }
+
+        // 2. Hero Section
+        if (homepage.hero) {
+          const heroImg = document.getElementById('hero-img');
+          const isMobile = window.innerWidth < 768;
+          heroImg.src = (isMobile && homepage.hero.mobileImageUrl) ? homepage.hero.mobileImageUrl : homepage.hero.desktopImageUrl;
+          
+          if (homepage.hero.focalPoint) {
+            heroImg.style.objectPosition = `${homepage.hero.focalPoint.x}% ${homepage.hero.focalPoint.y}%`;
+          }
+          if (homepage.hero.headline) document.getElementById('hero-headline').textContent = homepage.hero.headline;
+          if (homepage.hero.description) document.getElementById('hero-description').textContent = homepage.hero.description;
+          if (homepage.hero.ctaText) document.getElementById('hero-cta').textContent = homepage.hero.ctaText;
+          if (homepage.hero.ctaLink) document.getElementById('hero-cta').href = homepage.hero.ctaLink;
+        }
+
+        // 3. Products Grid
+        const grid = document.getElementById('products-grid');
+        if (featuredProducts && featuredProducts.length > 0) {
+          grid.innerHTML = featuredProducts.map(p => {
+            const primaryImg = (p.images || []).find(i => i.isPrimary) || (p.images || [])[0];
+            const defaultVariant = (p.variants || [])[0] || { size: '100ml', price: 12500, stock: 10 };
+            const isSoldOut = (p.variants || []).every(v => v.stock <= 0);
+
+            return `
+              <article class="product-card">
+                <div class="product-card-media">
+                  <a href="/product/${p.slug}">
+                    <img src="${primaryImg ? primaryImg.url : '/images/delice-01.jpg'}" alt="${primaryImg ? primaryImg.altText : p.name}" loading="lazy">
+                  </a>
+                  ${isSoldOut ? '<span class="badge-soldout">Sold Out</span>' : ''}
+                  ${defaultVariant.salePrice ? '<span class="badge-sale">Courtesy Offer</span>' : ''}
+                </div>
+                <div class="product-card-body">
+                  <span class="product-family">${p.scentFamily}</span>
+                  <h3 class="product-name"><a href="/product/${p.slug}">${p.name}</a></h3>
+                  <p class="product-excerpt">${p.shortDescription}</p>
+                  
+                  <div class="product-card-footer">
+                    <div class="product-price-wrap">
+                      <span class="product-price">${window.Delice.formatBDT(defaultVariant.salePrice || defaultVariant.price)}</span>
+                      ${defaultVariant.salePrice ? `<span class="product-original-price">${window.Delice.formatBDT(defaultVariant.price)}</span>` : ''}
+                    </div>
+                    <a href="/product/${p.slug}" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.775rem;">
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('');
+        } else {
+          grid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px; background: var(--color-ivory-card); border: 1px solid var(--color-border);">
+              <p style="font-family: var(--font-serif); font-size: 1.25rem; margin-bottom: 8px;">Private Reserve in Preparation</p>
+              <p style="font-size: 0.9rem; color: var(--color-muted);">Our next cask batch is completing maturation. Please visit our admin portal or check back shortly.</p>
+            </div>
+          `;
+        }
+
+        // 4. Brand Story
+        if (homepage.brandStory && homepage.brandStory.enabled) {
+          if (homepage.brandStory.title) document.getElementById('story-title').textContent = homepage.brandStory.title;
+          if (homepage.brandStory.subtitle) document.getElementById('story-subtitle').textContent = homepage.brandStory.subtitle;
+          if (homepage.brandStory.paragraph1) document.getElementById('story-p1').textContent = homepage.brandStory.paragraph1;
+          if (homepage.brandStory.paragraph2) document.getElementById('story-p2').textContent = homepage.brandStory.paragraph2;
+          if (homepage.brandStory.imageUrl) document.getElementById('story-img').src = homepage.brandStory.imageUrl;
+        }
+
+        // 5. Customer Experiences (only if approved items exist)
+        if (homepage.customerExperiences && homepage.customerExperiences.enabled && homepage.customerExperiences.items && homepage.customerExperiences.items.length > 0) {
+          const approved = homepage.customerExperiences.items.filter(i => i.approved);
+          if (approved.length > 0) {
+            const expSection = document.getElementById('experiences');
+            const expGrid = document.getElementById('experiences-grid');
+            expSection.style.display = 'block';
+            expGrid.innerHTML = approved.map(item => `
+              <div class="experience-card">
+                <p class="experience-quote">“${item.quote}”</p>
+                <div class="experience-author">
+                  <strong>${item.customerName}</strong>
+                  <span class="author-meta">${item.location || 'Bangladesh'} • Verified Patron</span>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+
+        // 6. Footer Content
+        if (homepage.footer) {
+          if (homepage.footer.aboutText) document.getElementById('footer-about').textContent = homepage.footer.aboutText;
+          if (homepage.footer.contactPhone) document.getElementById('footer-phone').textContent = `Concierge: ${homepage.footer.contactPhone}`;
+          if (homepage.footer.contactEmail) document.getElementById('footer-email').textContent = `Email: ${homepage.footer.contactEmail}`;
+        }
+      } catch (err) {
+        console.error('Failed to load homepage dynamic configuration:', err);
+      }
+    });
+  </script>
+</body>
+</html>

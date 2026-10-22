@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Shopping Bag — DÉLICE Parfums</title>
+  <meta name="description" content="Review your selected luxury fragrances before proceeding to white-glove checkout.">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .cart-page-section {
+      padding: 60px 0 100px 0;
+    }
+    .cart-page-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .cart-table-card {
+      background-color: var(--color-ivory-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 32px;
+    }
+    .cart-table-header {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr 1fr;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.775rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      font-weight: 600;
+    }
+    .cart-row {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr 1fr;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .cart-row:last-child {
+      border-bottom: none;
+    }
+    .cart-row-product {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .cart-row-img {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-subtle);
+      background-color: var(--color-ivory-warm);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .cart-row-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .summary-card {
+      background-color: var(--color-ivory-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      position: sticky;
+      top: 100px;
+    }
+    .summary-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      font-size: 0.95rem;
+      color: var(--color-charcoal);
+    }
+    .summary-total-line {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-black);
+    }
+    @media (max-width: 860px) {
+      .cart-page-layout {
+        grid-template-columns: 1fr;
+      }
+      .cart-table-header {
+        display: none;
+      }
+      .cart-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-wordmark" aria-label="DÉLICE Home">
+        DÉLICE<span>.</span>
+      </a>
+      <nav class="nav-desktop">
+        <a href="/#collection" class="nav-link">Shop Collection</a>
+        <a href="/#story" class="nav-link">Our Story</a>
+        <a href="/track-order" class="nav-link">Track Order</a>
+      </nav>
+      <div class="header-actions">
+        <a href="/checkout" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.775rem;">
+          Checkout
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="cart-page-section">
+    <div class="container">
+      <h1 class="serif-font" style="font-size: 2.5rem; margin-bottom: 32px;">Your Shopping Bag</h1>
+
+      <div id="cart-content-layout" class="cart-page-layout">
+        <div class="cart-table-card">
+          <div class="cart-table-header">
+            <span>Fragrance</span>
+            <span>Price</span>
+            <span>Quantity</span>
+            <span>Total</span>
+          </div>
+          <div id="cart-table-rows">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <h2 class="summary-title">Summary</h2>
+          <div class="summary-line">
+            <span>Subtotal</span>
+            <span id="page-cart-subtotal">৳0</span>
+          </div>
+          <div class="summary-line">
+            <span>Estimated Shipping</span>
+            <span id="page-cart-shipping">Calculated at checkout</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--color-muted); margin-bottom: 20px;">
+            Complimentary shipping across Bangladesh on orders over ৳5,000.
+          </p>
+          <div class="summary-total-line">
+            <span>Estimated Total</span>
+            <span id="page-cart-total">৳0</span>
+          </div>
+          <div style="margin-top: 28px;">
+            <a href="/checkout" class="btn btn-primary" style="width: 100%;">
+              Proceed to Checkout
+            </a>
+          </div>
+          <div style="margin-top: 16px; text-align: center;">
+            <a href="/#collection" class="btn-text" style="font-size: 0.8rem;">
+              Continue Discovering Fragrances
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div id="cart-empty-message" style="display: none; text-align: center; padding: 80px 0;">
+        <h2 class="serif-font" style="margin-bottom: 16px;">Your bag is currently empty.</h2>
+        <p style="color: var(--color-muted); margin-bottom: 28px;">Discover our artisanal collection of pure French extraits and eaux de parfum.</p>
+        <a href="/#collection" class="btn btn-primary">Discover DÉLICE Collection</a>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/storefront.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPageCart();
+    });
+
+    function renderPageCart() {
+      const cart = window.Delice.getCart();
+      const container = document.getElementById('cart-table-rows');
+      const layout = document.getElementById('cart-content-layout');
+      const emptyMsg = document.getElementById('cart-empty-message');
+
+      if (!cart || cart.length === 0) {
+        layout.style.display = 'none';
+        emptyMsg.style.display = 'block';
+        return;
+      }
+
+      layout.style.display = 'grid';
+      emptyMsg.style.display = 'none';
+
+      let subtotal = 0;
+
+      container.innerHTML = cart.map(item => {
+        const itemTotal = item.unitPrice * item.quantity;
+        subtotal += itemTotal;
+
+        return `
+          <div class="cart-row">
+            <div class="cart-row-product">
+              <div class="cart-row-img">
+                <img src="${item.imageUrl || '/images/delice-01.jpg'}" alt="${item.name}">
+              </div>
+              <div>
+                <a href="/product/${item.slug}" style="font-weight: 600; font-size: 1.05rem;">${item.name}</a>
+                <div style="font-size: 0.8rem; color: var(--color-muted); margin-top: 2px;">Flacon: ${item.size}</div>
+                <button onclick="window.Delice.removeFromBag('${item.productId}', '${item.size}'); renderPageCart();" class="btn-text" style="font-size: 0.75rem; color: var(--color-error); margin-top: 6px;">Remove</button>
+              </div>
+            </div>
+            <div>${window.Delice.formatBDT(item.unitPrice)}</div>
+            <div>
+              <div class="qty-control">
+                <button class="qty-btn" onclick="window.Delice.updateQuantity('${item.productId}', '${item.size}', -1); renderPageCart();">−</button>
+                <span class="qty-val">${item.quantity}</span>
+                <button class="qty-btn" onclick="window.Delice.updateQuantity('${item.productId}', '${item.size}', 1); renderPageCart();">+</button>
+              </div>
+            </div>
+            <div style="font-weight: 600;">${window.Delice.formatBDT(itemTotal)}</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('page-cart-subtotal').textContent = window.Delice.formatBDT(subtotal);
+      document.getElementById('page-cart-total').textContent = window.Delice.formatBDT(subtotal);
+    }
+  </script>
+</body>
+</html>

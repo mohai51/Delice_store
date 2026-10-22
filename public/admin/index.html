@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DÉLICE — Concierge Admin Workspace</title>
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body style="background-color: #141414; color: #FAF7F2;">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <a href="/admin" class="sidebar-brand">DÉLICE<span>.</span></a>
+      <span class="sidebar-badge">Administration</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-tab="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>1. Dashboard</span>
+      </div>
+
+      <div class="nav-item" data-tab="homepage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        <span>2. Homepage Editor</span>
+      </div>
+
+      <div class="nav-item" data-tab="products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+        <span>3. Products & Stock</span>
+      </div>
+
+      <div class="nav-item" data-tab="media">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+        <span>4. Media Library</span>
+      </div>
+
+      <div class="nav-item" data-tab="orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+        <span>5. Orders</span>
+      </div>
+
+      <div class="nav-item" data-tab="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        <span>6. Analytics & Map</span>
+      </div>
+
+      <div class="nav-item" data-tab="referrals">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span>7. Referrals & Patrons</span>
+      </div>
+
+      <div class="nav-item" data-tab="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Store Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div>DÉLICE Core v1.0</div>
+      <div style="font-size: 0.7rem; color: #555; margin-top: 2px;">Market: Bangladesh (BDT)</div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="admin-main">
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-size: 0.85rem; color: var(--admin-text-muted);">
+          Logged in as: <strong id="admin-username-display" style="color: #fff;">Admin</strong>
+        </span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="/" target="_blank" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.775rem;">
+          View Live Storefront &nearr;
+        </a>
+        <button id="logout-btn" class="btn-text" style="color: #999; font-size: 0.8rem; border: none; cursor: pointer;">
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <div class="admin-content-area">
+      <!-- ========================================================
+           TAB 1: DASHBOARD
+           ======================================================== -->
+      <section id="view-dashboard" class="admin-view">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h1 class="panel-title" style="font-size: 1.8rem;">Executive Dashboard</h1>
+          <div>
+            <select id="dashboard-days-filter" class="admin-select" style="width: auto;" onchange="loadDashboard();">
+              <option value="1">Today</option>
+              <option value="7">Last 7 Days</option>
+              <option value="30" selected>Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="low-stock-warnings" style="display: none; background: rgba(246, 173, 85, 0.15); border: 1px solid #F6AD55; padding: 12px 16px; border-radius: 4px; margin-bottom: 24px; font-size: 0.85rem;"></div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Delivered Net Sales</div>
+            <div id="metric-net-sales" class="metric-value">৳0</div>
+            <div class="metric-sub">Excludes cancellations/refunds</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Total Orders</div>
+            <div id="metric-total-orders" class="metric-value">0</div>
+            <div class="metric-sub">Across selected period</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Pending Orders</div>
+            <div id="metric-pending-orders" class="metric-value">0</div>
+            <div class="metric-sub">Awaiting verification / dispatch</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Low Stock Variants</div>
+            <div id="metric-low-stock" class="metric-value">0</div>
+            <div class="metric-sub">&lt; 5 bottles remaining</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Unique Visitors</div>
+            <div id="metric-visitors" class="metric-value">0</div>
+            <div class="metric-sub">First-party telemetry</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Page Views</div>
+            <div id="metric-pageviews" class="metric-value">0</div>
+            <div class="metric-sub">Total impressions</div>
+          </div>
+        </div>
+
+        <!-- Recent Orders Panel -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Recent Patron Acquisitions</h2>
+            <button onclick="switchTab('orders')" class="btn-text" style="font-size: 0.8rem;">View All Orders &rarr;</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order Reference</th>
+                  <th>Patron</th>
+                  <th>Amount</th>
+                  <th>Payment</th>
+                  <th>Fulfillment</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-recent-orders-tbody">
+                <tr><td colspan="7" style="text-align: center; padding: 32px; color: var(--admin-text-muted);">Loading orders...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TAB 2: HOMEPAGE EDITOR & REVISIONS
+           ======================================================== -->
+      <section id="view-homepage" class="admin-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1 class="panel-title" style="font-size: 1.8rem;">Homepage Editor</h1>
+            <p style="font-size: 0.85rem; color: var(--admin-text-muted); margin-top: 4px;">
+              Edits are saved as draft until published. Live storefront only serves published versions.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button onclick="window.DeliceAdmin.togglePreview('desktop')" class="btn btn-secondary">
+              Desktop Preview
+            </button>
+            <button onclick="window.DeliceAdmin.togglePreview('mobile')" class="btn btn-secondary">
+              Mobile Preview
+            </button>
+            <button onclick="window.DeliceAdmin.saveDraft()" class="btn btn-secondary">
+              Save Draft
+            </button>
+            <button onclick="window.DeliceAdmin.publishHomepage()" class="btn btn-gold">
+              Publish Live
+            </button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 32px; align-items: start;">
+          <div>
+            <!-- Section 1: Announcement Bar -->
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title" style="font-size: 1.25rem;">1. Announcement Bar</h3>
+                <label style="font-size: 0.8rem; color: var(--admin-gold);">
+                  <input type="checkbox" id="edit-announcement-enabled"> Enable Bar
+                </label>
+              </div>
+              <div class="form-group">
+                <label class="admin-label">Announcement Text</label>
+                <input type="text" id="edit-announcement-text" class="admin-input">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="admin-label">Destination Link</label>
+                <input type="text" id="edit-announcement-link" class="admin-input">
+              </div>
+            </div>
+
+            <!-- Section 2: Hero Section -->
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title" style="font-size: 1.25rem;">2. Hero Visuals & Focal Point</h3>
+                <label style="font-size: 0.8rem; color: var(--admin-gold);">
+                  <input type="checkbox" id="vis-hero" checked> Visible
+                </label>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                  <label class="admin-label">Headline</label>
+                  <input type="text" id="edit-hero-headline" class="admin-input">
+                </div>
+                <div class="form-group">
+                  <label class="admin-label">CTA Text</label>
+                  <input type="text" id="edit-hero-cta-text" class="admin-input">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="admin-label">Short Description</label>
+                <textarea id="edit-hero-desc" class="admin-textarea" rows="2"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="admin-label">CTA Link</label>
+                <input type="text" id="edit-hero-cta-link" class="admin-input">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                  <label class="admin-label">Desktop Image URL</label>
+                  <input type="text" id="edit-hero-desktop-img" class="admin-input">
+                </div>
+                <div class="form-group">
+                  <label class="admin-label">Mobile Image URL</label>
+                  <input type="text" id="edit-hero-mobile-img" class="admin-input">
+                </div>
+              </div>
+              <div style="background: #242424; padding: 16px; border-radius: 4px; border: 1px solid var(--admin-border);">
+                <label class="admin-label">Image Focal Point (Avoids bottle cropping)</label>
+                <div style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
+                  <span style="font-size: 0.8rem;">X-Axis: <strong id="focal-x-val">50%</strong></span>
+                  <input type="range" id="edit-hero-focal-x" min="0" max="100" value="50" oninput="document.getElementById('focal-x-val').textContent = this.value + '%';" style="flex-grow: 1;">
+                  <span style="font-size: 0.8rem;">Y-Axis: <strong id="focal-y-val">50%</strong></span>
+                  <input type="range" id="edit-hero-focal-y" min="0" max="100" value="50" oninput="document.getElementById('focal-y-val').textContent = this.value + '%';" style="flex-grow: 1;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Brand Story -->
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title" style="font-size: 1.25rem;">3. Brand Story & Atelier</h3>
+                <label style="font-size: 0.8rem; color: var(--admin-gold);">
+                  <input type="checkbox" id="vis-story" checked> Visible
+                </label>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                  <label class="admin-label">Story Title</label>
+                  <input type="text" id="edit-story-title" class="admin-input">
+                </div>
+                <div class="form-group">
+                  <label class="admin-label">Subtitle</label>
+                  <input type="text" id="edit-story-subtitle" class="admin-input">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="admin-label">Paragraph 1</label>
+                <textarea id="edit-story-p1" class="admin-textarea" rows="2"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="admin-label">Paragraph 2</label>
+                <textarea id="edit-story-p2" class="admin-textarea" rows="2"></textarea>
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="admin-label">Atelier Image URL</label>
+                <input type="text" id="edit-story-img" class="admin-input">
+              </div>
+            </div>
+
+            <!-- Section 4: Customer Experiences -->
+            <div class="panel">
+              <div class="panel-header">
+                <h3 class="panel-title" style="font-size: 1.25rem;">4. Customer Reflections</h3>
+                <label style="font-size: 0.8rem; color: var(--admin-gold);">
+                  <input type="checkbox" id="edit-exp-enabled"> Section Enabled
+                </label>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 16px;">
+                Strict policy: Only genuine, approved quotes are displayed. Hidden automatically until approved items exist.
+              </p>
+              <div id="experiences-admin-items">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Visibility & Revision History -->
+          <div>
+            <div class="panel">
+              <h3 class="panel-title" style="font-size: 1.25rem; margin-bottom: 16px;">Section Visibility</h3>
+              <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.875rem;">
+                <label><input type="checkbox" id="vis-collection" checked> Signature Collection</label>
+                <label><input type="checkbox" id="vis-experiences"> Patron Impressions (Experiences)</label>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3 class="panel-title" style="font-size: 1.25rem; margin-bottom: 16px;">Revision History</h3>
+              <p style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 16px;">
+                Every publish creates an immutable snapshot. Restore any previous revision with 1 click.
+              </p>
+              <div id="homepage-revisions-list" style="max-height: 400px; overflow-y: auto;">
+                <!-- Revisions populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TAB 3: PRODUCTS & INVENTORY
+           ======================================================== -->
+      <section id="view-products" class="admin-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1 class="panel-title" style="font-size: 1.8rem;">Products & Inventory</h1>
+            <p style="font-size: 0.85rem; color: var(--admin-text-muted);">
+              Manage luxury fragrance catalog, prices in BDT, size variants and atomic inventory limits.
+            </p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button onclick="window.DeliceAdmin.openCreateProductModal()" class="btn btn-gold">
+              + New Fragrance
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Product & Family</th>
+                  <th>Size Variants & Prices</th>
+                  <th>Stock Count</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-tbody">
+                <tr><td colspan="5" style="text-align: center; padding: 32px;">Loading products...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TAB 4: MEDIA LIBRARY
+           ======================================================== -->
+      <section id="view-media" class="admin-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1 class="panel-title" style="font-size: 1.8rem;">Media Library</h1>
+            <p style="font-size: 0.85rem; color: var(--admin-text-muted);">
+              Uploads are validated for MIME safety and processed into progressive WebP via Sharp.
+            </p>
+          </div>
+          <div>
+            <label class="btn btn-gold" style="cursor: pointer; display: inline-flex;">
+              + Upload Image
+              <input type="file" id="media-file-input" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="window.DeliceAdmin.uploadMediaFile(this)">
+            </label>
+          </div>
+        </div>
+
+        <div id="media-library-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TAB 5: ORDERS & FULFILLMENT
+           ======================================================== -->
+      <section id="view-orders" class="admin-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1 class="panel-title" style="font-size: 1.8rem;">Orders & Fulfillment</h1>
+            <p id="orders-total-count" style="font-size: 0.85rem; color: var(--admin-text-muted);">Loading orders...</p>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+          <input type="text" id="order-search-input" class="admin-input" placeholder="Search order reference, patron name, phone..." style="max-width: 320px;" oninput="loadOrders();">
+          
+          <select id="order-status-filter" class="admin-select" style="max-width: 180px;" onchange="loadOrders();">
+            <option value="">All Fulfillment</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="packed">Packed</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+
+          <select id="order-payment-filter" class="admin-select" style="max-width: 180px;" onchange="loadOrders();">
+            <option value="">All Payments</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="pending_verification">Pending Verification</option>
+            <option value="paid">Paid</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+
+        <div class="panel">
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order Reference</th>
+                  <th>Patron</th>
+                  <th>Items Snapshot</th>
+                  <th>Total BDT</th>
+                  <th>Payment</th>
+                  <th>Fulfillment</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-tbody">
+                <tr><td colspan="7" style="text-align: center; padding: 32px;">Loading orders...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TAB 6: ANALYTICS & VISITOR MAP
+           ======================================================== -->
+      <section id="view-analytics" class="admin-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1 class="panel-title" style="font-size: 1.8rem;">First-Party Telemetry & Visitor Map</h1>
+            <p style="font-size: 0.85rem; color: var(--admin-text-muted);">
+              Privacy-conscious first-party data. No third-party trackers, no GPS claims, bot filtered.
+            </p>
+          </div>
+          <div>
+            <select id="analytics-days-filter" class="admin-select" style="width: auto;" onchange="loadAnalytics();">
+              <option value="1">Today</option>
+              <option value="7" selected>7-Day Rolling</option>
+              <option value="30">30-Day Rolling</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">Estimated Visitors</div>
+            <div id="analytics-visitors" class="metric-value">0</div>
+            <div class="metric-sub" id="analytics-devices">Mobile / Desktop</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Total Page Views</div>
+            <div id="analytics-pageviews" class="metric-value">0</div>
+            <div class="metric-sub">Clean navigation events</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Overall Conversion Rate</div>
+            <div id="analytics-conv-rate" class="metric-value">0%</div>
+            <div class="metric-sub">Sessions to Confirmed Purchases</div>
+          </div>
+        </div>
+
+        <!-- Funnel Progression -->
+        <div class="panel">
+          <h2 class="panel-title" style="margin-bottom: 20px;">Customer Acquisition Funnel</h2>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; text-align: center;">
+            <div style="background: #242424; padding: 20px; border-radius: 4px;">
+              <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--admin-text-muted);">1. Product Views</span>
+              <div id="funnel-p-views" style="font-size: 1.8rem; font-weight: 600; margin: 8px 0;">0</div>
+            </div>
+            <div style="background: #242424; padding: 20px; border-radius: 4px;">
+              <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--admin-text-muted);">2. Add to Bag</span>
+              <div id="funnel-add-bag" style="font-size: 1.8rem; font-weight: 600; margin: 8px 0;">0</div>
+              <span id="funnel-cart-rate" style="font-size: 0.75rem; color: var(--admin-gold);">0% rate</span>
+            </div>
+            <div style="background: #242424; padding: 20px; border-radius: 4px;">
+              <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--admin-text-muted);">3. Checkout Starts</span>
+              <div id="funnel-checkout" style="font-size: 1.8rem; font-weight: 600; margin: 8px 0;">0</div>
+              <span id="funnel-chk-rate" style="font-size: 0.75rem; color: var(--admin-gold);">0% rate</span>
+            </div>
+            <div style="background: #242424; padding: 20px; border-radius: 4px;">
+              <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--admin-text-muted);">4. Confirmed Purchases</span>
+              <div id="funnel-purchase" style="font-size: 1.8rem; font-weight: 600; margin: 8px 0; color: #68D391;">0</div>
+              <span id="funnel-buy-rate" style="font-size: 0.75rem; color: #68D391;">0% rate</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+          <!-- Bangladesh District Clusters -->
+          <div class="panel">
+            <h2 class="panel-title" style="margin-bottom: 16px;">Bangladesh Visitor Geographic Clusters</h2>
+            <div id="analytics-district-breakdown">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Top Viewed Fragrances -->
+          <div class="panel">
+            <h2 class="panel-title" style="margin-bottom: 16px;">Top Viewed Fragrances</h2>
+            <ul id="analytics-top-products" style="list-style: none;">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TAB 7: REFERRALS & PATRONS
+           ======================================================== -->
+      <section id="view-referrals" class="admin-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h1 class="panel-title" style="font-size: 1.8rem;">Ambassador Referrals & Patron Ledger</h1>
+            <p style="font-size: 0.85rem; color: var(--admin-text-muted);">
+              Track genuine ambassador sales. Commission becomes eligible only after confirmed delivery and return period.
+            </p>
+          </div>
+          <div>
+            <button onclick="window.DeliceAdmin.createReferralCode()" class="btn btn-gold">
+              + Issue Referral Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Referral Codes -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Active Referral Programs</h2>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Ambassador</th>
+                  <th>Rates (Comm/Disc)</th>
+                  <th>Uses</th>
+                  <th>Sales Generated</th>
+                  <th>Pending Comm</th>
+                  <th>Paid Comm</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="referrals-table-tbody">
+                <tr><td colspan="8" style="text-align: center; padding: 24px;">Loading referral ledger...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payouts Ledger & Customers -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Commission Payouts Ledger</h2>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ref</th>
+                    <th>Recipient</th>
+                    <th>Method</th>
+                    <th>Amount</th>
+                    <th>Processed</th>
+                  </tr>
+                </thead>
+                <tbody id="payouts-table-tbody">
+                  <tr><td colspan="5" style="text-align: center; padding: 24px;">No payouts recorded.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Registered Patrons</h2>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>District</th>
+                    <th>Orders</th>
+                    <th>Total Spent</th>
+                  </tr>
+                </thead>
+                <tbody id="customers-table-tbody">
+                  <tr><td colspan="5" style="text-align: center; padding: 24px;">Loading customers...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           TAB 8: STORE SETTINGS
+           ======================================================== -->
+      <section id="view-settings" class="admin-view" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h1 class="panel-title" style="font-size: 1.8rem;">Store Settings & Security</h1>
+          <button onclick="window.DeliceAdmin.saveStoreSettings()" class="btn btn-gold">
+            Save Settings
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+          <!-- Store Identity & Contact -->
+          <div class="panel">
+            <h2 class="panel-title" style="margin-bottom: 16px;">Brand & Concierge Identity</h2>
+            <div class="form-group">
+              <label class="admin-label">Store Name</label>
+              <input type="text" id="sett-store-name" class="admin-input">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Tagline</label>
+              <input type="text" id="sett-tagline" class="admin-input">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Concierge Email</label>
+              <input type="email" id="sett-email" class="admin-input">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Concierge Phone</label>
+              <input type="text" id="sett-phone" class="admin-input">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">WhatsApp Number</label>
+              <input type="text" id="sett-whatsapp" class="admin-input">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Boutique Address</label>
+              <input type="text" id="sett-address" class="admin-input">
+            </div>
+          </div>
+
+          <!-- Delivery & Payments -->
+          <div class="panel">
+            <h2 class="panel-title" style="margin-bottom: 16px;">Delivery & Payments</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="admin-label">Inside Dhaka Delivery (৳)</label>
+                <input type="number" id="sett-dhaka-charge" class="admin-input">
+              </div>
+              <div class="form-group">
+                <label class="admin-label">Outside Dhaka Delivery (৳)</label>
+                <input type="number" id="sett-outside-charge" class="admin-input">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Free Delivery Threshold (৳)</label>
+              <input type="number" id="sett-free-threshold" class="admin-input">
+            </div>
+
+            <h3 style="font-size: 1.1rem; color: var(--admin-gold); margin: 24px 0 12px 0;">Payment Methods</h3>
+            <label style="display: block; margin-bottom: 12px;">
+              <input type="checkbox" id="sett-cod-enabled"> Enable Cash on Delivery (COD)
+            </label>
+            <label style="display: block; margin-bottom: 12px;">
+              <input type="checkbox" id="sett-bkash-enabled"> Enable Manual bKash Send Money
+            </label>
+            <div class="form-group">
+              <label class="admin-label">bKash Receiving Number</label>
+              <input type="text" id="sett-bkash-num" class="admin-input">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">bKash Instructions</label>
+              <textarea id="sett-bkash-instruct" class="admin-textarea" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Policies -->
+        <div class="panel">
+          <h2 class="panel-title" style="margin-bottom: 16px;">Client Policy Text</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label class="admin-label">Delivery Policy</label>
+              <textarea id="sett-policy-delivery" class="admin-textarea" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Returns Policy</label>
+              <textarea id="sett-policy-returns" class="admin-textarea" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Privacy Policy</label>
+              <textarea id="sett-policy-privacy" class="admin-textarea" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Terms of Service</label>
+              <textarea id="sett-policy-terms" class="admin-textarea" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security, Backup & Audit Logs -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+          <div class="panel">
+            <h2 class="panel-title" style="margin-bottom: 16px;">Admin Password & Backups</h2>
+            <div class="form-group">
+              <label class="admin-label">Current Password</label>
+              <input type="password" id="pw-curr" class="admin-input">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">New Password (min 8 chars)</label>
+              <input type="password" id="pw-next" class="admin-input">
+            </div>
+            <button onclick="window.DeliceAdmin.changeAdminPassword()" class="btn btn-secondary" style="margin-bottom: 24px;">
+              Update Password
+            </button>
+
+            <div style="border-top: 1px solid var(--admin-border); padding-top: 20px;">
+              <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Database Backup Export</h3>
+              <p style="font-size: 0.8rem; color: var(--admin-text-muted); margin-bottom: 12px;">
+                Download complete JSON snapshot of all products, orders, customers, and settings.
+              </p>
+              <a href="/api/admin/backup/export" class="btn btn-secondary" download>
+                Export Database Backup
+              </a>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2 class="panel-title" style="margin-bottom: 16px;">Administrative Audit Logs</h2>
+            <div id="admin-audit-logs-list" style="max-height: 320px; overflow-y: auto;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MODAL: STOCK ADJUSTMENT -->
+  <div id="stock-modal" class="admin-modal-backdrop">
+    <div class="admin-modal-window" style="max-width: 480px;">
+      <div class="admin-modal-header">
+        <h3 id="stock-modal-title" class="panel-title" style="font-size: 1.25rem;">Adjust Stock</h3>
+        <button onclick="document.getElementById('stock-modal').classList.remove('active')" class="btn-text" style="font-size: 1.4rem;">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <input type="hidden" id="stock-modal-product-id">
+        <div class="form-group">
+          <label class="admin-label">Variant Size</label>
+          <select id="stock-modal-variant-select" class="admin-select"></select>
+        </div>
+        <div class="form-group">
+          <label class="admin-label">New Stock Count</label>
+          <input type="number" id="stock-modal-new-qty" class="admin-input" min="0">
+        </div>
+        <div class="form-group">
+          <label class="admin-label">Reason for Adjustment *</label>
+          <input type="text" id="stock-modal-reason" class="admin-input" placeholder="e.g. New cask batch maturation received">
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button onclick="document.getElementById('stock-modal').classList.remove('active')" class="btn btn-secondary">Cancel</button>
+        <button onclick="window.DeliceAdmin.saveStockAdjustment()" class="btn btn-gold">Save Adjustment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ORDER DETAILS & STATUS UPDATE -->
+  <div id="order-modal" class="admin-modal-backdrop">
+    <div class="admin-modal-window">
+      <div class="admin-modal-header">
+        <h3 id="order-modal-title" class="panel-title" style="font-size: 1.3rem;">Order Details</h3>
+        <button onclick="document.getElementById('order-modal').classList.remove('active')" class="btn-text" style="font-size: 1.4rem;">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <input type="hidden" id="order-modal-ref">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <div>
+            <label class="admin-label">Patron & Destination</label>
+            <div id="order-modal-customer" style="font-size: 0.9rem; line-height: 1.6; background: #242424; padding: 14px; border-radius: 4px;"></div>
+          </div>
+          <div>
+            <label class="admin-label">Purchased Items Snapshot</label>
+            <div id="order-modal-items" style="background: #242424; padding: 14px; border-radius: 4px; max-height: 140px; overflow-y: auto;"></div>
+            <div style="display: flex; justify-content: space-between; margin-top: 8px; font-weight: 600;">
+              <span>Total Payable:</span>
+              <span id="order-modal-total">৳0</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid var(--admin-border); padding-top: 20px;">
+          <div>
+            <label class="admin-label">Fulfillment Status</label>
+            <select id="order-fulfillment-select" class="admin-select">
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="packed">Packed</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled (Restocks Item Atomically)</option>
+            </select>
+            <div class="form-group" style="margin-top: 10px;">
+              <label class="admin-label">Courier Name</label>
+              <input type="text" id="order-courier-name" class="admin-input" placeholder="e.g. Steadfast / Paperfly / Concierge Dedicated">
+            </div>
+            <div class="form-group">
+              <label class="admin-label">Courier Waybill / Tracking #</label>
+              <input type="text" id="order-tracking-num" class="admin-input" placeholder="e.g. STF-89410">
+            </div>
+          </div>
+
+          <div>
+            <label class="admin-label">Payment Status</label>
+            <select id="order-payment-select" class="admin-select">
+              <option value="unpaid">Unpaid</option>
+              <option value="pending_verification">Pending Verification</option>
+              <option value="paid">Paid</option>
+              <option value="refunded">Refunded</option>
+            </select>
+            <div id="order-payment-method-desc" style="font-size: 0.8rem; color: var(--admin-gold); margin-top: 8px;"></div>
+
+            <div class="form-group" style="margin-top: 14px;">
+              <label class="admin-label">Internal Concierge Notes</label>
+              <textarea id="order-modal-notes" class="admin-textarea" rows="2" placeholder="Private internal staff notes..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button onclick="document.getElementById('order-modal').classList.remove('active')" class="btn btn-secondary">Cancel</button>
+        <button onclick="window.DeliceAdmin.saveOrderChanges()" class="btn btn-gold">Update Order Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PREVIEW IFRAME -->
+  <div id="preview-modal" class="admin-modal-backdrop">
+    <div class="admin-modal-window" style="max-width: 90vw; height: 90vh;">
+      <div class="admin-modal-header">
+        <h3 class="panel-title" style="font-size: 1.25rem;">Storefront Preview (Draft Mode)</h3>
+        <button onclick="window.DeliceAdmin.closePreview()" class="btn-text" style="font-size: 1.4rem;">&times;</button>
+      </div>
+      <div class="admin-modal-body" style="padding: 0; display: flex; justify-content: center; background: #000;">
+        <iframe id="preview-iframe" style="height: 100%; border: none; background: #FAF7F2; transition: width 0.3s ease;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="/admin/js/admin.js"></script>
+</body>
+</html>

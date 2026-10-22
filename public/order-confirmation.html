@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed — DÉLICE Parfums</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .confirmation-section {
+      padding: 70px 0 100px 0;
+    }
+    .confirmation-card {
+      max-width: 720px;
+      margin: 0 auto;
+      background-color: var(--color-ivory-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 48px;
+      text-align: center;
+    }
+    .order-badge-ref {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: 1.1rem;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+      color: var(--color-gold-accent);
+      background-color: var(--color-gold-subtle);
+      border: 1px solid var(--color-gold);
+      padding: 8px 24px;
+      border-radius: var(--radius-subtle);
+      margin: 20px 0 32px 0;
+    }
+    .order-summary-box {
+      text-align: left;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+      padding: 24px 0;
+      margin: 32px 0;
+    }
+    @media print {
+      body {
+        background-color: #fff;
+      }
+      .site-header, .site-footer, .no-print {
+        display: none !important;
+      }
+      .confirmation-card {
+        border: none;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-wordmark" aria-label="DÉLICE Home">
+        DÉLICE<span>.</span>
+      </a>
+      <div>
+        <a href="/" class="btn-text" style="font-size: 0.8rem;">Return to Boutique</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="confirmation-section">
+    <div class="container">
+      <div class="confirmation-card">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 16px auto;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="16 12 12 8 8 12"></polyline>
+          <line x1="12" y1="16" x2="12" y2="8"></line>
+        </svg>
+
+        <p class="section-eyebrow" style="color: var(--color-gold-accent);">Acquisition Registered</p>
+        <h1 class="serif-font" style="font-size: 2.4rem; margin-bottom: 12px;">Thank You for Your Patronage</h1>
+        <p style="color: var(--color-charcoal); max-width: 520px; margin: 0 auto;">
+          Your order has been recorded in our archives. Our concierge is preparing your flacon for temperature-controlled dispatch.
+        </p>
+
+        <div id="order-ref-badge" class="order-badge-ref">
+          DEL-2026-.....
+        </div>
+
+        <div id="order-summary-details" class="order-summary-box">
+          <p style="text-align: center; color: var(--color-muted);">Retrieving verified order snapshot...</p>
+        </div>
+
+        <div class="no-print" style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+          <a id="track-order-link" href="#" class="btn btn-secondary">
+            Track Order Status
+          </a>
+          <button onclick="window.print();" class="btn btn-primary">
+            Print Order Invoice
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/storefront.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const ref = urlParams.get('ref');
+      const token = urlParams.get('token');
+
+      if (!token) {
+        document.getElementById('order-summary-details').innerHTML = `
+          <p style="text-align: center; color: var(--color-error);">Missing order tracking token.</p>
+        `;
+        return;
+      }
+
+      document.getElementById('order-ref-badge').textContent = ref || 'DEL-2026-CONFIRMED';
+      document.getElementById('track-order-link').href = `/track-order?token=${token}`;
+
+      try {
+        const res = await fetch(`/api/storefront/track/${token}`);
+        if (!res.ok) throw new Error('Order lookup failed');
+        const order = await res.json();
+
+        document.getElementById('order-summary-details').innerHTML = `
+          <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+            <div>
+              <strong style="display:block; font-size: 1rem;">Recipient: ${order.recipientName}</strong>
+              <span style="font-size: 0.85rem; color: var(--color-muted);">Destination: ${order.recipientDistrict}, Bangladesh</span>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-gold-accent); font-weight: 600;">
+                Payment: ${order.paymentMethod === 'bkash_manual' ? 'bKash (' + order.paymentStatus.toUpperCase() + ')' : 'Cash on Delivery'}
+              </span>
+            </div>
+          </div>
+          <div style="margin-top: 16px; border-top: 1px solid var(--color-border-light); padding-top: 14px;">
+            ${order.items.map(i => `
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+                <span>${i.name} (${i.size}) × ${i.quantity}</span>
+                <span style="font-weight: 500;">${window.Delice.formatBDT(i.subtotal)}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div style="margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 12px; display: flex; justify-content: space-between; font-weight: 600; font-size: 1.1rem;">
+            <span>Total Payable</span>
+            <span>${window.Delice.formatBDT(order.pricing.total)}</span>
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('order-summary-details').innerHTML = `
+          <p style="text-align: center; color: var(--color-muted);">Order registered. Your tracking link is: <strong>/track-order?token=${token}</strong></p>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

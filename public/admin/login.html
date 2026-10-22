@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DÉLICE — Concierge Admin Access</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background-color: #121212;
+      color: #FAF7F2;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .admin-login-card {
+      background-color: #1C1C1C;
+      border: 1px solid #333;
+      border-radius: var(--radius-card);
+      max-width: 440px;
+      width: 100%;
+      padding: 48px 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+    .admin-wordmark {
+      font-family: var(--font-serif);
+      font-size: 2.2rem;
+      letter-spacing: 0.2em;
+      color: #FAF7F2;
+      margin-bottom: 8px;
+    }
+    .admin-wordmark span {
+      color: var(--color-gold);
+    }
+    .login-subtitle {
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-gold);
+      margin-bottom: 36px;
+    }
+    .login-input {
+      width: 100%;
+      background-color: #262626;
+      border: 1px solid #3D3D3D;
+      color: #FFF;
+      padding: 14px 16px;
+      border-radius: var(--radius-subtle);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+    .login-input:focus {
+      border-color: var(--color-gold);
+      background-color: #2E2E2E;
+    }
+    .error-banner {
+      background-color: rgba(140, 45, 25, 0.2);
+      border: 1px solid var(--color-error);
+      color: #FF8E75;
+      padding: 10px 14px;
+      border-radius: var(--radius-subtle);
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-login-card">
+    <div class="admin-wordmark">DÉLICE<span>.</span></div>
+    <div class="login-subtitle">Concierge Administration Portal</div>
+
+    <div id="login-error" class="error-banner"></div>
+
+    <form id="admin-login-form" onsubmit="handleLogin(event);">
+      <div style="text-align: left; margin-bottom: 6px;">
+        <label style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #AAA;">Username or Email</label>
+      </div>
+      <input type="text" id="username" class="login-input" placeholder="admin" required autocomplete="username">
+
+      <div style="text-align: left; margin-bottom: 6px;">
+        <label style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #AAA;">Password</label>
+      </div>
+      <input type="password" id="password" class="login-input" placeholder="••••••••••••" required autocomplete="current-password">
+
+      <button type="submit" id="login-btn" class="btn btn-gold" style="width: 100%; padding: 15px; margin-top: 10px;">
+        Authenticate
+      </button>
+    </form>
+
+    <div style="margin-top: 32px; font-size: 0.75rem; color: #777;">
+      Strictly restricted to authorized DÉLICE personnel.<br>
+      Initial administrator access configured via <code>npm run setup-admin</code>.
+    </div>
+  </div>
+
+  <script>
+    async function handleLogin(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+      errBox.style.display = 'none';
+
+      btn.disabled = true;
+      btn.textContent = 'Verifying Credentials...';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/admin/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Authentication rejected.');
+        }
+
+        // Store CSRF token in session memory for AJAX requests
+        sessionStorage.setItem('delice_csrf', data.csrfToken);
+
+        // Redirect to Admin Panel Dashboard
+        window.location.href = '/admin';
+
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Authenticate';
+      }
+    }
+  </script>
+</body>
+</html>

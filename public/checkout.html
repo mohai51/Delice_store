@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DÉLICE — White-Glove Checkout</title>
+  <meta name="description" content="Secure, guest-friendly perfume order checkout with Bangladesh-wide concierge delivery.">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .checkout-section {
+      padding: 50px 0 100px 0;
+    }
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 56px;
+      align-items: start;
+    }
+    .checkout-form-card {
+      background-color: var(--color-ivory-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 40px;
+    }
+    .form-section-title {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .form-section-title span {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      background-color: var(--color-black);
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 13px 16px;
+      background-color: var(--color-ivory-light);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-subtle);
+      font-family: var(--font-sans);
+      font-size: 0.925rem;
+      color: var(--color-black);
+      outline: none;
+      transition: var(--transition-smooth);
+    }
+    .form-control:focus {
+      border-color: var(--color-gold);
+      background-color: #fff;
+    }
+    .payment-option-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background-color: var(--color-ivory-light);
+      transition: var(--transition-smooth);
+    }
+    .payment-option-card.active {
+      border-color: var(--color-black);
+      background-color: #fff;
+      box-shadow: var(--shadow-subtle);
+    }
+    .payment-option-card input[type="radio"] {
+      margin-top: 4px;
+    }
+    .bkash-panel {
+      background-color: #FDF9F5;
+      border: 1px dashed var(--color-gold);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      margin-top: 16px;
+      display: none;
+    }
+    .bkash-alert {
+      background-color: #FFF3CD;
+      border-left: 4px solid #FFC107;
+      padding: 10px 14px;
+      font-size: 0.825rem;
+      color: #856404;
+      margin-bottom: 14px;
+    }
+    .order-summary-panel {
+      background-color: var(--color-ivory-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 32px;
+      position: sticky;
+      top: 100px;
+    }
+    .summary-item-row {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+    .summary-item-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-subtle);
+      background-color: var(--color-ivory-warm);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .summary-item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    @media (max-width: 860px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+      .checkout-form-card {
+        padding: 24px;
+      }
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SITE HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-wordmark" aria-label="DÉLICE Home">
+        DÉLICE<span>.</span>
+      </a>
+      <div style="font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted);">
+        Discreet Checkout
+      </div>
+      <div>
+        <a href="/cart" class="btn-text" style="font-size: 0.8rem;">&larr; Return to Bag</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="checkout-section">
+    <div class="container">
+      <div class="checkout-grid">
+        <!-- Left: Form -->
+        <div class="checkout-form-card">
+          <form id="checkout-form">
+            <!-- Step 1: Client Information -->
+            <div style="margin-bottom: 36px;">
+              <h2 class="form-section-title"><span>1</span> Patron Information</h2>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="cust-name">Full Recipient Name *</label>
+                  <input type="text" id="cust-name" class="form-control" placeholder="e.g. Nusrat Jahan" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="cust-phone">Bangladesh Mobile Number *</label>
+                  <input type="tel" id="cust-phone" class="form-control" placeholder="017XXXXXXXX" pattern="^(?:\+88|88)?01[3-9]\d{8}$" required>
+                  <small style="font-size: 0.75rem; color: var(--color-muted);">For courier verification and dispatch notification.</small>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cust-email">Email Address (Optional)</label>
+                <input type="email" id="cust-email" class="form-control" placeholder="client@domain.com">
+                <small style="font-size: 0.75rem; color: var(--color-muted);">Order confirmation and tracking link will be sent here.</small>
+              </div>
+            </div>
+
+            <!-- Step 2: Delivery Destination -->
+            <div style="margin-bottom: 36px;">
+              <h2 class="form-section-title"><span>2</span> Delivery Destination</h2>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="cust-district">District / Region *</label>
+                  <select id="cust-district" class="form-control" required onchange="calculateCartWithServer();">
+                    <option value="Dhaka">Dhaka (Metro & Greater)</option>
+                    <option value="Chittagong">Chittagong</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Barisal">Barisal</option>
+                    <option value="Rangpur">Rangpur</option>
+                    <option value="Mymensingh">Mymensingh</option>
+                    <option value="Comilla">Comilla</option>
+                    <option value="Gazipur">Gazipur</option>
+                    <option value="Narayanganj">Narayanganj</option>
+                    <option value="Cox's Bazar">Cox's Bazar</option>
+                    <option value="Other District">Other Bangladesh District</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="cust-area">Area / Police Station *</label>
+                  <input type="text" id="cust-area" class="form-control" placeholder="e.g. Gulshan-2, Dhanmondi, Uttara" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cust-address">Detailed Street & House Address *</label>
+                <textarea id="cust-address" class="form-control" rows="3" placeholder="Apartment / Flat, House number, Road name, Landmark" required></textarea>
+              </div>
+            </div>
+
+            <!-- Step 3: Payment Method -->
+            <div style="margin-bottom: 36px;">
+              <h2 class="form-section-title"><span>3</span> Payment Preference</h2>
+
+              <!-- Cash on Delivery -->
+              <label class="payment-option-card active" id="pay-card-cod">
+                <input type="radio" name="paymentMethod" value="cod" checked onchange="togglePaymentPanels();">
+                <div>
+                  <strong style="display:block; font-size: 0.95rem;">Cash on Delivery (COD)</strong>
+                  <span style="font-size: 0.825rem; color: var(--color-muted);">
+                    Inspect the luxury packaging upon delivery and pay our courier concierge in cash.
+                  </span>
+                </div>
+              </label>
+
+              <!-- Manual bKash Payment -->
+              <label class="payment-option-card" id="pay-card-bkash">
+                <input type="radio" name="paymentMethod" value="bkash_manual" onchange="togglePaymentPanels();">
+                <div>
+                  <strong style="display:block; font-size: 0.95rem;">Manual bKash Send Money</strong>
+                  <span style="font-size: 0.825rem; color: var(--color-muted);">
+                    Send exact order total to our concierge bKash account and provide your TrxID.
+                  </span>
+                </div>
+              </label>
+
+              <!-- bKash Instructions Panel -->
+              <div id="bkash-instructions" class="bkash-panel">
+                <div class="bkash-alert">
+                  <strong>Security Advisory:</strong> DÉLICE concierge will <strong>NEVER</strong> request your bKash PIN or OTP. All manual submissions remain "Pending verification" until reconciled by our finance desk.
+                </div>
+                <p style="font-size: 0.85rem; margin-bottom: 12px;">
+                  1. Open your bKash App and select <strong>Send Money</strong>.<br>
+                  2. Enter DÉLICE Concierge Number: <strong id="bkash-number-display">01712000000</strong>.<br>
+                  3. Enter exact order total: <strong id="bkash-amount-display">৳0</strong>.<br>
+                  4. Input the reference details below:
+                </p>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="bkash-sender">Your Sending bKash Number *</label>
+                    <input type="tel" id="bkash-sender" class="form-control" placeholder="01XXXXXXXXX">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="bkash-trx">bKash Transaction ID (TrxID) *</label>
+                    <input type="text" id="bkash-trx" class="form-control" placeholder="e.g. 9K20AB87XZ" style="text-transform: uppercase;">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 4: Referral Code & Notes -->
+            <div style="margin-bottom: 32px;">
+              <h2 class="form-section-title"><span>4</span> Special Instructions & Courtesies</h2>
+              <div class="form-group">
+                <label class="form-label" for="referral-input">Patron Referral Code (Optional)</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="referral-input" class="form-control" placeholder="e.g. DELICE10" style="text-transform: uppercase;">
+                  <button type="button" class="btn btn-secondary" onclick="calculateCartWithServer();" style="padding: 0 20px; font-size: 0.775rem;">Apply</button>
+                </div>
+                <div id="referral-status-msg" style="font-size: 0.8rem; margin-top: 6px;"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="order-notes">Delivery & Gift Notes (Optional)</label>
+                <textarea id="order-notes" class="form-control" rows="2" placeholder="Instructions for gate entry, delivery timing, or gift packaging notes."></textarea>
+              </div>
+            </div>
+
+            <!-- Submit Button with Anti-duplicate Protection -->
+            <button type="submit" id="submit-order-btn" class="btn btn-primary" style="width: 100%; padding: 18px; font-size: 0.95rem;">
+              Confirm and Place Order
+            </button>
+            <div style="text-align: center; margin-top: 14px; font-size: 0.75rem; color: var(--color-muted);">
+              By placing your order, you agree to DÉLICE terms and white-glove delivery standards.
+            </div>
+          </form>
+        </div>
+
+        <!-- Right: Order Summary Panel -->
+        <div class="order-summary-panel">
+          <h2 class="serif-font" style="font-size: 1.4rem; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border);">
+            Order Overview
+          </h2>
+          <div id="checkout-items-list">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div style="margin-top: 24px; border-top: 1px solid var(--color-border); padding-top: 16px;">
+            <div class="summary-line">
+              <span>Subtotal</span>
+              <span id="summary-subtotal">৳0</span>
+            </div>
+            <div class="summary-line" id="discount-row" style="display: none; color: var(--color-success);">
+              <span>Patron Courtesy</span>
+              <span id="summary-discount">-৳0</span>
+            </div>
+            <div class="summary-line">
+              <span>White-Glove Delivery</span>
+              <span id="summary-delivery">৳80</span>
+            </div>
+            <div class="summary-total-line">
+              <span>Total Amount</span>
+              <span id="summary-total">৳0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/storefront.js"></script>
+  <script>
+    let serverCalculation = null;
+    let idempotencyKey = 'idemp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Track checkout start
+      window.Delice.trackEvent('checkout_start');
+
+      const cart = window.Delice.getCart();
+      if (!cart || cart.length === 0) {
+        window.location.href = '/cart';
+        return;
+      }
+
+      renderCheckoutItems(cart);
+      await calculateCartWithServer();
+
+      // Form Submit
+      document.getElementById('checkout-form').addEventListener('submit', handleOrderSubmit);
+    });
+
+    function renderCheckoutItems(cart) {
+      const container = document.getElementById('checkout-items-list');
+      container.innerHTML = cart.map(item => `
+        <div class="summary-item-row">
+          <div class="summary-item-thumb">
+            <img src="${item.imageUrl || '/images/delice-01.jpg'}" alt="${item.name}">
+          </div>
+          <div style="flex-grow: 1;">
+            <div style="font-size: 0.9rem; font-weight: 600;">${item.name}</div>
+            <div style="font-size: 0.75rem; color: var(--color-muted);">${item.size} × ${item.quantity}</div>
+          </div>
+          <div style="font-weight: 500; font-size: 0.9rem;">
+            ${window.Delice.formatBDT(item.unitPrice * item.quantity)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function calculateCartWithServer() {
+      const cart = window.Delice.getCart();
+      const district = document.getElementById('cust-district').value;
+      const refCode = document.getElementById('referral-input').value.trim();
+
+      try {
+        const res = await fetch('/api/storefront/validate-cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: cart,
+            referralCode: refCode,
+            district
+          })
+        });
+
+        const data = await res.json();
+        serverCalculation = data;
+
+        // Update UI
+        document.getElementById('summary-subtotal').textContent = window.Delice.formatBDT(data.pricing.subtotal);
+        document.getElementById('summary-delivery').textContent = data.pricing.deliveryCharge === 0 ? 'Complimentary' : window.Delice.formatBDT(data.pricing.deliveryCharge);
+        document.getElementById('summary-total').textContent = window.Delice.formatBDT(data.pricing.total);
+        document.getElementById('bkash-amount-display').textContent = window.Delice.formatBDT(data.pricing.total);
+
+        // Referral status
+        const refStatusEl = document.getElementById('referral-status-msg');
+        const discountRow = document.getElementById('discount-row');
+        if (data.referral.isValid) {
+          discountRow.style.display = 'flex';
+          document.getElementById('summary-discount').textContent = `-${window.Delice.formatBDT(data.referral.discount)}`;
+          refStatusEl.style.color = 'var(--color-success)';
+          refStatusEl.textContent = `✓ ${data.referral.message}`;
+        } else {
+          discountRow.style.display = 'none';
+          if (refCode) {
+            refStatusEl.style.color = 'var(--color-error)';
+            refStatusEl.textContent = '✕ Referral code is invalid or inactive.';
+          } else {
+            refStatusEl.textContent = '';
+          }
+        }
+      } catch (err) {
+        console.error('Failed to validate cart with server:', err);
+      }
+    }
+
+    function togglePaymentPanels() {
+      const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+      const bkashPanel = document.getElementById('bkash-instructions');
+      const codCard = document.getElementById('pay-card-cod');
+      const bkashCard = document.getElementById('pay-card-bkash');
+
+      if (method === 'bkash_manual') {
+        bkashPanel.style.display = 'block';
+        bkashCard.classList.add('active');
+        codCard.classList.remove('active');
+      } else {
+        bkashPanel.style.display = 'none';
+        codCard.classList.add('active');
+        bkashCard.classList.remove('active');
+      }
+    }
+
+    async function handleOrderSubmit(e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('submit-order-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registering with Concierge...';
+
+      const customer = {
+        name: document.getElementById('cust-name').value.trim(),
+        phone: document.getElementById('cust-phone').value.trim(),
+        email: document.getElementById('cust-email').value.trim(),
+        district: document.getElementById('cust-district').value,
+        area: document.getElementById('cust-area').value.trim(),
+        fullAddress: document.getElementById('cust-address').value.trim()
+      };
+
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+      let bkashDetails = null;
+
+      if (paymentMethod === 'bkash_manual') {
+        const sender = document.getElementById('bkash-sender').value.trim();
+        const trx = document.getElementById('bkash-trx').value.trim();
+        if (!sender || !trx) {
+          window.Delice.showToast('Please provide your sending bKash number and Transaction ID.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Confirm and Place Order';
+          return;
+        }
+        bkashDetails = { senderNumber: sender, trxId: trx };
+      }
+
+      const cart = window.Delice.getCart();
+      const referralCode = document.getElementById('referral-input').value.trim();
+      const orderNotes = document.getElementById('order-notes').value.trim();
+
+      try {
+        const res = await fetch('/api/storefront/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-session-id': localStorage.getItem('delice_sid') || ''
+          },
+          body: JSON.stringify({
+            customer,
+            items: cart,
+            paymentMethod,
+            bkashDetails,
+            referralCode,
+            orderNotes,
+            idempotencyKey
+          })
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.error || 'Failed to place order.');
+        }
+
+        // Clear shopping bag
+        localStorage.removeItem('delice_cart');
+
+        // Redirect to Confirmation
+        window.location.href = `/order-confirmation?ref=${result.orderReference}&token=${result.trackingToken}`;
+
+      } catch (err) {
+        window.Delice.showToast(err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm and Place Order';
+      }
+    }
+  </script>
+</body>
+</html>

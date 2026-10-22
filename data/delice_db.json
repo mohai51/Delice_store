@@ -1,0 +1,592 @@
+{
+  "admins": [
+    {
+      "username": "admin",
+      "email": "concierge@deliceparfums.com",
+      "passwordHash": "$2b$12$YSaLMsXO.HPI6h1PDrO8Y.89uzy1IypBJ3IPggxnw1DMI.QFGFfSC",
+      "role": "superadmin",
+      "twoFactorEnabled": false,
+      "createdAt": "2026-10-22T07:46:42.749Z",
+      "updatedAt": "2026-10-22T07:46:42.749Z",
+      "_id": "adm_1792655202749",
+      "lastLoginAt": "2026-10-22T08:03:28.059Z"
+    }
+  ],
+  "sessions": [],
+  "products": [
+    {
+      "name": "DÉLICE No. 01",
+      "slug": "delice-no-01",
+      "sku": "DEL-01-EDP",
+      "scentFamily": "Fresh Woody",
+      "shortDescription": "Crisp Italian bergamot and cracked coriander evolving into smoked Atlas cedarwood, dry vetiver, and white musk.",
+      "fullDescription": "DÉLICE No. 01 is an homage to pristine mornings in Grasse and the tranquil sanctuary of an old library. Bright Mediterranean citrus awakens the senses before receding into a meditative heart of cedarwood shavings, earthy Haitian vetiver, and sheer ambergris. Subtly present, never loud—an intimate olfactory whisper for the thoughtful individual.",
+      "scentNotes": {
+        "top": [
+          "Calabrian Bergamot",
+          "Cracked Coriander",
+          "Bitter Petitgrain"
+        ],
+        "heart": [
+          "Atlas Cedarwood",
+          "Orris Root",
+          "French Lavender"
+        ],
+        "base": [
+          "Haitian Vetiver",
+          "White Amber",
+          "Clean Musk"
+        ]
+      },
+      "ingredients": [
+        "Alcohol Denat.",
+        "Parfum (Fragrance)",
+        "Aqua (Water)",
+        "Limonene",
+        "Linalool",
+        "Citronellol",
+        "Geraniol",
+        "Citral",
+        "Farnesol"
+      ],
+      "variants": [
+        {
+          "size": "50ml",
+          "volumeMl": 50,
+          "price": 7800,
+          "salePrice": null,
+          "stock": 23,
+          "sku": "DEL-01-50ML"
+        },
+        {
+          "size": "100ml",
+          "volumeMl": 100,
+          "price": 12500,
+          "salePrice": null,
+          "stock": 18,
+          "sku": "DEL-01-100ML"
+        }
+      ],
+      "images": [
+        {
+          "id": "img_delice_01",
+          "url": "/images/delice-01.jpg",
+          "thumbnailUrl": "/images/delice-01.jpg",
+          "altText": "Heavy crystal flacon of DÉLICE No. 01 seated upon warm limestone plinth",
+          "isPrimary": true,
+          "order": 0
+        }
+      ],
+      "isFeatured": true,
+      "featuredOrder": 1,
+      "status": "published",
+      "seo": {
+        "title": "DÉLICE No. 01 — Fresh Woody Eau de Parfum",
+        "description": "An intimate, understated signature of crisp bergamot, noble Atlas cedar, and dry vetiver. Formulated in Grasse."
+      },
+      "_id": "prod_1792655220567_e077a722",
+      "createdAt": "2026-10-22T07:47:00.568Z",
+      "updatedAt": "2026-10-22T08:00:38.631Z"
+    },
+    {
+      "name": "DÉLICE No. 02",
+      "slug": "delice-no-02",
+      "sku": "DEL-02-EDP",
+      "scentFamily": "Amber Floral",
+      "shortDescription": "Velvety Damask rose absolute kissed by spiced saffron, wrapped in balsamic labdanum and rich golden amber.",
+      "fullDescription": "DÉLICE No. 02 captures the golden dusk of ancient courtyards. Centered on rich French centifolia rose petals steeped in warm honeyed resins, it unfurls with saffron threads, creamy sandalwood, and Madagascar vanilla bean. A warm, enveloping composition crafted for evening gatherings and introspective nights.",
+      "scentNotes": {
+        "top": [
+          "Damask Rose Petals",
+          "Persian Saffron",
+          "Pink Peppercorn"
+        ],
+        "heart": [
+          "Centifolia Rose Absolute",
+          "Balsamic Labdanum",
+          "Incense Smoke"
+        ],
+        "base": [
+          "Golden Amber Resin",
+          "Creamy Sandalwood",
+          "Madagascar Bourbon Vanilla"
+        ]
+      },
+      "ingredients": [
+        "Alcohol Denat.",
+        "Parfum (Fragrance)",
+        "Aqua (Water)",
+        "Benzyl Benzoate",
+        "Eugenol",
+        "Cinnamyl Alcohol",
+        "Coumarin",
+        "Isoeugenol"
+      ],
+      "variants": [
+        {
+          "size": "50ml",
+          "volumeMl": 50,
+          "price": 8800,
+          "salePrice": null,
+          "stock": 20,
+          "sku": "DEL-02-50ML"
+        },
+        {
+          "size": "100ml",
+          "volumeMl": 100,
+          "price": 13900,
+          "salePrice": null,
+          "stock": 15,
+          "sku": "DEL-02-100ML"
+        }
+      ],
+      "images": [
+        {
+          "id": "img_delice_02",
+          "url": "/images/delice-02.jpg",
+          "thumbnailUrl": "/images/delice-02.jpg",
+          "altText": "DÉLICE No. 02 amber floral flacon resting upon natural travertine stone under soft evening light",
+          "isPrimary": true,
+          "order": 0
+        }
+      ],
+      "isFeatured": true,
+      "featuredOrder": 2,
+      "status": "published",
+      "seo": {
+        "title": "DÉLICE No. 02 — Amber Floral Eau de Parfum",
+        "description": "Opulent rose absolute and spiced amber resins distilled into an enveloping quiet luxury fragrance."
+      },
+      "_id": "prod_1792655220573_c44bc43e",
+      "createdAt": "2026-10-22T07:47:00.573Z",
+      "updatedAt": "2026-10-22T08:00:38.525Z"
+    }
+  ],
+  "inventoryAdjustments": [
+    {
+      "_id": "adj_1792656038631_750f5d56",
+      "productId": "prod_1792655220567_e077a722",
+      "productName": "DÉLICE No. 01",
+      "variantSize": "50ml",
+      "sku": "DEL-01-50ML",
+      "previousStock": 24,
+      "newStock": 23,
+      "delta": -1,
+      "reason": "Customer order placed (DEL-2026-66691)",
+      "adminUsername": "Storefront",
+      "orderReference": "DEL-2026-66691",
+      "createdAt": "2026-10-22T08:00:38.631Z"
+    }
+  ],
+  "media": [
+    {
+      "filename": "brand-story.jpg",
+      "originalName": "brand-story.jpg",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 896498,
+      "dimensions": {
+        "width": 1200,
+        "height": 900
+      },
+      "url": "/images/brand-story.jpg",
+      "thumbnailUrl": "/images/brand-story.jpg",
+      "altText": "French perfumer atelier desk with tincture bottles and parchment formulas",
+      "usedIn": [
+        "homepage:brandStory"
+      ],
+      "_id": "med_1792655220616_9ec932d1",
+      "createdAt": "2026-10-22T07:47:00.616Z"
+    },
+    {
+      "filename": "delice-02.jpg",
+      "originalName": "delice-02.jpg",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 783194,
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      },
+      "url": "/images/delice-02.jpg",
+      "thumbnailUrl": "/images/delice-02.jpg",
+      "altText": "DÉLICE No. 02 bottle on travertine with rose petals and amber",
+      "usedIn": [
+        "product:delice-no-02"
+      ],
+      "_id": "med_1792655220576_fa7a65fd",
+      "createdAt": "2026-10-22T07:47:00.576Z"
+    },
+    {
+      "filename": "delice-01.jpg",
+      "originalName": "delice-01.jpg",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 666205,
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      },
+      "url": "/images/delice-01.jpg",
+      "thumbnailUrl": "/images/delice-01.jpg",
+      "altText": "DÉLICE No. 01 bottle on limestone pedestal",
+      "usedIn": [
+        "product:delice-no-01"
+      ],
+      "_id": "med_1792655220575_5edb12b0",
+      "createdAt": "2026-10-22T07:47:00.575Z"
+    },
+    {
+      "filename": "hero-desktop.jpg",
+      "originalName": "hero-desktop.jpg",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 632673,
+      "dimensions": {
+        "width": 1920,
+        "height": 1080
+      },
+      "url": "/images/hero-desktop.jpg",
+      "thumbnailUrl": "/images/hero-desktop.jpg",
+      "altText": "DÉLICE signature perfume bottle atop champagne silk drapery",
+      "usedIn": [
+        "homepage:hero"
+      ],
+      "_id": "med_1792655220574_84b19c15",
+      "createdAt": "2026-10-22T07:47:00.574Z"
+    }
+  ],
+  "homepage": {
+    "_id": "home_1792655220617_aa6fd20f",
+    "version": 1,
+    "isPublished": true,
+    "announcementBar": {
+      "enabled": true,
+      "text": "Complimentary white-glove courier across Bangladesh on orders over ৳5,000",
+      "linkUrl": "#collection"
+    },
+    "hero": {
+      "desktopImageUrl": "/images/hero-desktop.jpg",
+      "mobileImageUrl": "/images/hero-desktop.jpg",
+      "focalPoint": {
+        "x": 50,
+        "y": 50
+      },
+      "headline": "A Signature, Remembered.",
+      "description": "Quiet luxury fragrances distilled in Grasse, bottled for the discerning connoisseur in Bangladesh.",
+      "ctaText": "Discover DÉLICE",
+      "ctaLink": "#collection"
+    },
+    "featuredProducts": [
+      "delice-no-01",
+      "delice-no-02"
+    ],
+    "brandStory": {
+      "enabled": true,
+      "title": "The Philosophy of Quiet Luxury",
+      "subtitle": "Pure Essence, Sublime Restraint",
+      "paragraph1": "At DÉLICE, perfume is neither an ornament nor an imposition. It is an intimate aura, composed of rare raw botanicals and precious resins harvested by historic French distillers.",
+      "paragraph2": "Each batch is matured in small casks to allow subtle nuances to harmonize, honoring centuries of Grasse craftsmanship while attuned to the tropical cadence of Bangladesh.",
+      "imageUrl": "/images/brand-story.jpg"
+    },
+    "customerExperiences": {
+      "enabled": false,
+      "title": "Patron Impressions",
+      "subtitle": "Verified Customer Reflections",
+      "items": []
+    },
+    "footer": {
+      "aboutText": "DÉLICE — Quiet luxury haute perfumery. Crafted with artistic restraint.",
+      "contactEmail": "concierge@deliceparfums.com",
+      "contactPhone": "+880 1712 000 000",
+      "address": "House 14, Road 71, Gulshan 2, Dhaka 1212",
+      "instagramUrl": "https://instagram.com/deliceparfums",
+      "facebookUrl": "https://facebook.com/deliceparfums",
+      "whatsappNumber": "+8801712000000",
+      "newsletterEnabled": true
+    },
+    "sectionOrder": [
+      "announcement",
+      "hero",
+      "collection",
+      "story",
+      "experiences",
+      "footer"
+    ],
+    "sectionVisibility": {
+      "announcement": true,
+      "hero": true,
+      "collection": true,
+      "story": true,
+      "experiences": false,
+      "footer": true
+    },
+    "savedBy": "System",
+    "publishedAt": "2026-10-22T07:47:00.617Z",
+    "updatedAt": "2026-10-22T07:47:00.617Z"
+  },
+  "homepageRevisions": [],
+  "orders": [
+    {
+      "_id": "ord_1792656038630_6d3b55f4",
+      "orderReference": "DEL-2026-66691",
+      "trackingToken": "04bc281e8e5989442112b67cd61e91a8",
+      "customer": {
+        "name": "Sayeda Rahman",
+        "phone": "01819283746",
+        "email": "sayeda.rahman@example.com",
+        "district": "Dhaka",
+        "area": "Gulshan 2",
+        "fullAddress": "Road 71, House 14, Apartment 4B"
+      },
+      "items": [
+        {
+          "productId": "prod_1792655220567_e077a722",
+          "slug": "delice-no-01",
+          "name": "DÉLICE No. 01",
+          "size": "50ml",
+          "sku": "DEL-01-50ML",
+          "unitPrice": 7800,
+          "quantity": 1,
+          "subtotal": 7800,
+          "imageUrl": "/images/delice-01.jpg"
+        }
+      ],
+      "pricing": {
+        "subtotal": 7800,
+        "discount": 0,
+        "deliveryCharge": 0,
+        "total": 7800
+      },
+      "payment": {
+        "method": "cod",
+        "status": "unpaid",
+        "bkashSenderNumber": "",
+        "bkashTrxId": "",
+        "paymentVerifiedAt": null,
+        "paymentVerifiedBy": null,
+        "refundAmount": 0
+      },
+      "fulfillment": {
+        "status": "confirmed",
+        "courierName": "Concierge White-Glove Dedicated",
+        "trackingNumber": "DEL-BD-7729",
+        "deliveredAt": null,
+        "cancelledAt": null,
+        "stockRestocked": false
+      },
+      "referral": {
+        "code": null,
+        "referrerId": null,
+        "commissionRatePercent": 0,
+        "refereeDiscountPercent": 0,
+        "commissionAmount": 0,
+        "status": "none"
+      },
+      "orderNotes": "Please ring bell upon arrival.",
+      "internalNotes": "",
+      "statusHistory": [
+        {
+          "status": "Order Placed",
+          "type": "system",
+          "note": "Order registered via storefront. Payment method: Cash on Delivery.",
+          "adminUsername": "Storefront",
+          "timestamp": "2026-10-22T08:00:38.631Z"
+        },
+        {
+          "status": "Fulfillment: CONFIRMED",
+          "type": "fulfillment",
+          "note": "Verified address and telephone reservation.",
+          "adminUsername": "admin",
+          "timestamp": "2026-10-22T08:00:38.688Z"
+        }
+      ],
+      "createdAt": "2026-10-22T08:00:38.631Z",
+      "updatedAt": "2026-10-22T08:00:38.688Z"
+    }
+  ],
+  "customers": [
+    {
+      "_id": "cust_1792656038634_e7b60b71",
+      "name": "Sayeda Rahman",
+      "phone": "01819283746",
+      "email": "sayeda.rahman@example.com",
+      "defaultAddress": {
+        "district": "Dhaka",
+        "area": "Gulshan 2",
+        "fullAddress": "Road 71, House 14, Apartment 4B"
+      },
+      "totalOrdersCount": 1,
+      "totalSpentAmount": 7800,
+      "firstOrderAt": "2026-10-22T08:00:38.631Z",
+      "lastOrderAt": "2026-10-22T08:00:38.631Z",
+      "createdAt": "2026-10-22T08:00:38.634Z"
+    }
+  ],
+  "referralCodes": [],
+  "commissionPayouts": [],
+  "analyticsEvents": [
+    {
+      "_id": "evt_1792656038648_11084cb1",
+      "sessionId": "storefront_session",
+      "eventType": "purchase",
+      "pagePath": "/checkout",
+      "productSlug": null,
+      "productName": null,
+      "orderReference": "DEL-2026-66691",
+      "amount": 7800,
+      "deviceCategory": "desktop",
+      "referrer": "Direct",
+      "utmSource": null,
+      "utmMedium": null,
+      "utmCampaign": null,
+      "location": {
+        "country": "Bangladesh",
+        "district": "Dhaka",
+        "isEstimated": true
+      },
+      "isBot": false,
+      "createdAt": "2026-10-22T08:00:38.648Z"
+    }
+  ],
+  "settings": {
+    "_id": "sett_1792655946753_e3a46377",
+    "storeName": "DÉLICE",
+    "tagline": "Haute Parfumerie Bangladesh",
+    "currency": "BDT",
+    "currencySymbol": "৳",
+    "brandColors": {
+      "backgroundIvory": "#F9F6F0",
+      "deepBlack": "#141414",
+      "champagneGold": "#C5A880"
+    },
+    "contact": {
+      "email": "concierge@deliceparfums.com",
+      "phone": "+880 1712 000 000",
+      "whatsapp": "+8801712000000",
+      "address": "House 14, Road 71, Gulshan 2, Dhaka 1212",
+      "instagram": "https://instagram.com/deliceparfums",
+      "facebook": "https://facebook.com/deliceparfums"
+    },
+    "deliveryZones": [
+      {
+        "id": "dhaka_metro",
+        "name": "Inside Dhaka Metropolitan Area",
+        "charge": 80,
+        "estimatedDays": "1-2 business days"
+      },
+      {
+        "id": "outside_dhaka",
+        "name": "Outside Dhaka (All Bangladesh Districts)",
+        "charge": 150,
+        "estimatedDays": "3-4 business days"
+      }
+    ],
+    "freeDeliveryThreshold": 5000,
+    "paymentMethods": {
+      "cod": {
+        "enabled": true,
+        "title": "Cash on Delivery",
+        "description": "Inspect package upon arrival and pay courier in cash."
+      },
+      "bkashManual": {
+        "enabled": true,
+        "title": "Manual bKash Send Money",
+        "number": "01712000000",
+        "accountType": "Personal / Merchant",
+        "instructions": "Send the exact order total to our bKash number. Then input your sending bKash number and Transaction ID (TrxID) below. Never share your bKash PIN or OTP with anyone. Your order will be verified by our concierge before dispatch."
+      }
+    },
+    "policies": {
+      "delivery": "Delivery within Dhaka metropolitan area is fulfilled within 24 to 48 hours. Orders across other districts in Bangladesh are delivered within 3 to 5 business days via secure temperature-controlled courier partners.",
+      "returns": "Given the intimate and fragile nature of haute perfumery, bottles may be returned within 7 calendar days of receipt only if the cellophane security seal remains unbroken and intact. Damaged transit claims must be reported within 24 hours of delivery.",
+      "privacy": "DÉLICE safeguards client privacy with paramount discretion. We only record information strictly necessary to fulfill delivery and verify transactions. We do not sell, rent, or distribute personal data.",
+      "terms": "All fragrance formulations, photographic assets, and brand marks are exclusive intellectual property of DÉLICE. Order confirmation constitutes an offer to purchase subject to product availability and payment verification."
+    },
+    "referralRules": {
+      "commissionPercent": 5,
+      "refereeDiscountPercent": 10,
+      "returnPeriodDays": 7
+    },
+    "seoDefaults": {
+      "title": "DÉLICE — Quiet Luxury Perfumery",
+      "description": "Exquisite haute fragrances inspired by French craftsmanship and bottled for discerning patrons in Bangladesh.",
+      "ogImageUrl": "/images/hero-desktop.jpg"
+    },
+    "analyticsRetentionDays": 90,
+    "updatedAt": "2026-10-22T07:59:06.754Z",
+    "updatedBy": "System"
+  },
+  "auditLogs": [
+    {
+      "_id": "audit_1792656208062_73fc3844",
+      "adminUsername": "admin",
+      "action": "ADMIN_LOGIN",
+      "targetType": "admin",
+      "targetId": "adm_1792655202749",
+      "details": {
+        "timestamp": "2026-10-22T08:03:28.062Z"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-22T08:03:28.062Z"
+    },
+    {
+      "_id": "audit_1792656038694_2d183808",
+      "adminUsername": "admin",
+      "action": "UPDATE_FULFILLMENT",
+      "targetType": "order",
+      "targetId": "DEL-2026-66691",
+      "details": {
+        "newStatus": "confirmed",
+        "courierName": "Concierge White-Glove Dedicated",
+        "trackingNumber": "DEL-BD-7729"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-22T08:00:38.694Z"
+    },
+    {
+      "_id": "audit_1792656038533_085d3142",
+      "adminUsername": "admin",
+      "action": "UPDATE_PRODUCT",
+      "targetType": "product",
+      "targetId": "prod_1792655220573_c44bc43e",
+      "details": {
+        "name": "DÉLICE No. 02"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-22T08:00:38.534Z"
+    },
+    {
+      "_id": "audit_1792656038511_20fd0ae7",
+      "adminUsername": "admin",
+      "action": "UPDATE_PRODUCT",
+      "targetType": "product",
+      "targetId": "prod_1792655220567_e077a722",
+      "details": {
+        "name": "DÉLICE No. 01"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-22T08:00:38.511Z"
+    },
+    {
+      "_id": "audit_1792656038472_ec7ff982",
+      "adminUsername": "admin",
+      "action": "ADMIN_LOGIN",
+      "targetType": "admin",
+      "targetId": "adm_1792655202749",
+      "details": {
+        "timestamp": "2026-10-22T08:00:38.472Z"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-22T08:00:38.472Z"
+    },
+    {
+      "_id": "audit_1792655998376_d004925b",
+      "adminUsername": "admin",
+      "action": "ADMIN_LOGIN",
+      "targetType": "admin",
+      "targetId": "adm_1792655202749",
+      "details": {
+        "timestamp": "2026-10-22T07:59:58.376Z"
+      },
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-10-22T07:59:58.376Z"
+    }
+  ]
+}

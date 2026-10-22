@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Your Order — DÉLICE Parfums</title>
+  <meta name="description" content="Secure real-time concierge order tracking for your DÉLICE fragrance dispatch.">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .track-section {
+      padding: 60px 0 100px 0;
+    }
+    .track-card {
+      max-width: 680px;
+      margin: 0 auto;
+      background-color: var(--color-ivory-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      padding: 40px;
+    }
+    .track-timeline {
+      margin-top: 36px;
+      position: relative;
+      padding-left: 32px;
+    }
+    .track-timeline::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 11px;
+      width: 2px;
+      background-color: var(--color-border);
+    }
+    .timeline-step {
+      position: relative;
+      margin-bottom: 28px;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -32px;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: var(--color-ivory);
+      border: 2px solid var(--color-muted);
+    }
+    .timeline-step.active .timeline-dot {
+      background-color: var(--color-gold);
+      border-color: var(--color-gold);
+      box-shadow: 0 0 0 4px rgba(197, 168, 128, 0.2);
+    }
+    .timeline-step.completed .timeline-dot {
+      background-color: var(--color-black);
+      border-color: var(--color-black);
+    }
+    .step-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .step-desc {
+      font-size: 0.825rem;
+      color: var(--color-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand-wordmark" aria-label="DÉLICE Home">
+        DÉLICE<span>.</span>
+      </a>
+      <nav class="nav-desktop">
+        <a href="/#collection" class="nav-link">Shop Collection</a>
+        <a href="/#story" class="nav-link">Our Story</a>
+      </nav>
+      <div>
+        <a href="/" class="btn-text" style="font-size: 0.8rem;">&larr; Boutique</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="track-section">
+    <div class="container">
+      <div class="track-card">
+        <h1 class="serif-font" style="font-size: 2.2rem; margin-bottom: 8px; text-align: center;">Concierge Order Tracking</h1>
+        <p style="text-align: center; color: var(--color-muted); margin-bottom: 32px; font-size: 0.9rem;">
+          Enter your unique private tracking token or access link provided upon order confirmation.
+        </p>
+
+        <form id="track-form" style="display: flex; gap: 8px; margin-bottom: 32px;" onsubmit="handleTrack(event);">
+          <input type="text" id="track-token-input" class="form-control" placeholder="Paste your 32-character tracking token" required style="font-family: monospace;">
+          <button type="submit" class="btn btn-primary" style="padding: 0 24px;">Track</button>
+        </form>
+
+        <div id="track-results" style="display: none;">
+          <div style="background-color: var(--color-ivory-warm); border: 1px solid var(--color-border); border-radius: var(--radius-subtle); padding: 20px; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <div>
+                <span style="font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-gold-accent);">Order Reference</span>
+                <h3 id="track-order-ref" class="serif-font" style="font-size: 1.5rem; margin-top: 4px;">—</h3>
+              </div>
+              <div style="text-align: right;">
+                <span id="track-status-pill" style="display: inline-block; padding: 4px 12px; border-radius: var(--radius-subtle); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; background-color: var(--color-black); color: #fff;">
+                  CONFIRMED
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="track-timeline">
+            <div class="timeline-step" id="step-pending">
+              <div class="timeline-dot"></div>
+              <div class="step-title">Order Received</div>
+              <div class="step-desc">Order registered with DÉLICE concierge and entered into cask reservation queue.</div>
+            </div>
+            <div class="timeline-step" id="step-confirmed">
+              <div class="timeline-dot"></div>
+              <div class="step-title">Order Confirmed</div>
+              <div class="step-desc">Payment / address verified. Packaging preparation commenced.</div>
+            </div>
+            <div class="timeline-step" id="step-packed">
+              <div class="timeline-dot"></div>
+              <div class="step-title">Bottled & Sealed</div>
+              <div class="step-desc">Batch maturation verified, serialized certificate affixed, securely boxed.</div>
+            </div>
+            <div class="timeline-step" id="step-shipped">
+              <div class="timeline-dot"></div>
+              <div class="step-title">In Transit</div>
+              <div id="step-shipped-desc" class="step-desc">Handed over to temperature-controlled courier partner.</div>
+            </div>
+            <div class="timeline-step" id="step-delivered">
+              <div class="timeline-dot"></div>
+              <div class="step-title">Delivered</div>
+              <div id="step-delivered-desc" class="step-desc">Hand-delivered to patron.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/storefront.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      if (token) {
+        document.getElementById('track-token-input').value = token;
+        fetchTrackingData(token);
+      }
+    });
+
+    function handleTrack(e) {
+      e.preventDefault();
+      const token = document.getElementById('track-token-input').value.trim();
+      if (token) {
+        fetchTrackingData(token);
+      }
+    }
+
+    async function fetchTrackingData(token) {
+      try {
+        const res = await fetch(`/api/storefront/track/${token}`);
+        if (!res.ok) throw new Error('Order not found with this tracking token');
+        const order = await res.json();
+
+        document.getElementById('track-results').style.display = 'block';
+        document.getElementById('track-order-ref').textContent = order.orderReference;
+
+        const status = order.fulfillmentStatus || 'pending';
+        document.getElementById('track-status-pill').textContent = status.toUpperCase();
+
+        // Update courier info if shipped
+        if (order.courierName || order.trackingNumber) {
+          document.getElementById('step-shipped-desc').textContent = `In transit via ${order.courierName || 'Dedicated Courier'}${order.trackingNumber ? ' (Waybill: ' + order.trackingNumber + ')' : ''}.`;
+        }
+
+        if (order.deliveredAt) {
+          document.getElementById('step-delivered-desc').textContent = `Delivered on ${new Date(order.deliveredAt).toLocaleDateString()}.`;
+        }
+
+        // Update timeline status classes
+        const statuses = ['pending', 'confirmed', 'packed', 'shipped', 'delivered'];
+        const currentIdx = statuses.indexOf(status);
+
+        statuses.forEach((s, idx) => {
+          const el = document.getElementById(`step-${s}`);
+          if (!el) return;
+          el.className = 'timeline-step';
+          if (idx < currentIdx) {
+            el.classList.add('completed');
+          } else if (idx === currentIdx) {
+            el.classList.add('active');
+          }
+        });
+
+      } catch (err) {
+        window.Delice.showToast(err.message);
+      }
+    }
+  </script>
+</body>
+</html>
