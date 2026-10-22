@@ -5,12 +5,18 @@ const path = require('path');
 let isConnected = false;
 let isUsingLocalStore = false;
 
-const DATA_FILE = path.join(__dirname, '../../data/delice_db.json');
+const DATA_FILE = process.env.VERCEL
+  ? path.join('/tmp', 'delice_db.json')
+  : path.join(__dirname, '../../data/delice_db.json');
 
-// Ensure data directory exists
-const dataDir = path.dirname(DATA_FILE);
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+// Ensure data directory exists safely
+try {
+  const dataDir = path.dirname(DATA_FILE);
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+} catch (e) {
+  // Safe fallback in read-only serverless environment
 }
 
 // In-memory + file-persisted document store for zero-setup execution & graceful fallback
@@ -45,7 +51,7 @@ class LocalDocumentStore {
         this.save();
       }
     } catch (err) {
-      console.warn('[LocalStore] Error reading store, starting clean:', err.message);
+      // In serverless, keep in-memory
     }
   }
 
@@ -53,7 +59,7 @@ class LocalDocumentStore {
     try {
       fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2), 'utf8');
     } catch (err) {
-      console.error('[LocalStore] Error writing store:', err.message);
+      // In serverless, keep in-memory
     }
   }
 

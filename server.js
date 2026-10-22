@@ -14,12 +14,16 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // Auto-connect database for serverless environments (e.g. Vercel)
+let isConnecting = false;
 app.use(async (req, res, next) => {
-  if (!getIsConnected()) {
+  if (!getIsConnected() && !isConnecting) {
+    isConnecting = true;
     try {
       await connectDB();
     } catch (err) {
       console.error('[DB] Serverless connection error:', err.message);
+    } finally {
+      isConnecting = false;
     }
   }
   next();
@@ -171,6 +175,8 @@ async function startServer() {
   }
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
 
 module.exports = app;

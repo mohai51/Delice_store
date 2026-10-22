@@ -4,14 +4,20 @@ const fs = require('fs');
 const sharp = require('sharp');
 const crypto = require('crypto');
 
-const UPLOADS_DIR = path.join(__dirname, '../../uploads');
+const UPLOADS_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'uploads')
+  : path.join(__dirname, '../../uploads');
 const OPTIMIZED_DIR = path.join(UPLOADS_DIR, 'optimized');
 const THUMBNAILS_DIR = path.join(UPLOADS_DIR, 'thumbnails');
 
-// Ensure directories exist
-[UPLOADS_DIR, OPTIMIZED_DIR, THUMBNAILS_DIR].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
+// Ensure directories exist safely
+try {
+  [UPLOADS_DIR, OPTIMIZED_DIR, THUMBNAILS_DIR].forEach(dir => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  });
+} catch (e) {
+  // Safe in serverless read-only environment
+}
 
 // Configure Multer storage to disk
 const storage = multer.diskStorage({
