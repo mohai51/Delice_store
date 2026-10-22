@@ -183,15 +183,16 @@ class StoreService {
     const productData = {
       ...data,
       slug,
-      _id: generateId('prod'),
       createdAt: new Date(),
       updatedAt: new Date()
     };
 
     if (getIsConnected()) {
+      delete productData._id;
       return await Product.create(productData);
     }
 
+    productData._id = generateId('prod');
     localStore.getCollection('products').push(productData);
     localStore.save();
     return productData;
@@ -224,8 +225,7 @@ class StoreService {
     variant.stock = Math.max(0, newStock);
 
     const adjustmentRecord = {
-      _id: generateId('adj'),
-      productId,
+      productId: productId ? productId.toString() : '',
       productName: product.name,
       variantSize,
       sku: variant.sku,
@@ -239,9 +239,11 @@ class StoreService {
     };
 
     if (getIsConnected()) {
+      delete adjustmentRecord._id;
       await Product.findByIdAndUpdate(productId, { variants: product.variants, updatedAt: new Date() });
       await InventoryAdjustment.create(adjustmentRecord);
     } else {
+      adjustmentRecord._id = generateId('adj');
       await this.updateProduct(productId, { variants: product.variants });
       localStore.getCollection('inventoryAdjustments').unshift(adjustmentRecord);
       localStore.save();
@@ -371,7 +373,6 @@ class StoreService {
 
     // Create revision snapshot of the currently published version before overwriting
     const revision = {
-      _id: generateId('rev'),
       revisionId: `rev_${Date.now()}`,
       snapshot: JSON.parse(JSON.stringify(currentPublished)),
       adminUsername,
@@ -388,6 +389,7 @@ class StoreService {
     });
 
     if (getIsConnected()) {
+      delete revision._id;
       await HomepageRevision.create(revision);
       let published = await Homepage.findOne({ isPublished: true });
       if (!published) {
@@ -399,6 +401,7 @@ class StoreService {
       return published;
     }
 
+    revision._id = generateId('rev');
     localStore.getCollection('homepageRevisions').unshift(revision);
     localStore.data.homepage = JSON.parse(JSON.stringify(publishData));
     localStore.data.homepageDraft = null; // Clear draft once published
@@ -537,7 +540,6 @@ class StoreService {
     const paymentStatus = paymentMethod === 'bkash_manual' ? 'pending_verification' : 'unpaid';
 
     const orderData = {
-      _id: generateId('ord'),
       orderReference: orderRef,
       trackingToken,
       idempotencyKey,
@@ -608,8 +610,10 @@ class StoreService {
     // 7. Save order
     let savedOrder;
     if (getIsConnected()) {
+      delete orderData._id;
       savedOrder = await Order.create(orderData);
     } else {
+      orderData._id = generateId('ord');
       localStore.getCollection('orders').unshift(orderData);
       localStore.save();
       savedOrder = orderData;
@@ -919,7 +923,6 @@ class StoreService {
     if (existing) throw new Error(`Referral code "${cleanCode}" already exists`);
 
     const data = {
-      _id: generateId('ref'),
       code: cleanCode,
       ownerName: sanitizeText(ownerName),
       ownerPhone: sanitizeText(ownerPhone),
@@ -939,9 +942,11 @@ class StoreService {
     };
 
     if (getIsConnected()) {
+      delete data._id;
       return await ReferralCode.create(data);
     }
 
+    data._id = generateId('ref');
     localStore.getCollection('referralCodes').push(data);
     localStore.save();
     return data;
@@ -1000,7 +1005,6 @@ class StoreService {
     if (!ref) throw new Error('Referral code not found');
 
     const payoutRecord = {
-      _id: generateId('pay'),
       payoutReference: `PAY-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
       referralCode: ref.code,
       recipientName: sanitizeText(recipientName || ref.ownerName),
@@ -1017,6 +1021,7 @@ class StoreService {
     };
 
     if (getIsConnected()) {
+      delete payoutRecord._id;
       await CommissionPayout.create(payoutRecord);
       await ReferralCode.findOneAndUpdate(
         { code: ref.code },
@@ -1028,6 +1033,7 @@ class StoreService {
         }
       );
     } else {
+      payoutRecord._id = generateId('pay');
       localStore.getCollection('commissionPayouts').unshift(payoutRecord);
       if (ref.stats) {
         ref.stats.paidCommission = (ref.stats.paidCommission || 0) + payoutRecord.amount;
@@ -1052,14 +1058,15 @@ class StoreService {
   async recordMediaUpload(mediaData) {
     const data = {
       ...mediaData,
-      _id: generateId('med'),
       createdAt: new Date()
     };
 
     if (getIsConnected()) {
+      delete data._id;
       return await Media.create(data);
     }
 
+    data._id = generateId('med');
     localStore.getCollection('media').unshift(data);
     localStore.save();
     return data;
@@ -1115,7 +1122,6 @@ class StoreService {
     }
 
     const event = {
-      _id: generateId('evt'),
       sessionId: sessionId || generateId('sess'),
       eventType,
       pagePath: pagePath || '/',
@@ -1138,9 +1144,11 @@ class StoreService {
     };
 
     if (getIsConnected()) {
+      delete event._id;
       return await AnalyticsEvent.create(event);
     }
 
+    event._id = generateId('evt');
     localStore.getCollection('analyticsEvents').push(event);
     localStore.save();
     return event;
@@ -1286,20 +1294,21 @@ class StoreService {
   // ==========================================
   async logAdminAction({ adminUsername, action, targetType, targetId = '', details = {}, ipAddress = '127.0.0.1' }) {
     const entry = {
-      _id: generateId('audit'),
       adminUsername: adminUsername || 'Admin',
       action,
       targetType,
-      targetId,
+      targetId: targetId ? targetId.toString() : '',
       details,
       ipAddress,
       createdAt: new Date()
     };
 
     if (getIsConnected()) {
+      delete entry._id;
       return await AuditLog.create(entry);
     }
 
+    entry._id = generateId('audit');
     localStore.getCollection('auditLogs').unshift(entry);
     localStore.save();
     return entry;
