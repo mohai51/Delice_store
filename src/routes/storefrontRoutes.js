@@ -119,7 +119,7 @@ router.post('/validate-cart', async (req, res, next) => {
     let hasStockIssue = false;
 
     for (const item of items) {
-      const product = await storeService.getProductById(item.productId);
+      const product = await storeService.getProductById(item.productId || item.slug);
       if (!product || product.status !== 'published') {
         validatedItems.push({
           ...item,
@@ -186,11 +186,16 @@ router.post('/validate-cart', async (req, res, next) => {
 
     // Delivery calculation
     const isDhaka = /dhaka/i.test(district || '');
-    let deliveryCharge = isDhaka 
-      ? (settings.deliveryZones[0]?.charge || 80) 
-      : (settings.deliveryZones[1]?.charge || 150);
+    let dhakaCharge = 80;
+    let outsideCharge = 150;
+    if (settings && Array.isArray(settings.deliveryZones) && settings.deliveryZones.length >= 2) {
+      dhakaCharge = Number(settings.deliveryZones[0]?.charge) || 80;
+      outsideCharge = Number(settings.deliveryZones[1]?.charge) || 150;
+    }
+    let deliveryCharge = isDhaka ? dhakaCharge : outsideCharge;
+    const freeDeliveryThreshold = Number(settings?.freeDeliveryThreshold) || 5000;
 
-    if (subtotal >= (settings.freeDeliveryThreshold || 5000)) {
+    if (subtotal >= freeDeliveryThreshold) {
       deliveryCharge = 0;
     }
 
@@ -231,11 +236,15 @@ router.post('/orders', orderRateLimiter, async (req, res, next) => {
       return res.status(400).json({ error: 'Please provide full recipient name, Bangladesh phone number, district, and delivery address.' });
     }
 
-    // Bangladesh phone regex: 01XXXXXXXXX (11 digits starting with 013-019)
-    const bdPhoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
-    const cleanPhone = customer.phone.replace(/[\s-]/g, '');
+    // Flexible Bangladesh phone normalization: handles +8801..., 8801..., 01..., spaces, dashes
+    const rawPhone = (customer.phone || '').toString();
+    let cleanPhone = rawPhone.replace(/\D/g, '');
+    if (cleanPhone.startsWith('8801') && cleanPhone.length === 13) {
+      cleanPhone = cleanPhone.substring(2);
+    }
+    const bdPhoneRegex = /^01[3-9]\d{8}$/;
     if (!bdPhoneRegex.test(cleanPhone)) {
-      return res.status(400).json({ error: 'Please enter a valid Bangladesh mobile number (e.g. 017XXXXXXXX).' });
+      return res.status(400).json({ error: 'Please enter a valid 11-digit Bangladesh mobile number (e.g. 017XXXXXXXX).' });
     }
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -250,6 +259,16 @@ router.post('/orders', orderRateLimiter, async (req, res, next) => {
     if (paymentMethod === 'bkash_manual') {
       if (!bkashDetails || !bkashDetails.senderNumber || !bkashDetails.trxId) {
         return res.status(400).json({ error: 'Please provide your sending bKash number and Transaction ID (TrxID).' });
+      }
+      let cleanSender = (bkashDetails.senderNumber || '').toString().replace(/\D/g, '');
+      if (cleanSender.startsWith('8801') && cleanSender.length === 13) cleanSender = cleanSender.substring(2);
+      if (!bdPhoneRegex.test(cleanSender)) {
+        return res.status(400).json({ error: 'Please provide a valid 11-digit bKash sender number (e.g. 01XXXXXXXXX).' });
+      }
+      bkashDetails.senderNumber = cleanSender;
+      bkashDetails.trxId = (bkashDetails.trxId || '').toString().trim().toUpperCase();
+      if (bkashDetails.trxId.length < 6) {
+        return res.status(400).json({ error: 'Please enter a valid bKash Transaction ID.' });
       }
     }
 
@@ -271,15 +290,19 @@ router.post('/orders', orderRateLimiter, async (req, res, next) => {
     });
 
     // Track purchase event for real analytics deduplicated by order reference
-    await storeService.recordAnalyticsEvent({
-      sessionId: req.headers['x-session-id'] || 'storefront_session',
-      eventType: 'purchase',
-      pagePath: '/checkout',
-      orderReference: order.orderReference,
-      amount: order.pricing.total,
-      deviceCategory: req.headers['user-agent']?.toLowerCase().includes('mobile') ? 'mobile' : 'desktop',
-      location: { country: 'Bangladesh', district: order.customer.district }
-    });
+    try {
+      await storeService.recordAnalyticsEvent({
+        sessionId: req.headers['x-session-id'] || 'storefront_session',
+        eventType: 'purchase',
+        pagePath: '/checkout',
+        orderReference: order.orderReference,
+        amount: order.pricing.total,
+        deviceCategory: req.headers['user-agent']?.toLowerCase().includes('mobile') ? 'mobile' : 'desktop',
+        location: { country: 'Bangladesh', district: order.customer.district }
+      });
+    } catch (e) {
+      console.warn('Analytics purchase event recording skipped:', e.message);
+    }
 
     res.status(201).json({
       success: true,

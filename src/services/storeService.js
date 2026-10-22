@@ -171,11 +171,22 @@ class StoreService {
   }
 
   async getProductById(id) {
+    if (!id) return null;
+    const mongoose = require('mongoose');
     if (getIsConnected()) {
-      return await Product.findById(id);
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        const prod = await Product.findById(id);
+        if (prod) return prod;
+      }
+      return await Product.findOne({
+        $or: [
+          { slug: id },
+          { name: id }
+        ]
+      });
     }
     const list = localStore.getCollection('products');
-    return list.find(p => p._id === id || p.id === id) || null;
+    return list.find(p => p._id === id || p.id === id || p.slug === id) || null;
   }
 
   async createProduct(data, adminUsername = 'Admin') {
@@ -225,10 +236,10 @@ class StoreService {
     variant.stock = Math.max(0, newStock);
 
     const adjustmentRecord = {
-      productId: productId ? productId.toString() : '',
+      productId: product._id ? product._id.toString() : productId,
       productName: product.name,
       variantSize,
-      sku: variant.sku,
+      sku: variant.sku || `${product.slug}-${variant.size}`.toUpperCase(),
       previousStock: prevStock,
       newStock: variant.stock,
       delta,
@@ -240,11 +251,11 @@ class StoreService {
 
     if (getIsConnected()) {
       delete adjustmentRecord._id;
-      await Product.findByIdAndUpdate(productId, { variants: product.variants, updatedAt: new Date() });
+      await Product.findByIdAndUpdate(product._id, { variants: product.variants, updatedAt: new Date() });
       await InventoryAdjustment.create(adjustmentRecord);
     } else {
       adjustmentRecord._id = generateId('adj');
-      await this.updateProduct(productId, { variants: product.variants });
+      await this.updateProduct(product._id || productId, { variants: product.variants });
       localStore.getCollection('inventoryAdjustments').unshift(adjustmentRecord);
       localStore.save();
     }
@@ -474,11 +485,11 @@ class StoreService {
       const primaryImg = (product.images || []).find(i => i.isPrimary) || (product.images || [])[0];
 
       validatedItems.push({
-        productId: product._id.toString(),
+        productId: product._id ? product._id.toString() : product.id,
         slug: product.slug,
         name: product.name,
         size: variant.size,
-        sku: variant.sku,
+        sku: variant.sku || `${product.slug}-${variant.size}`.toUpperCase(),
         unitPrice,
         quantity: requestedQty,
         subtotal: itemSubtotal,
@@ -524,15 +535,20 @@ class StoreService {
 
     // 4. Delivery charge calculation
     const isDhaka = /dhaka/i.test(customer.district || '') || /dhaka/i.test(customer.area || '');
-    let deliveryCharge = isDhaka 
-      ? (settings.deliveryZones[0]?.charge || 80) 
-      : (settings.deliveryZones[1]?.charge || 150);
+    let dhakaCharge = 80;
+    let outsideCharge = 150;
+    if (settings && Array.isArray(settings.deliveryZones) && settings.deliveryZones.length >= 2) {
+      dhakaCharge = Number(settings.deliveryZones[0]?.charge) || 80;
+      outsideCharge = Number(settings.deliveryZones[1]?.charge) || 150;
+    }
+    let deliveryCharge = isDhaka ? dhakaCharge : outsideCharge;
+    const freeDeliveryThreshold = Number(settings?.freeDeliveryThreshold) || 5000;
 
-    if (subtotal >= (settings.freeDeliveryThreshold || 5000)) {
+    if (subtotal >= freeDeliveryThreshold) {
       deliveryCharge = 0;
     }
 
-    const total = subtotal - discount + deliveryCharge;
+    const total = Math.max(0, subtotal - discount + deliveryCharge);
     const orderRef = generateOrderReference();
     const trackingToken = generateTrackingToken();
 
@@ -597,7 +613,7 @@ class StoreService {
       const variant = (product.variants || []).find(v => v.size === item.size);
       if (variant) {
         await this.adjustStock({
-          productId: item.productId,
+          productId: product._id ? product._id.toString() : item.productId,
           variantSize: item.size,
           newStock: variant.stock - item.quantity,
           reason: `Customer order placed (${orderRef})`,

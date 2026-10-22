@@ -76,12 +76,36 @@
       <nav class="nav-desktop">
         <a href="/#collection" class="nav-link">Shop Collection</a>
         <a href="/#story" class="nav-link">Our Story</a>
+        <a href="/track-order" class="nav-link active">Track Order</a>
       </nav>
-      <div>
-        <a href="/" class="btn-text" style="font-size: 0.8rem;">&larr; Boutique</a>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="/" class="btn-text hide-mobile" style="font-size: 0.8rem;">&larr; Boutique</a>
+        <button class="mobile-menu-btn" aria-label="Open mobile menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="3" y1="7" x2="21" y2="7"></line>
+            <line x1="3" y1="17" x2="21" y2="17"></line>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="brand-wordmark" style="font-size: 1.4rem;">DÉLICE<span>.</span></span>
+        <button id="mobile-nav-close" style="background:none; border:none; font-size:1.6rem; cursor:pointer;" aria-label="Close menu">&times;</button>
+      </div>
+      <div class="mobile-nav-links">
+        <a href="/#collection" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">The Collection</a>
+        <a href="/#story" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">Our Story</a>
+        <a href="/cart" class="mobile-nav-link">Shopping Bag</a>
+        <a href="/track-order" class="mobile-nav-link">Track Order</a>
+        <a href="/admin/login" class="mobile-nav-link" style="font-size: 1rem; color: var(--color-muted); margin-top: 24px;">Admin Portal</a>
+      </div>
+    </div>
+  </div>
 
   <main class="track-section">
     <div class="container">

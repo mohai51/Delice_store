@@ -1141,3 +1141,90 @@ img {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ==========================================================================
+   MOBILE VIEW PERFECTION (iOS/Android Smoothness, Safe Areas, Touch Targets)
+   ========================================================================== */
+.hide-desktop {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  .hide-desktop {
+    display: block !important;
+  }
+
+  /* Prevent iOS Safari auto-zoom on input focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  .cart-drawer {
+    width: 100%;
+    max-width: 100vw;
+    height: 100dvh;
+  }
+
+  .drawer-footer {
+    padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .header-inner {
+    height: 64px !important;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .brand-wordmark {
+    font-size: 1.5rem !important;
+    letter-spacing: 0.12em !important;
+  }
+
+  /* Compact Announcement Bar on Mobile */
+  .announcement-bar {
+    padding: 8px 12px;
+    font-size: 0.725rem;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+  }
+
+  /* Hero Section Mobile */
+  .hero-content {
+    padding: 48px 16px !important;
+  }
+
+  /* Product Card Mobile spacing */
+  .product-card {
+    border-radius: var(--radius-card);
+  }
+
+  .product-card-body {
+    padding: 18px 14px;
+  }
+
+  .product-name {
+    font-size: 1.25rem !important;
+  }
+
+  /* Toast notification on mobile */
+  .toast-container {
+    bottom: 20px;
+    left: 16px;
+    right: 16px;
+  }
+
+  .toast {
+    padding: 12px 18px;
+    font-size: 0.825rem;
+    text-align: center;
+  }
+}
+

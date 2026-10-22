@@ -11,6 +11,7 @@ const storeService = require('./src/services/storeService');
 const seedInitialContent = require('./src/scripts/seed');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 4000;
 
 // Auto-connect database for serverless environments (e.g. Vercel)

@@ -147,6 +147,38 @@
     saveCart();
   }
 
+  function clearCart() {
+    state.cart = [];
+    saveCart();
+    updateCartUI();
+  }
+
+  function copyToClipboard(text, successMsg = 'Copied to clipboard') {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(successMsg);
+      }).catch(() => {
+        fallbackCopy(text, successMsg);
+      });
+    } else {
+      fallbackCopy(text, successMsg);
+    }
+  }
+
+  function fallbackCopy(text, successMsg) {
+    const tempInput = document.createElement('input');
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    try {
+      document.execCommand('copy');
+      showToast(successMsg);
+    } catch (err) {
+      showToast('Could not copy automatically');
+    }
+    document.body.removeChild(tempInput);
+  }
+
   function updateCartUI() {
     const totalCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
     const subtotal = state.cart.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
@@ -343,12 +375,14 @@
     addToBag,
     updateQuantity,
     removeFromBag,
+    clearCart,
     openCartDrawer,
     closeCartDrawer,
     openPolicyModal,
     formatBDT,
     showToast,
     trackEvent,
+    copyToClipboard,
     getCart: () => state.cart
   };
 })();

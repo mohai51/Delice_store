@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Your Shopping Bag — DÉLICE Parfums</title>
   <meta name="description" content="Review your selected luxury fragrances before proceeding to white-glove checkout.">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     .cart-page-section {
-      padding: 60px 0 100px 0;
+      padding: 40px 0 100px 0;
     }
     .cart-page-layout {
       display: grid;
@@ -93,16 +93,57 @@
       font-weight: 600;
       color: var(--color-black);
     }
+    .free-shipping-bar-wrap {
+      background: var(--color-ivory-warm);
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+      margin: 12px 0 18px 0;
+    }
+    .free-shipping-progress {
+      background-color: var(--color-gold);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Mobile Perfection */
     @media (max-width: 860px) {
+      .cart-page-section {
+        padding: 24px 0 80px 0;
+      }
       .cart-page-layout {
         grid-template-columns: 1fr;
+        gap: 28px;
+      }
+      .cart-table-card {
+        padding: 20px 16px;
       }
       .cart-table-header {
         display: none;
       }
       .cart-row {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        display: block;
+        padding: 18px 0;
+        border-bottom: 1px solid var(--color-border-light);
+      }
+      .cart-row-product {
+        margin-bottom: 14px;
+      }
+      .cart-mobile-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-left: 96px; /* align with text beside 80px image */
+      }
+      .summary-card {
+        padding: 24px 18px;
+      }
+    }
+    @media (max-width: 480px) {
+      .cart-mobile-actions {
+        padding-left: 0;
+        margin-top: 12px;
       }
     }
   </style>
@@ -121,16 +162,36 @@
         <a href="/track-order" class="nav-link">Track Order</a>
       </nav>
       <div class="header-actions">
-        <a href="/checkout" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.775rem;">
-          Checkout
-        </a>
+        <button class="mobile-menu-btn" aria-label="Open mobile menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="3" y1="7" x2="21" y2="7"></line>
+            <line x1="3" y1="17" x2="21" y2="17"></line>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
 
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="brand-wordmark" style="font-size: 1.4rem;">DÉLICE<span>.</span></span>
+        <button id="mobile-nav-close" style="background:none; border:none; font-size:1.6rem; cursor:pointer;" aria-label="Close menu">&times;</button>
+      </div>
+      <div class="mobile-nav-links">
+        <a href="/#collection" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">The Collection</a>
+        <a href="/#story" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">Our Story</a>
+        <a href="/cart" class="mobile-nav-link">Shopping Bag</a>
+        <a href="/track-order" class="mobile-nav-link">Track Order</a>
+        <a href="/admin/login" class="mobile-nav-link" style="font-size: 1rem; color: var(--color-muted); margin-top: 24px;">Admin Portal</a>
+      </div>
+    </div>
+  </div>
+
   <main class="cart-page-section">
     <div class="container">
-      <h1 class="serif-font" style="font-size: 2.5rem; margin-bottom: 32px;">Your Shopping Bag</h1>
+      <h1 class="serif-font" style="font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 24px;">Your Shopping Bag</h1>
 
       <div id="cart-content-layout" class="cart-page-layout">
         <div class="cart-table-card">
@@ -147,6 +208,16 @@
 
         <div class="summary-card">
           <h2 class="summary-title">Summary</h2>
+          
+          <div id="free-shipping-widget">
+            <div id="free-shipping-text" style="font-size: 0.825rem; color: var(--color-black-soft); font-weight: 500;">
+              Calculating shipping status...
+            </div>
+            <div class="free-shipping-bar-wrap">
+              <div id="free-shipping-progress" class="free-shipping-progress"></div>
+            </div>
+          </div>
+
           <div class="summary-line">
             <span>Subtotal</span>
             <span id="page-cart-subtotal">৳0</span>
@@ -155,30 +226,28 @@
             <span>Estimated Shipping</span>
             <span id="page-cart-shipping">Calculated at checkout</span>
           </div>
-          <p style="font-size: 0.8rem; color: var(--color-muted); margin-bottom: 20px;">
-            Complimentary shipping across Bangladesh on orders over ৳5,000.
-          </p>
+          
           <div class="summary-total-line">
             <span>Estimated Total</span>
             <span id="page-cart-total">৳0</span>
           </div>
           <div style="margin-top: 28px;">
-            <a href="/checkout" class="btn btn-primary" style="width: 100%;">
-              Proceed to Checkout
+            <a href="/checkout" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 0.95rem; text-align: center; display: block;">
+              Proceed to Checkout &rarr;
             </a>
           </div>
-          <div style="margin-top: 16px; text-align: center;">
+          <div style="margin-top: 18px; text-align: center;">
             <a href="/#collection" class="btn-text" style="font-size: 0.8rem;">
-              Continue Discovering Fragrances
+              &larr; Continue Discovering Fragrances
             </a>
           </div>
         </div>
       </div>
 
-      <div id="cart-empty-message" style="display: none; text-align: center; padding: 80px 0;">
-        <h2 class="serif-font" style="margin-bottom: 16px;">Your bag is currently empty.</h2>
-        <p style="color: var(--color-muted); margin-bottom: 28px;">Discover our artisanal collection of pure French extraits and eaux de parfum.</p>
-        <a href="/#collection" class="btn btn-primary">Discover DÉLICE Collection</a>
+      <div id="cart-empty-message" style="display: none; text-align: center; padding: 60px 20px; background: var(--color-ivory-card); border: 1px solid var(--color-border); border-radius: var(--radius-card); max-width: 600px; margin: 0 auto;">
+        <h2 class="serif-font" style="margin-bottom: 16px; font-size: 2rem;">Your Bag is Currently Empty</h2>
+        <p style="color: var(--color-muted); margin-bottom: 28px;">Discover our artisanal collection of pure French extraits and luxury eaux de parfum.</p>
+        <a href="/#collection" class="btn btn-primary" style="padding: 14px 28px;">Discover DÉLICE Collection</a>
       </div>
     </div>
   </main>
@@ -207,7 +276,7 @@
       let subtotal = 0;
 
       container.innerHTML = cart.map(item => {
-        const itemTotal = item.unitPrice * item.quantity;
+        const itemTotal = (item.unitPrice || 0) * (item.quantity || 1);
         subtotal += itemTotal;
 
         return `
@@ -216,27 +285,60 @@
               <div class="cart-row-img">
                 <img src="${item.imageUrl || '/images/delice-01.jpg'}" alt="${item.name}">
               </div>
-              <div>
-                <a href="/product/${item.slug}" style="font-weight: 600; font-size: 1.05rem;">${item.name}</a>
+              <div style="flex-grow: 1;">
+                <a href="/product/${item.slug}" style="font-weight: 600; font-size: 1rem; color: var(--color-black);">${item.name}</a>
                 <div style="font-size: 0.8rem; color: var(--color-muted); margin-top: 2px;">Flacon: ${item.size}</div>
-                <button onclick="window.Delice.removeFromBag('${item.productId}', '${item.size}'); renderPageCart();" class="btn-text" style="font-size: 0.75rem; color: var(--color-error); margin-top: 6px;">Remove</button>
+                <div class="hide-desktop" style="font-weight: 500; font-size: 0.85rem; margin-top: 4px; color: var(--color-gold-accent);">
+                  ${window.Delice.formatBDT(item.unitPrice)}
+                </div>
               </div>
             </div>
-            <div>${window.Delice.formatBDT(item.unitPrice)}</div>
-            <div>
+
+            <!-- Desktop Columns -->
+            <div class="hide-mobile" style="font-size: 0.95rem;">${window.Delice.formatBDT(item.unitPrice)}</div>
+            <div class="hide-mobile">
               <div class="qty-control">
                 <button class="qty-btn" onclick="window.Delice.updateQuantity('${item.productId}', '${item.size}', -1); renderPageCart();">−</button>
                 <span class="qty-val">${item.quantity}</span>
                 <button class="qty-btn" onclick="window.Delice.updateQuantity('${item.productId}', '${item.size}', 1); renderPageCart();">+</button>
               </div>
             </div>
-            <div style="font-weight: 600;">${window.Delice.formatBDT(itemTotal)}</div>
+            <div class="hide-mobile" style="font-weight: 600; font-size: 0.95rem;">${window.Delice.formatBDT(itemTotal)}</div>
+
+            <!-- Mobile Actions Row -->
+            <div class="cart-mobile-actions hide-desktop">
+              <div class="qty-control" style="border-color: var(--color-border);">
+                <button class="qty-btn" style="width: 34px; height: 34px; font-size: 1.1rem;" onclick="window.Delice.updateQuantity('${item.productId}', '${item.size}', -1); renderPageCart();">−</button>
+                <span class="qty-val" style="width: 36px; font-weight: 500;">${item.quantity}</span>
+                <button class="qty-btn" style="width: 34px; height: 34px; font-size: 1.1rem;" onclick="window.Delice.updateQuantity('${item.productId}', '${item.size}', 1); renderPageCart();">+</button>
+              </div>
+              <div style="display: flex; align-items: baseline; gap: 14px;">
+                <span style="font-weight: 600; font-size: 1.05rem;">${window.Delice.formatBDT(itemTotal)}</span>
+                <button onclick="window.Delice.removeFromBag('${item.productId}', '${item.size}'); renderPageCart();" class="btn-text" style="font-size: 0.75rem; color: var(--color-error); padding: 2px;">Remove</button>
+              </div>
+            </div>
           </div>
         `;
       }).join('');
 
       document.getElementById('page-cart-subtotal').textContent = window.Delice.formatBDT(subtotal);
       document.getElementById('page-cart-total').textContent = window.Delice.formatBDT(subtotal);
+
+      // Free shipping threshold (5000 BDT)
+      const freeThreshold = 5000;
+      const progressEl = document.getElementById('free-shipping-progress');
+      const textEl = document.getElementById('free-shipping-text');
+      if (subtotal >= freeThreshold) {
+        progressEl.style.width = '100%';
+        textEl.innerHTML = '✨ <strong>Complimentary delivery unlocked!</strong>';
+        textEl.style.color = 'var(--color-success)';
+      } else {
+        const remaining = freeThreshold - subtotal;
+        const pct = Math.min(100, Math.round((subtotal / freeThreshold) * 100));
+        progressEl.style.width = `${pct}%`;
+        textEl.innerHTML = `Add <strong>${window.Delice.formatBDT(remaining)}</strong> more for complimentary delivery.`;
+        textEl.style.color = 'var(--color-charcoal)';
+      }
     }
   </script>
 </body>

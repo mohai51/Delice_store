@@ -262,17 +262,22 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background-color: var(--color-ivory-light);
+      background-color: rgba(253, 251, 247, 0.98);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-top: 1px solid var(--color-border);
-      padding: 12px 20px;
-      z-index: 40;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      padding: 12px 18px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      z-index: 90;
+      box-shadow: 0 -6px 24px rgba(18, 18, 18, 0.08);
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
     }
     .sticky-bar-price {
       font-weight: 600;
       font-size: 1.15rem;
+      color: var(--color-black);
     }
     .sticky-bar-size {
       font-size: 0.75rem;
@@ -338,6 +343,23 @@
     </div>
   </header>
 
+  <!-- MOBILE NAVIGATION DRAWER -->
+  <div id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="brand-wordmark" style="font-size: 1.4rem;">DÉLICE<span>.</span></span>
+        <button id="mobile-nav-close" style="background:none; border:none; font-size:1.6rem; cursor:pointer;" aria-label="Close menu">&times;</button>
+      </div>
+      <div class="mobile-nav-links">
+        <a href="/#collection" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">The Collection</a>
+        <a href="/#story" class="mobile-nav-link" onclick="document.getElementById('mobile-nav-close').click();">Our Story</a>
+        <a href="/cart" class="mobile-nav-link">Shopping Bag</a>
+        <a href="/track-order" class="mobile-nav-link">Track Order</a>
+        <a href="/admin/login" class="mobile-nav-link" style="font-size: 1rem; color: var(--color-muted); margin-top: 24px;">Admin Portal</a>
+      </div>
+    </div>
+  </div>
+
   <!-- MAIN PRODUCT DETAILS -->
   <main class="product-page-section">
     <div class="container">
@@ -399,15 +421,18 @@
             <span id="stock-text">In Reserve — Ready for dispatch</span>
           </div>
 
-          <!-- Quantity & Add to Bag -->
+          <!-- Quantity & Add to Bag / Buy Now -->
           <div class="purchase-action-group">
             <div class="qty-picker">
               <button id="pdp-qty-minus" aria-label="Decrease quantity">−</button>
               <span id="pdp-qty-val">1</span>
               <button id="pdp-qty-plus" aria-label="Increase quantity">+</button>
             </div>
-            <button id="pdp-add-btn" class="btn btn-primary" style="flex-grow: 1;">
-              Add to Shopping Bag
+            <button id="pdp-add-btn" class="btn btn-secondary" style="flex: 1; padding: 14px 18px; font-size: 0.85rem;">
+              Add to Bag
+            </button>
+            <button id="pdp-buy-btn" class="btn btn-primary" style="flex: 1; padding: 14px 20px; font-size: 0.85rem; white-space: nowrap;">
+              Buy Now
             </button>
           </div>
 
@@ -469,13 +494,18 @@
 
   <!-- STICKY MOBILE ADD TO BAG BAR -->
   <div id="sticky-bar" class="sticky-mobile-bar">
-    <div>
+    <div style="flex-shrink: 0; min-width: 90px;">
       <div id="sticky-price" class="sticky-bar-price">৳12,500</div>
-      <div id="sticky-size" class="sticky-bar-size">100ml Eau de Parfum</div>
+      <div id="sticky-size" class="sticky-bar-size">100ml</div>
     </div>
-    <button id="sticky-add-btn" class="btn btn-primary" style="padding: 12px 24px; font-size: 0.8rem;">
-      Add to Bag
-    </button>
+    <div style="display: flex; gap: 8px; flex-grow: 1; justify-content: flex-end;">
+      <button id="sticky-add-btn" class="btn btn-secondary" style="padding: 11px 14px; font-size: 0.775rem;">
+        Add to Bag
+      </button>
+      <button id="sticky-buy-btn" class="btn btn-primary" style="padding: 11px 18px; font-size: 0.775rem; white-space: nowrap;">
+        Buy Now
+      </button>
+    </div>
   </div>
 
   <!-- CART DRAWER COMPONENT -->
@@ -591,7 +621,7 @@
             return;
           }
           window.Delice.addToBag({
-            productId: currentProduct._id,
+            productId: currentProduct._id ? currentProduct._id.toString() : currentProduct.id,
             slug: currentProduct.slug,
             name: currentProduct.name,
             size: selectedVariant.size,
@@ -601,8 +631,27 @@
           });
         };
 
-        document.getElementById('pdp-add-btn').addEventListener('click', handleAdd);
-        document.getElementById('sticky-add-btn').addEventListener('click', handleAdd);
+        const handleBuyNow = () => {
+          if (!selectedVariant || selectedVariant.stock <= 0) {
+            window.Delice.showToast('This size is currently sold out.');
+            return;
+          }
+          window.Delice.addToBag({
+            productId: currentProduct._id ? currentProduct._id.toString() : currentProduct.id,
+            slug: currentProduct.slug,
+            name: currentProduct.name,
+            size: selectedVariant.size,
+            unitPrice: selectedVariant.salePrice || selectedVariant.price,
+            quantity: currentQty,
+            imageUrl: images[0].url
+          });
+          window.location.href = '/checkout';
+        };
+
+        document.getElementById('pdp-add-btn')?.addEventListener('click', handleAdd);
+        document.getElementById('sticky-add-btn')?.addEventListener('click', handleAdd);
+        document.getElementById('pdp-buy-btn')?.addEventListener('click', handleBuyNow);
+        document.getElementById('sticky-buy-btn')?.addEventListener('click', handleBuyNow);
 
         // Related Products
         if (related && related.length > 0) {
@@ -690,21 +739,25 @@
       const stockText = document.getElementById('stock-text');
       const addBtn = document.getElementById('pdp-add-btn');
       const stickyAddBtn = document.getElementById('sticky-add-btn');
+      const buyBtn = document.getElementById('pdp-buy-btn');
+      const stickyBuyBtn = document.getElementById('sticky-buy-btn');
 
       if (selectedVariant.stock > 0) {
         stockStatus.className = 'stock-indicator';
         stockText.textContent = selectedVariant.stock <= 5 
           ? `Scarce Allocation: Only ${selectedVariant.stock} bottle(s) remaining in cask` 
           : 'In Reserve — Ready for dispatch';
-        addBtn.disabled = false;
-        stickyAddBtn.disabled = false;
-        addBtn.textContent = 'Add to Shopping Bag';
+        if (addBtn) { addBtn.disabled = false; addBtn.textContent = 'Add to Bag'; }
+        if (stickyAddBtn) { stickyAddBtn.disabled = false; stickyAddBtn.textContent = 'Add to Bag'; }
+        if (buyBtn) { buyBtn.disabled = false; buyBtn.textContent = 'Buy Now'; }
+        if (stickyBuyBtn) { stickyBuyBtn.disabled = false; stickyBuyBtn.textContent = 'Buy Now'; }
       } else {
         stockStatus.className = 'stock-indicator out';
         stockText.textContent = 'Allocations Exhausted — Sold Out';
-        addBtn.disabled = true;
-        stickyAddBtn.disabled = true;
-        addBtn.textContent = 'Sold Out';
+        if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Sold Out'; }
+        if (stickyAddBtn) { stickyAddBtn.disabled = true; stickyAddBtn.textContent = 'Sold Out'; }
+        if (buyBtn) { buyBtn.disabled = true; buyBtn.textContent = 'Sold Out'; }
+        if (stickyBuyBtn) { stickyBuyBtn.disabled = true; stickyBuyBtn.textContent = 'Sold Out'; }
       }
     }
   </script>
