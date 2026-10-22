@@ -71,18 +71,18 @@ async function connectDB() {
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/delice_db';
   
   try {
-    // Attempt Mongoose connection with 3-second timeout
     await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 3000,
-      connectTimeoutMS: 3000
+      serverSelectionTimeoutMS: 8000,
+      connectTimeoutMS: 8000
     });
     isConnected = true;
     isUsingLocalStore = false;
-    console.log(`[Database] MongoDB connected via Mongoose: ${uri}`);
+    const maskedUri = uri.replace(/:([^@:]+)@/, ':****@');
+    console.log(`[Database] MongoDB connected via Mongoose: ${maskedUri}`);
   } catch (err) {
     isConnected = false;
     isUsingLocalStore = true;
-    console.log(`[Database] Local MongoDB not detected on port 27017 (${err.message}).`);
+    console.log(`[Database] MongoDB Atlas/local not reachable (${err.message}).`);
     console.log(`[Database] Seamlessly running persistent server data store (data/delice_db.json) with strict server-side validation.`);
   }
 

@@ -44,7 +44,6 @@ const ProductSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-ProductSchema.index({ slug: 1 });
 ProductSchema.index({ status: 1, isFeatured: 1 });
 
 module.exports = mongoose.models.Product || mongoose.model('Product', ProductSchema);

@@ -7,7 +7,8 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "seed": "node src/scripts/seed.js",
-    "setup-admin": "node src/scripts/setupAdmin.js"
+    "setup-admin": "node src/scripts/setupAdmin.js",
+    "migrate": "node src/scripts/migrateToMongo.js"
   },
   "keywords": [
     "delice",

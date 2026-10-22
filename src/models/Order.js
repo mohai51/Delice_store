@@ -96,8 +96,6 @@ const OrderSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-OrderSchema.index({ orderReference: 1 });
-OrderSchema.index({ trackingToken: 1 });
 OrderSchema.index({ 'customer.phone': 1 });
 OrderSchema.index({ 'fulfillment.status': 1 });
 OrderSchema.index({ 'payment.status': 1 });
