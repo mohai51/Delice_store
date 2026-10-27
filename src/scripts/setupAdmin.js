@@ -1,3 +1,4 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { connectDB, getIsConnected, localStore } = require('../config/db');

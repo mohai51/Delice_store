@@ -413,68 +413,77 @@
       const res = await adminFetch(`/api/admin/analytics?days=${days}`);
       const data = await res.json();
 
-      document.getElementById('analytics-visitors').textContent = data.visitors || 0;
-      document.getElementById('analytics-pageviews').textContent = data.pageviews || 0;
-      document.getElementById('analytics-total-addtocart').textContent = data.funnel?.addToBags || 0;
-      document.getElementById('analytics-conv-rate').textContent = (data.funnel?.overallConversionRate || '0.0') + '%';
+      const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      setTxt('analytics-visitors', data.visitors || 0);
+      setTxt('analytics-pageviews', data.pageviews || 0);
+      setTxt('analytics-total-addtocart', data.funnel?.addToBags || 0);
+      setTxt('analytics-conv-rate', (data.funnel?.overallConversionRate || '0.0') + '%');
 
       // Funnel Details
-      document.getElementById('funnel-p-views').textContent = data.funnel?.productViews || 0;
-      document.getElementById('funnel-add-bag').textContent = data.funnel?.addToBags || 0;
-      document.getElementById('funnel-checkout').textContent = data.funnel?.checkoutStarts || 0;
-      document.getElementById('funnel-purchase').textContent = data.funnel?.purchases || 0;
+      setTxt('funnel-p-views', data.funnel?.productViews || 0);
+      setTxt('funnel-add-bag', data.funnel?.addToBags || 0);
+      setTxt('funnel-checkout', data.funnel?.checkoutStarts || 0);
+      setTxt('funnel-purchase', data.funnel?.purchases || 0);
 
-      document.getElementById('funnel-cart-rate').textContent = `(${data.funnel?.cartRate || 0}% of views)`;
-      document.getElementById('funnel-chk-rate').textContent = `(${data.funnel?.checkoutRate || 0}% of carts)`;
-      document.getElementById('funnel-buy-rate').textContent = `(${data.funnel?.purchaseRate || 0}% of checkouts)`;
+      setTxt('funnel-cart-rate', `(${data.funnel?.cartRate || 0}% of views)`);
+      setTxt('funnel-chk-rate', `(${data.funnel?.checkoutRate || 0}% of carts)`);
+      setTxt('funnel-buy-rate', `(${data.funnel?.purchaseRate || 0}% of checkouts)`);
 
       // Product-wise Performance Table
       const perfTbody = document.getElementById('analytics-product-performance-tbody');
       const products = data.productPerformance || [];
 
-      if (products.length > 0) {
-        perfTbody.innerHTML = products.map(p => `
-          <tr>
-            <td>
-              <div style="display:flex; gap:10px; align-items:center;">
-                <img src="${p.image}" style="width:36px;height:36px;border-radius:4px;object-fit:cover;background:#222;" onerror="this.src='/images/delice-01.jpg'">
-                <div>
-                  <strong>${p.name}</strong>
-                  <div style="font-size:0.75rem; color:var(--admin-text-muted);">${formatBDT(p.salePrice || p.price)}</div>
+      if (perfTbody) {
+        if (products.length > 0) {
+          perfTbody.innerHTML = products.map(p => `
+            <tr>
+              <td>
+                <div style="display:flex; gap:10px; align-items:center;">
+                  <img src="${p.image}" style="width:36px;height:36px;border-radius:4px;object-fit:cover;background:#222;" onerror="this.src='/images/delice-01.jpg'">
+                  <div>
+                    <strong>${p.name}</strong>
+                    <div style="font-size:0.75rem; color:var(--admin-text-muted);">${formatBDT(p.salePrice || p.price)}</div>
+                  </div>
                 </div>
-              </div>
-            </td>
-            <td><strong>${p.views}</strong> views</td>
-            <td><strong style="color:var(--admin-gold);">${p.addToBag}</strong> adds</td>
-            <td><strong>${p.unitsSold}</strong> bottles (${p.ordersCount} orders)</td>
-            <td><strong style="color:#68D391;">${formatBDT(p.revenue)}</strong></td>
-            <td>
-              <span class="badge ${parseFloat(p.cartToBuyRate) > 15 ? 'badge-delivered' : 'badge-pending'}" style="font-size:0.8rem;">
-                ${p.cartToBuyRate}%
-              </span>
-            </td>
-            <td>
-              <span style="font-size:0.85rem; color:var(--admin-text-main);">
-                ${p.viewToBuyRate}%
-              </span>
-            </td>
-          </tr>
-        `).join('');
-      } else {
-        perfTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--admin-text-muted);">No product event telemetry recorded yet.</td></tr>`;
+              </td>
+              <td><strong>${p.views}</strong> views</td>
+              <td><strong style="color:var(--admin-gold);">${p.addToBag}</strong> adds</td>
+              <td><strong>${p.unitsSold}</strong> bottles (${p.ordersCount} orders)</td>
+              <td><strong style="color:#68D391;">${formatBDT(p.revenue)}</strong></td>
+              <td>
+                <span class="badge ${parseFloat(p.cartToBuyRate) > 15 ? 'badge-delivered' : 'badge-pending'}" style="font-size:0.8rem;">
+                  ${p.cartToBuyRate}%
+                </span>
+              </td>
+              <td>
+                <span style="font-size:0.85rem; color:var(--admin-text-main);">
+                  ${p.viewToBuyRate}%
+                </span>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          perfTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--admin-text-muted);">No product event telemetry recorded yet.</td></tr>`;
+        }
       }
 
       // Districts
       const locContainer = document.getElementById('analytics-district-breakdown');
-      if (data.locations && data.locations.length > 0) {
-        locContainer.innerHTML = data.locations.map(loc => `
-          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--admin-border); font-size:0.85rem;">
-            <span>📍 ${loc.district}</span>
-            <strong>${loc.visitors} sessions</strong>
-          </div>
-        `).join('');
-      } else {
-        locContainer.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.85rem;">No district data yet.</p>`;
+      if (locContainer) {
+        if (data.locations && data.locations.length > 0) {
+          locContainer.innerHTML = data.locations.map(loc => `
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--admin-border); font-size:0.85rem;">
+              <span>📍 ${loc.district}</span>
+              <strong>${loc.visitors} sessions</strong>
+            </div>
+          `).join('');
+        } else {
+          locContainer.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.85rem;">No district data yet.</p>`;
+        }
       }
 
     } catch (err) {
@@ -689,14 +698,16 @@
     saveHeroDraft: async () => {
       const draftData = Object.assign({}, cachedHomepage, {
         hero: {
-          ...cachedHomepage.hero,
+          ...(cachedHomepage?.hero || {}),
           headline: document.getElementById('edit-hero-headline').value.trim(),
           description: document.getElementById('edit-hero-desc').value.trim(),
           ctaText: document.getElementById('edit-hero-cta-text').value.trim(),
           ctaLink: document.getElementById('edit-hero-cta-link').value.trim(),
-          slides: cachedHomepage.hero.slides || []
+          slides: cachedHomepage?.hero?.slides || []
         }
       });
+      delete draftData._id;
+      delete draftData.__v;
 
       try {
         await adminFetch('/api/admin/homepage/draft', {
@@ -750,7 +761,7 @@
     },
 
     openEditProductModal: (id) => {
-      const p = cachedProducts.find(item => (item._id || item.id) === id);
+      const p = cachedProducts.find(item => (item._id || item.id) === id || String(item._id) === String(id));
       if (!p) return;
 
       document.getElementById('product-modal-title').textContent = `Edit — ${p.name}`;
@@ -880,6 +891,43 @@
       const heartNotes = document.getElementById('edit-prod-notes-heart').value.split(',').map(s => s.trim()).filter(Boolean);
       const baseNotes = document.getElementById('edit-prod-notes-base').value.split(',').map(s => s.trim()).filter(Boolean);
 
+      const cleanedImages = (currentModalProductImages.length > 0 ? currentModalProductImages : [{
+        id: 'img_' + Date.now(),
+        url: '/images/delice-01.jpg',
+        altText: name,
+        isPrimary: true
+      }]).map((img, i) => ({
+        id: String(img.id || ('img_' + Date.now() + '_' + i)),
+        url: String(img.url || '/images/delice-01.jpg'),
+        thumbnailUrl: img.thumbnailUrl || img.url || '/images/delice-01.jpg',
+        altText: img.altText || name,
+        isPrimary: Boolean(img.isPrimary !== undefined ? img.isPrimary : i === 0),
+        order: typeof img.order === 'number' ? img.order : i
+      }));
+
+      if (!cleanedImages.some(img => img.isPrimary)) {
+        cleanedImages[0].isPrimary = true;
+      }
+
+      let productVariants = [
+        {
+          size,
+          volumeMl: parseInt(size, 10) || 100,
+          price,
+          salePrice,
+          stock,
+          sku: `${sku}-${size}`.toUpperCase()
+        }
+      ];
+
+      if (pId) {
+        const existingProduct = cachedProducts.find(item => (item._id || item.id) === pId || String(item._id) === String(pId));
+        if (existingProduct && Array.isArray(existingProduct.variants) && existingProduct.variants.length > 1) {
+          const otherVariants = existingProduct.variants.filter(v => v.size !== size);
+          productVariants = [productVariants[0], ...otherVariants];
+        }
+      }
+
       const productPayload = {
         name,
         sku,
@@ -892,22 +940,8 @@
           heart: heartNotes,
           base: baseNotes
         },
-        images: currentModalProductImages.length > 0 ? currentModalProductImages : [{
-          id: 'default',
-          url: '/images/delice-01.jpg',
-          altText: name,
-          isPrimary: true
-        }],
-        variants: [
-          {
-            size,
-            volumeMl: parseInt(size, 10) || 100,
-            price,
-            salePrice,
-            stock,
-            sku: `${sku}-${size}`.toUpperCase()
-          }
-        ]
+        images: cleanedImages,
+        variants: productVariants
       };
 
       try {
@@ -968,7 +1002,7 @@
 
     // Stock Adjustment Modal
     openStockModal: (productId) => {
-      const p = cachedProducts.find(i => (i._id || i.id) === productId);
+      const p = cachedProducts.find(i => (i._id || i.id) === productId || String(i._id) === String(productId));
       if (!p) return;
 
       document.getElementById('stock-modal-title').textContent = `Adjust Stock — ${p.name}`;
@@ -979,7 +1013,15 @@
         <option value="${v.size}" data-stock="${v.stock}">${v.size} (Current: ${v.stock})</option>
       `).join('');
 
-      document.getElementById('stock-modal-new-qty').value = (p.variants && p.variants[0]) ? p.variants[0].stock : 0;
+      const updateQtyInput = () => {
+        const selectedOpt = select.options[select.selectedIndex];
+        const stock = selectedOpt ? selectedOpt.getAttribute('data-stock') : (p.variants && p.variants[0] ? p.variants[0].stock : 0);
+        document.getElementById('stock-modal-new-qty').value = stock;
+      };
+
+      select.onchange = updateQtyInput;
+      updateQtyInput();
+
       document.getElementById('stock-modal-reason').value = '';
       document.getElementById('stock-modal').classList.add('active');
     },
@@ -988,11 +1030,15 @@
       const pId = document.getElementById('stock-modal-product-id').value;
       const size = document.getElementById('stock-modal-variant-select').value;
       const newStock = parseInt(document.getElementById('stock-modal-new-qty').value, 10);
-      const reason = document.getElementById('stock-modal-reason').value.trim();
+      let reason = document.getElementById('stock-modal-reason').value.trim();
+
+      if (isNaN(newStock) || newStock < 0) {
+        showAdminToast('Please provide a valid stock quantity.', true);
+        return;
+      }
 
       if (!reason) {
-        showAdminToast('Please provide an administrative reason for the stock adjustment.', true);
-        return;
+        reason = 'Admin stock adjustment';
       }
 
       try {
@@ -1155,8 +1201,23 @@
       } catch (err) {
         showAdminToast(err.message, true);
       }
-    }
+    },
+
+    // Navigation and Tab View Loaders
+    switchTab,
+    loadDashboard,
+    loadHeroEditor,
+    loadProducts,
+    loadOrders,
+    loadAnalytics,
+    loadProfitCalculator
   };
+
+  // Global aliases for legacy/inline event triggers
+  window.loadOrders = loadOrders;
+  window.loadAnalytics = loadAnalytics;
+  window.loadDashboard = loadDashboard;
+  window.loadProducts = loadProducts;
 
   // Launch on DOM Ready
   document.addEventListener('DOMContentLoaded', initAdmin);

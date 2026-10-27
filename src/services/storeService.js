@@ -387,21 +387,24 @@ class StoreService {
   }
 
   async saveHomepageDraft(draftData, adminUsername = 'Admin') {
-    draftData.updatedAt = new Date();
-    draftData.savedBy = adminUsername;
-    draftData.isPublished = false;
+    const cleanData = JSON.parse(JSON.stringify(draftData || {}));
+    delete cleanData._id;
+    delete cleanData.__v;
+    cleanData.updatedAt = new Date();
+    cleanData.savedBy = adminUsername;
+    cleanData.isPublished = false;
 
     if (getIsConnected()) {
       let draft = await Homepage.findOne({ isPublished: false });
       if (!draft) {
-        draft = new Homepage(draftData);
+        draft = new Homepage(cleanData);
       } else {
-        Object.assign(draft, draftData);
+        Object.assign(draft, cleanData);
       }
       return await draft.save();
     }
 
-    localStore.data.homepageDraft = Object.assign({}, localStore.data.homepageDraft || {}, draftData);
+    localStore.data.homepageDraft = Object.assign({}, localStore.data.homepageDraft || {}, cleanData);
     localStore.save();
     return localStore.data.homepageDraft;
   }
@@ -411,24 +414,31 @@ class StoreService {
     const currentPublished = await this.getHomepage({ isDraft: false });
 
     // Create revision snapshot of the currently published version before overwriting
+    const currentPubObj = currentPublished && typeof currentPublished.toObject === 'function' ? currentPublished.toObject() : JSON.parse(JSON.stringify(currentPublished || {}));
+    delete currentPubObj._id;
+    delete currentPubObj.__v;
+
     const revision = {
       revisionId: `rev_${Date.now()}`,
-      snapshot: JSON.parse(JSON.stringify(currentPublished)),
+      snapshot: currentPubObj,
       adminUsername,
       note,
       createdAt: new Date()
     };
 
-    const publishData = Object.assign({}, draft, {
+    const draftObj = draft && typeof draft.toObject === 'function' ? draft.toObject() : JSON.parse(JSON.stringify(draft || {}));
+    delete draftObj._id;
+    delete draftObj.__v;
+
+    const publishData = Object.assign({}, draftObj, {
       isPublished: true,
       publishedAt: new Date(),
       updatedAt: new Date(),
       savedBy: adminUsername,
-      version: (currentPublished.version || 1) + 1
+      version: ((currentPublished && currentPublished.version) || 1) + 1
     });
 
     if (getIsConnected()) {
-      delete revision._id;
       await HomepageRevision.create(revision);
       let published = await Homepage.findOne({ isPublished: true });
       if (!published) {
@@ -447,6 +457,7 @@ class StoreService {
     localStore.save();
     return localStore.data.homepage;
   }
+
 
   async getHomepageRevisions() {
     if (getIsConnected()) {
@@ -1302,13 +1313,15 @@ class StoreService {
         if (matchedInOrder) orderMatches++;
       });
 
-      const cartToBuyRate = addBags > 0 
-        ? Math.min(100, (orderMatches / addBags) * 100).toFixed(1)
-        : (orderMatches > 0 ? '100.0' : '0.0');
+      const effectiveCarts = Math.max(addBags, orderMatches);
+      const cartToBuyRate = effectiveCarts > 0 
+        ? Math.min(100, (orderMatches / effectiveCarts) * 100).toFixed(1)
+        : '0.0';
 
-      const viewToBuyRate = views > 0 
-        ? Math.min(100, (orderMatches / views) * 100).toFixed(1)
-        : (orderMatches > 0 ? '100.0' : '0.0');
+      const effectiveViews = Math.max(views, effectiveCarts, orderMatches);
+      const viewToBuyRate = effectiveViews > 0 
+        ? Math.min(100, (orderMatches / effectiveViews) * 100).toFixed(1)
+        : '0.0';
 
       return {
         id: pId,

@@ -303,38 +303,56 @@
       const nav = document.getElementById('hero-slider-nav');
       const dotsContainer = document.getElementById('hero-slider-dots');
 
+      if (!container) return;
+
       container.innerHTML = slides.map((s, idx) => `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
           <img src="${s.imageUrl}" class="hero-image" alt="${s.title || 'DÉLICE Parfums'}" style="object-position: 50% 50%;">
         </div>
       `).join('');
 
+      // Set initial slide text if defined
+      if (slides[0]) {
+        if (slides[0].title) document.getElementById('hero-headline').textContent = slides[0].title;
+        if (slides[0].subtitle) document.getElementById('hero-description').textContent = slides[0].subtitle;
+        if (slides[0].link) document.getElementById('hero-cta').href = slides[0].link;
+      }
+
       if (slides.length > 1) {
-        nav.style.display = 'flex';
-        dotsContainer.innerHTML = slides.map((_, idx) => `
-          <button class="hero-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}" aria-label="Go to slide ${idx + 1}"></button>
-        `).join('');
+        if (nav) nav.style.display = 'flex';
+        if (dotsContainer) {
+          dotsContainer.innerHTML = slides.map((_, idx) => `
+            <button class="hero-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}" aria-label="Go to slide ${idx + 1}"></button>
+          `).join('');
 
-        dotsContainer.querySelectorAll('.hero-dot').forEach(dot => {
-          dot.addEventListener('click', () => {
-            goToSlide(parseInt(dot.getAttribute('data-index'), 10));
-            restartSlideTimer();
+          dotsContainer.querySelectorAll('.hero-dot').forEach(dot => {
+            dot.onclick = () => {
+              goToSlide(parseInt(dot.getAttribute('data-index'), 10));
+              restartSlideTimer();
+            };
           });
-        });
+        }
 
-        document.getElementById('hero-slide-prev')?.addEventListener('click', () => {
-          goToSlide(currentSlideIndex - 1);
-          restartSlideTimer();
-        });
+        const prevBtn = document.getElementById('hero-slide-prev');
+        if (prevBtn) {
+          prevBtn.onclick = () => {
+            goToSlide(currentSlideIndex - 1);
+            restartSlideTimer();
+          };
+        }
 
-        document.getElementById('hero-slide-next')?.addEventListener('click', () => {
-          goToSlide(currentSlideIndex + 1);
-          restartSlideTimer();
-        });
+        const nextBtn = document.getElementById('hero-slide-next');
+        if (nextBtn) {
+          nextBtn.onclick = () => {
+            goToSlide(currentSlideIndex + 1);
+            restartSlideTimer();
+          };
+        }
 
         startSlideTimer();
       } else {
-        nav.style.display = 'none';
+        if (nav) nav.style.display = 'none';
+        if (slideTimer) clearInterval(slideTimer);
       }
     }
 
@@ -352,9 +370,12 @@
 
       const activeSlide = heroSlides[currentSlideIndex];
       if (activeSlide) {
-        if (activeSlide.title) document.getElementById('hero-headline').textContent = activeSlide.title;
-        if (activeSlide.subtitle) document.getElementById('hero-description').textContent = activeSlide.subtitle;
-        if (activeSlide.link) document.getElementById('hero-cta').href = activeSlide.link;
+        const headlineEl = document.getElementById('hero-headline');
+        const descEl = document.getElementById('hero-description');
+        const ctaEl = document.getElementById('hero-cta');
+        if (headlineEl && activeSlide.title) headlineEl.textContent = activeSlide.title;
+        if (descEl && activeSlide.subtitle) descEl.textContent = activeSlide.subtitle;
+        if (ctaEl && activeSlide.link) ctaEl.href = activeSlide.link;
       }
     }
 

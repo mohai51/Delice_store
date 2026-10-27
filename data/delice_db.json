@@ -3,11 +3,11 @@
     {
       "username": "admin",
       "email": "concierge@deliceparfums.com",
-      "passwordHash": "$2b$12$YSaLMsXO.HPI6h1PDrO8Y.89uzy1IypBJ3IPggxnw1DMI.QFGFfSC",
+      "passwordHash": "$2b$12$lkumy3TFnEOmybp0XIxzSONts19sKFQsEVKUXI.AZ7Nk2tPgDBrwu",
       "role": "superadmin",
       "twoFactorEnabled": false,
       "createdAt": "2026-10-22T07:46:42.749Z",
-      "updatedAt": "2026-10-22T07:46:42.749Z",
+      "updatedAt": "2026-10-27T04:15:51.453Z",
       "_id": "adm_1792655202749",
       "lastLoginAt": "2026-10-22T08:03:28.059Z"
     }
@@ -254,7 +254,7 @@
   ],
   "homepage": {
     "_id": "home_1792655220617_aa6fd20f",
-    "version": 1,
+    "version": 2,
     "isPublished": true,
     "announcementBar": {
       "enabled": true,
@@ -271,7 +271,16 @@
       "headline": "A Signature, Remembered.",
       "description": "Quiet luxury fragrances distilled in Grasse, bottled for the discerning connoisseur in Bangladesh.",
       "ctaText": "Discover DÉLICE",
-      "ctaLink": "#collection"
+      "ctaLink": "#collection",
+      "slides": [
+        {
+          "id": "slide-1",
+          "imageUrl": "/images/hero-desktop.jpg",
+          "title": "A Signature, Remembered.",
+          "subtitle": "Haute Parfumerie Bangladesh",
+          "link": "#collection"
+        }
+      ]
     },
     "featuredProducts": [
       "delice-no-01",
@@ -317,11 +326,97 @@
       "experiences": false,
       "footer": true
     },
-    "savedBy": "System",
-    "publishedAt": "2026-10-22T07:47:00.617Z",
-    "updatedAt": "2026-10-22T07:47:00.617Z"
+    "savedBy": "Admin",
+    "publishedAt": "2026-10-27T03:58:54.559Z",
+    "updatedAt": "2026-10-27T03:58:54.559Z"
   },
-  "homepageRevisions": [],
+  "homepageRevisions": [
+    {
+      "revisionId": "rev_1793073534557",
+      "snapshot": {
+        "_id": "home_1792655220617_aa6fd20f",
+        "version": 1,
+        "isPublished": true,
+        "announcementBar": {
+          "enabled": true,
+          "text": "Complimentary white-glove courier across Bangladesh on orders over ৳5,000",
+          "linkUrl": "#collection"
+        },
+        "hero": {
+          "desktopImageUrl": "/images/hero-desktop.jpg",
+          "mobileImageUrl": "/images/hero-desktop.jpg",
+          "focalPoint": {
+            "x": 50,
+            "y": 50
+          },
+          "headline": "A Signature, Remembered.",
+          "description": "Quiet luxury fragrances distilled in Grasse, bottled for the discerning connoisseur in Bangladesh.",
+          "ctaText": "Discover DÉLICE",
+          "ctaLink": "#collection",
+          "slides": [
+            {
+              "id": "slide-1",
+              "imageUrl": "/images/hero-desktop.jpg",
+              "title": "A Signature, Remembered.",
+              "subtitle": "Haute Parfumerie Bangladesh",
+              "link": "#collection"
+            }
+          ]
+        },
+        "featuredProducts": [
+          "delice-no-01",
+          "delice-no-02"
+        ],
+        "brandStory": {
+          "enabled": true,
+          "title": "The Philosophy of Quiet Luxury",
+          "subtitle": "Pure Essence, Sublime Restraint",
+          "paragraph1": "At DÉLICE, perfume is neither an ornament nor an imposition. It is an intimate aura, composed of rare raw botanicals and precious resins harvested by historic French distillers.",
+          "paragraph2": "Each batch is matured in small casks to allow subtle nuances to harmonize, honoring centuries of Grasse craftsmanship while attuned to the tropical cadence of Bangladesh.",
+          "imageUrl": "/images/brand-story.jpg"
+        },
+        "customerExperiences": {
+          "enabled": false,
+          "title": "Patron Impressions",
+          "subtitle": "Verified Customer Reflections",
+          "items": []
+        },
+        "footer": {
+          "aboutText": "DÉLICE — Quiet luxury haute perfumery. Crafted with artistic restraint.",
+          "contactEmail": "concierge@deliceparfums.com",
+          "contactPhone": "+880 1712 000 000",
+          "address": "House 14, Road 71, Gulshan 2, Dhaka 1212",
+          "instagramUrl": "https://instagram.com/deliceparfums",
+          "facebookUrl": "https://facebook.com/deliceparfums",
+          "whatsappNumber": "+8801712000000",
+          "newsletterEnabled": true
+        },
+        "sectionOrder": [
+          "announcement",
+          "hero",
+          "collection",
+          "story",
+          "experiences",
+          "footer"
+        ],
+        "sectionVisibility": {
+          "announcement": true,
+          "hero": true,
+          "collection": true,
+          "story": true,
+          "experiences": false,
+          "footer": true
+        },
+        "savedBy": "System",
+        "publishedAt": "2026-10-22T07:47:00.617Z",
+        "updatedAt": "2026-10-22T07:47:00.617Z"
+      },
+      "adminUsername": "Admin",
+      "note": "test",
+      "createdAt": "2026-10-27T03:58:54.559Z",
+      "_id": "rev_1793073534559_d9428b0d"
+    }
+  ],
   "orders": [
     {
       "_id": "ord_1792656038630_6d3b55f4",
@@ -588,5 +683,6 @@
       "ipAddress": "127.0.0.1",
       "createdAt": "2026-10-22T07:59:58.376Z"
     }
-  ]
+  ],
+  "homepageDraft": null
 }

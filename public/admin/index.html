@@ -172,7 +172,7 @@
             <p style="font-size: 0.85rem; color: var(--admin-text-muted);">Real-time summary of sales, orders, and telemetry.</p>
           </div>
           <div>
-            <select id="dashboard-days-filter" class="admin-select" style="width: auto;" onchange="loadDashboard();">
+            <select id="dashboard-days-filter" class="admin-select" style="width: auto;" onchange="window.DeliceAdmin.loadDashboard();">
               <option value="1">Today</option>
               <option value="7">Last 7 Days</option>
               <option value="30" selected>Last 30 Days</option>
@@ -399,9 +399,9 @@
 
         <!-- Filter bar -->
         <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
-          <input type="text" id="order-search-input" class="admin-input" placeholder="Search order reference, customer, phone..." style="max-width: 320px;" oninput="loadOrders();">
+          <input type="text" id="order-search-input" class="admin-input" placeholder="Search order reference, customer, phone..." style="max-width: 320px;" oninput="window.DeliceAdmin.loadOrders();">
           
-          <select id="order-status-filter" class="admin-select" style="max-width: 180px;" onchange="loadOrders();">
+          <select id="order-status-filter" class="admin-select" style="max-width: 180px;" onchange="window.DeliceAdmin.loadOrders();">
             <option value="">All Fulfillment</option>
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
@@ -411,7 +411,7 @@
             <option value="cancelled">Cancelled</option>
           </select>
 
-          <select id="order-payment-filter" class="admin-select" style="max-width: 180px;" onchange="loadOrders();">
+          <select id="order-payment-filter" class="admin-select" style="max-width: 180px;" onchange="window.DeliceAdmin.loadOrders();">
             <option value="">All Payments</option>
             <option value="unpaid">Unpaid</option>
             <option value="pending_verification">Pending Verification</option>
@@ -454,7 +454,7 @@
             </p>
           </div>
           <div>
-            <select id="analytics-days-filter" class="admin-select" style="width: auto;" onchange="loadAnalytics();">
+            <select id="analytics-days-filter" class="admin-select" style="width: auto;" onchange="window.DeliceAdmin.loadAnalytics();">
               <option value="7" selected>Last 7 Days</option>
               <option value="30">Last 30 Days</option>
               <option value="90">Last 90 Days</option>
