@@ -245,6 +245,22 @@ router.put('/products/:id', requireAdmin, async (req, res, next) => {
   }
 });
 
+router.delete('/products/:id', requireAdmin, async (req, res, next) => {
+  try {
+    const removed = await storeService.deleteProduct(req.params.id, req.adminUsername);
+    await storeService.logAdminAction({
+      adminUsername: req.adminUsername,
+      action: 'DELETE_PRODUCT',
+      targetType: 'product',
+      targetId: req.params.id,
+      details: { name: removed.name }
+    });
+    res.json({ success: true, message: 'Product deleted successfully', removed });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post('/products/:id/adjust-stock', requireAdmin, async (req, res, next) => {
   try {
     const { variantSize, newStock, reason } = req.body;

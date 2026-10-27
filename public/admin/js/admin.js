@@ -1,6 +1,6 @@
 /**
- * DÉLICE — Luxury Concierge Administration Panel
- * Vanilla JavaScript SPA Engine (No external frameworks)
+ * DÉLICE — Luxury Administration Workspace Engine
+ * Vanilla JavaScript Single-Page Application
  */
 
 (function () {
@@ -11,7 +11,7 @@
   let activeTab = 'dashboard';
   let cachedHomepage = null;
   let cachedProducts = [];
-  let cachedMedia = [];
+  let currentModalProductImages = [];
 
   // Helper: Format BDT Currency
   function formatBDT(amount) {
@@ -32,7 +32,7 @@
   // Helper: Format Date & Time
   function formatDateTime(d) {
     if (!d) return '—';
-    return new Date(d).toLocaleString('en-US', {
+    return new Date(d).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -51,7 +51,7 @@
     }
 
     const toast = document.createElement('div');
-    toast.style.cssText = `background:#222;color:#FFF;padding:12px 20px;border-radius:4px;font-size:0.875rem;border-left:4px solid ${isError ? '#C53030' : '#C5A880'};box-shadow:0 8px 24px rgba(0,0,0,0.5);`;
+    toast.style.cssText = `background:#222;color:#FFF;padding:12px 20px;border-radius:4px;font-size:0.875rem;border-left:4px solid ${isError ? '#E53E3E' : '#C5A880'};box-shadow:0 8px 24px rgba(0,0,0,0.5);`;
     toast.textContent = message;
     container.appendChild(toast);
 
@@ -138,13 +138,11 @@
     // Trigger tab-specific loader
     switch (tabId) {
       case 'dashboard': loadDashboard(); break;
-      case 'homepage': loadHomepageEditor(); break;
+      case 'hero': loadHeroEditor(); break;
       case 'products': loadProducts(); break;
-      case 'media': loadMediaLibrary(); break;
       case 'orders': loadOrders(); break;
       case 'analytics': loadAnalytics(); break;
-      case 'referrals': loadReferrals(); break;
-      case 'settings': loadSettings(); break;
+      case 'profit': loadProfitCalculator(); break;
     }
   }
 
@@ -157,13 +155,10 @@
       const res = await adminFetch(`/api/admin/dashboard?days=${days}`);
       const { metrics, recentOrders } = await res.json();
 
-      document.getElementById('metric-total-orders').textContent = metrics.totalOrders;
-      document.getElementById('metric-net-sales').textContent = formatBDT(metrics.deliveredNetSales);
-      document.getElementById('metric-pending-orders').textContent = metrics.pendingOrdersCount;
-      document.getElementById('metric-low-stock').textContent = metrics.lowStockCount;
-
-      document.getElementById('metric-visitors').textContent = metrics.analytics.visitors;
-      document.getElementById('metric-pageviews').textContent = metrics.analytics.pageviews;
+      document.getElementById('metric-total-orders').textContent = metrics.totalOrders || 0;
+      document.getElementById('metric-net-sales').textContent = formatBDT(metrics.deliveredNetSales || 0);
+      document.getElementById('metric-pending-orders').textContent = metrics.pendingOrdersCount || 0;
+      document.getElementById('metric-low-stock').textContent = metrics.lowStockCount || 0;
 
       // Render recent orders
       const tbody = document.getElementById('dashboard-recent-orders-tbody');
@@ -171,13 +166,13 @@
         tbody.innerHTML = recentOrders.map(o => `
           <tr>
             <td><strong>${o.orderReference}</strong></td>
-            <td>${o.customer.name}<br><small style="color:var(--admin-text-muted);">${o.customer.district}</small></td>
-            <td>${formatBDT(o.pricing.total)}</td>
+            <td>${o.customer.name}<br><small style="color:var(--admin-text-muted);">${o.customer.phone} • ${o.customer.district}</small></td>
+            <td><strong>${formatBDT(o.pricing.total)}</strong></td>
             <td><span class="badge badge-${o.payment.status}">${o.payment.status}</span></td>
             <td><span class="badge badge-${o.fulfillment.status}">${o.fulfillment.status}</span></td>
             <td>${formatDate(o.createdAt)}</td>
             <td>
-              <button onclick="window.DeliceAdmin.openOrderModal('${o.orderReference}')" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">View</button>
+              <button onclick="window.DeliceAdmin.openOrderModal('${o.orderReference}')" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Manage</button>
             </td>
           </tr>
         `).join('');
@@ -190,7 +185,7 @@
       if (metrics.lowStockItems && metrics.lowStockItems.length > 0) {
         lowStockBox.style.display = 'block';
         lowStockBox.innerHTML = `
-          <strong style="color:#F6AD55;">Low Stock Notice:</strong> ${metrics.lowStockItems.map(i => `${i.productName} (${i.size}): ${i.stock} left`).join(' • ')}
+          <strong style="color:#F6AD55;">Low Stock Notice:</strong> ${metrics.lowStockItems.map(i => `${i.productName} (${i.size}): ${i.stock} bottles left`).join(' • ')}
         `;
       } else {
         lowStockBox.style.display = 'none';
@@ -202,95 +197,65 @@
   }
 
   // ==========================================
-  // 3. HOMEPAGE EDITOR VIEW
+  // 3. HERO SLIDER EDITOR VIEW
   // ==========================================
-  async function loadHomepageEditor() {
+  async function loadHeroEditor() {
     try {
       const res = await adminFetch('/api/admin/homepage');
-      const { published, draft, revisions, products } = await res.json();
+      const { published, draft } = await res.json();
       cachedHomepage = draft || published;
-      cachedProducts = products;
 
-      // Populate Inputs with Draft/Published Data
       const hp = cachedHomepage;
-
-      // Announcement Bar
-      document.getElementById('edit-announcement-enabled').checked = hp.announcementBar?.enabled ?? true;
-      document.getElementById('edit-announcement-text').value = hp.announcementBar?.text || '';
-      document.getElementById('edit-announcement-link').value = hp.announcementBar?.linkUrl || '#collection';
-
-      // Hero
-      document.getElementById('edit-hero-headline').value = hp.hero?.headline || '';
-      document.getElementById('edit-hero-desc').value = hp.hero?.description || '';
-      document.getElementById('edit-hero-cta-text').value = hp.hero?.ctaText || '';
-      document.getElementById('edit-hero-cta-link').value = hp.hero?.ctaLink || '';
-      document.getElementById('edit-hero-desktop-img').value = hp.hero?.desktopImageUrl || '';
-      document.getElementById('edit-hero-mobile-img').value = hp.hero?.mobileImageUrl || '';
-      document.getElementById('edit-hero-focal-x').value = hp.hero?.focalPoint?.x ?? 50;
-      document.getElementById('edit-hero-focal-y').value = hp.hero?.focalPoint?.y ?? 50;
-      document.getElementById('focal-x-val').textContent = (hp.hero?.focalPoint?.x ?? 50) + '%';
-      document.getElementById('focal-y-val').textContent = (hp.hero?.focalPoint?.y ?? 50) + '%';
-
-      // Brand Story
-      document.getElementById('edit-story-title').value = hp.brandStory?.title || '';
-      document.getElementById('edit-story-subtitle').value = hp.brandStory?.subtitle || '';
-      document.getElementById('edit-story-p1').value = hp.brandStory?.paragraph1 || '';
-      document.getElementById('edit-story-p2').value = hp.brandStory?.paragraph2 || '';
-      document.getElementById('edit-story-img').value = hp.brandStory?.imageUrl || '';
-
-      // Customer Experiences
-      document.getElementById('edit-exp-enabled').checked = hp.customerExperiences?.enabled ?? false;
-      renderExperiencesList(hp.customerExperiences?.items || []);
-
-      // Section Visibility
-      document.getElementById('vis-hero').checked = hp.sectionVisibility?.hero ?? true;
-      document.getElementById('vis-collection').checked = hp.sectionVisibility?.collection ?? true;
-      document.getElementById('vis-story').checked = hp.sectionVisibility?.story ?? true;
-      document.getElementById('vis-experiences').checked = hp.sectionVisibility?.experiences ?? false;
-
-      // Revisions History
-      const revContainer = document.getElementById('homepage-revisions-list');
-      if (revisions && revisions.length > 0) {
-        revContainer.innerHTML = revisions.map(r => `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--admin-border);">
-            <div>
-              <strong>${formatDateTime(r.createdAt)}</strong>
-              <div style="font-size:0.8rem; color:var(--admin-text-muted);">${r.note || 'Published version'} (by ${r.adminUsername})</div>
-            </div>
-            <button onclick="window.DeliceAdmin.restoreRevision('${r.revisionId}')" class="btn btn-secondary" style="padding:6px 12px; font-size:0.75rem;">Restore</button>
-          </div>
-        `).join('');
-      } else {
-        revContainer.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.85rem; padding:12px;">No archived revisions recorded yet.</p>`;
+      if (!hp.hero) hp.hero = {};
+      if (!hp.hero.slides) {
+        hp.hero.slides = [
+          { id: 'slide-1', imageUrl: hp.hero.desktopImageUrl || '/images/hero-desktop.jpg', title: hp.hero.headline || 'A Signature, Remembered.', subtitle: hp.hero.description || 'Haute Parfumerie Bangladesh', link: '#collection' }
+        ];
       }
 
+      // Populate text inputs
+      document.getElementById('edit-hero-headline').value = hp.hero.headline || '';
+      document.getElementById('edit-hero-desc').value = hp.hero.description || '';
+      document.getElementById('edit-hero-cta-text').value = hp.hero.ctaText || 'Discover DÉLICE';
+      document.getElementById('edit-hero-cta-link').value = hp.hero.ctaLink || '#collection';
+
+      renderHeroSlides();
     } catch (err) {
-      console.error('Failed to load homepage editor:', err);
+      console.error('Failed to load hero editor:', err);
     }
   }
 
-  function renderExperiencesList(items) {
-    const container = document.getElementById('experiences-admin-items');
-    if (!items || items.length === 0) {
-      container.innerHTML = `<p style="font-size:0.85rem; color:var(--admin-text-muted); padding:10px 0;">No patron quotes added. (Section hidden on storefront until genuine reviews are approved).</p>`;
+  function renderHeroSlides() {
+    const list = document.getElementById('hero-slides-list');
+    const badge = document.getElementById('hero-slides-count-badge');
+    const slides = cachedHomepage?.hero?.slides || [];
+
+    badge.textContent = `${slides.length} Slide(s)`;
+
+    if (slides.length === 0) {
+      list.innerHTML = `<div style="padding:24px; text-align:center; color:var(--admin-text-muted); background:#1e1e1e; border-radius:6px;">No slideshow images added yet. Add an image below.</div>`;
       return;
     }
 
-    container.innerHTML = items.map((item, idx) => `
-      <div style="background:#242424; padding:16px; border-radius:4px; margin-bottom:12px; border:1px solid var(--admin-border);">
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <strong>${item.customerName} (${item.location || 'Bangladesh'})</strong>
-          <label style="font-size:0.75rem; color:var(--admin-gold);">
-            <input type="checkbox" ${item.approved ? 'checked' : ''} onchange="window.DeliceAdmin.toggleReviewApproval(${idx}, this.checked)"> Approved
-          </label>
+    list.innerHTML = slides.map((s, idx) => `
+      <div class="slide-item-card">
+        <img src="${s.imageUrl}" class="slide-item-thumb" alt="Slide ${idx + 1}" onerror="this.src='/images/hero-desktop.jpg'">
+        <div style="flex-grow:1; min-width:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <strong style="color:var(--admin-gold); font-size:0.9rem;">Slide #${idx + 1}</strong>
+            <button type="button" onclick="window.DeliceAdmin.deleteHeroSlide(${idx})" class="btn-text" style="color:var(--status-cancelled); font-size:0.8rem; cursor:pointer;">
+              Remove Slide
+            </button>
+          </div>
+          <div style="font-size:0.85rem; font-weight:600; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${s.title || '(No title)'}</div>
+          <div style="font-size:0.75rem; color:var(--admin-text-muted); text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${s.imageUrl}</div>
         </div>
-        <p style="font-size:0.875rem; font-style:italic; color:#CCC;">“${item.quote}”</p>
       </div>
     `).join('');
   }
 
   // ==========================================
-  // 4. PRODUCTS & STOCK
+  // 4. PRODUCTS & MULTI-IMAGE MANAGEMENT
   // ==========================================
   async function loadProducts() {
     try {
@@ -301,25 +266,29 @@
       const tbody = document.getElementById('products-table-tbody');
       if (products && products.length > 0) {
         tbody.innerHTML = products.map(p => {
-          const v = (p.variants || [])[0] || { price: 0, stock: 0, size: '50ml' };
-          const totalStock = (p.variants || []).reduce((sum, item) => sum + item.stock, 0);
-          const isDraft = p.status === 'draft';
+          const v = (p.variants || [])[0] || { price: 0, salePrice: null, stock: 0, size: '50ml' };
+          const totalStock = (p.variants || []).reduce((sum, item) => sum + (item.stock || 0), 0);
+          const hasDiscount = Boolean(v.salePrice && v.salePrice < v.price);
+          const primaryImg = (p.images && p.images.find(i => i.isPrimary)) || (p.images && p.images[0]) || { url: '/images/delice-01.jpg' };
+          const imgCount = (p.images || []).length;
 
           return `
             <tr>
               <td>
                 <div style="display:flex; gap:12px; align-items:center;">
-                  <img src="${(p.images && p.images[0]) ? p.images[0].url : '/images/delice-01.jpg'}" style="width:48px;height:48px;border-radius:3px;object-fit:cover;">
+                  <img src="${primaryImg.url}" style="width:48px;height:48px;border-radius:4px;object-fit:cover;background:#222;" onerror="this.src='/images/delice-01.jpg'">
                   <div>
-                    <strong>${p.name}</strong>
-                    <div style="font-size:0.75rem; color:var(--admin-text-muted);">${p.scentFamily} • SKU: ${p.sku}</div>
+                    <strong style="font-size:0.95rem;">${p.name}</strong>
+                    <div style="font-size:0.75rem; color:var(--admin-text-muted);">${p.scentFamily} • SKU: ${p.sku} • <span style="color:var(--admin-gold);">${imgCount} image(s)</span></div>
                   </div>
                 </div>
               </td>
               <td>
-                ${(p.variants || []).map(varItem => `
-                  <div style="font-size:0.8rem;">${varItem.size}: ${formatBDT(varItem.price)} (${varItem.stock} in stock)</div>
-                `).join('')}
+                <div>
+                  <strong style="color:#fff; font-size:1rem;">${formatBDT(v.salePrice || v.price)}</strong>
+                  ${hasDiscount ? `<span style="font-size:0.8rem; color:var(--admin-text-muted); text-decoration:line-through; margin-left:6px;">${formatBDT(v.price)}</span> <span class="badge badge-confirmed" style="font-size:0.7rem; background:rgba(229,62,62,0.2); color:#FC8181;">৳${(v.price - v.salePrice).toLocaleString()} OFF</span>` : ''}
+                </div>
+                <div style="font-size:0.75rem; color:var(--admin-text-muted);">${v.size || '100ml'}</div>
               </td>
               <td>
                 <span style="font-weight:600; color:${totalStock < 5 ? '#FC8181' : '#68D391'};">
@@ -333,16 +302,14 @@
               </td>
               <td>
                 <div style="display:flex; gap:6px;">
-                  ${isDraft ? `
-                    <button onclick="window.DeliceAdmin.quickPublishProduct('${p._id}')" class="btn btn-gold" style="padding:6px 10px; font-size:0.75rem;">
-                      Publish Live
-                    </button>
-                  ` : ''}
-                  <button onclick="window.DeliceAdmin.openStockModal('${p._id}')" class="btn btn-secondary" style="padding:6px 10px; font-size:0.75rem;">
-                    Adjust Stock
-                  </button>
-                  <button onclick="window.DeliceAdmin.openEditProductModal('${p._id}')" class="btn btn-secondary" style="padding:6px 10px; font-size:0.75rem;">
+                  <button onclick="window.DeliceAdmin.openEditProductModal('${p._id || p.id}')" class="btn btn-gold" style="padding:6px 12px; font-size:0.75rem;">
                     Edit
+                  </button>
+                  <button onclick="window.DeliceAdmin.openStockModal('${p._id || p.id}')" class="btn btn-secondary" style="padding:6px 10px; font-size:0.75rem;">
+                    Stock
+                  </button>
+                  <button onclick="window.DeliceAdmin.quickDeleteProduct('${p._id || p.id}', '${p.name.replace(/'/g, "\\'")}')" class="btn-text" style="color:var(--status-cancelled); font-size:0.75rem; padding:4px 6px;">
+                    Delete
                   </button>
                 </div>
               </td>
@@ -350,51 +317,39 @@
           `;
         }).join('');
       } else {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:32px;">No products found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--admin-text-muted);">No products found in catalog.</td></tr>`;
       }
     } catch (err) {
       console.error('Products load error:', err);
     }
   }
 
-  // ==========================================
-  // 5. MEDIA LIBRARY
-  // ==========================================
-  async function loadMediaLibrary() {
-    try {
-      const res = await adminFetch('/api/admin/media');
-      const media = await res.json();
-      cachedMedia = media;
+  function renderProductModalImages() {
+    const grid = document.getElementById('product-modal-images-grid');
+    const badge = document.getElementById('prod-images-count-badge');
+    badge.textContent = `${currentModalProductImages.length} / 5 Images`;
 
-      const grid = document.getElementById('media-library-grid');
-      if (media && media.length > 0) {
-        grid.innerHTML = media.map(m => `
-          <div style="background:#242424; border:1px solid var(--admin-border); border-radius:4px; overflow:hidden;">
-            <div style="aspect-ratio:1/1; overflow:hidden; background:#111;">
-              <img src="${m.thumbnailUrl || m.url}" alt="${m.altText || m.filename}" style="width:100%;height:100%;object-fit:cover;">
-            </div>
-            <div style="padding:12px;">
-              <strong style="display:block; font-size:0.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.originalName}</strong>
-              <div style="font-size:0.75rem; color:var(--admin-text-muted); margin-top:2px;">
-                ${m.dimensions?.width || '—'}×${m.dimensions?.height || '—'} • ${(m.sizeBytes / 1024).toFixed(0)} KB
-              </div>
-              <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                <button onclick="navigator.clipboard.writeText('${m.url}'); window.DeliceAdmin.showToast('Image URL copied to clipboard');" class="btn btn-secondary" style="padding:4px 8px; font-size:0.7rem;">Copy URL</button>
-                <button onclick="window.DeliceAdmin.deleteMediaAsset('${m.filename}')" class="btn-text" style="color:var(--status-cancelled); font-size:0.75rem;">Delete</button>
-              </div>
-            </div>
-          </div>
-        `).join('');
-      } else {
-        grid.innerHTML = `<p style="color:var(--admin-text-muted); padding:32px; grid-column:1/-1; text-align:center;">No media assets uploaded yet.</p>`;
-      }
-    } catch (err) {
-      console.error('Media load error:', err);
+    if (currentModalProductImages.length === 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1; color:var(--admin-text-muted); font-size:0.8rem; text-align:center; padding:16px;">No photos uploaded yet. Upload 4-5 images for this perfume.</div>`;
+      return;
     }
+
+    grid.innerHTML = currentModalProductImages.map((img, idx) => `
+      <div class="product-img-card" style="${img.isPrimary ? 'border-color:var(--admin-gold);' : ''}">
+        <img src="${img.url}" alt="${img.altText || 'Fragrance photo'}" onerror="this.src='/images/delice-01.jpg'">
+        <div class="img-actions">
+          <label style="font-size:0.7rem; color:${img.isPrimary ? 'var(--admin-gold)' : 'var(--admin-text-muted)'}; cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <input type="radio" name="primary_product_img" ${img.isPrimary ? 'checked' : ''} onchange="window.DeliceAdmin.setPrimaryProductImage(${idx})">
+            ${img.isPrimary ? 'Primary' : 'Set Main'}
+          </label>
+          <button type="button" onclick="window.DeliceAdmin.deleteProductImage(${idx})" class="btn-text" style="color:var(--status-cancelled); font-size:0.75rem; padding:0 4px;" title="Remove image">&times; Delete</button>
+        </div>
+      </div>
+    `).join('');
   }
 
   // ==========================================
-  // 6. ORDERS VIEW
+  // 5. ORDERS VIEW
   // ==========================================
   async function loadOrders() {
     const search = document.getElementById('order-search-input')?.value || '';
@@ -420,16 +375,15 @@
               <div style="font-size:0.75rem; color:var(--admin-text-muted);">${o.customer.phone} • ${o.customer.district}</div>
             </td>
             <td>
-              ${o.items.map(i => `<div style="font-size:0.8rem;">${i.name} (${i.size}) × ${i.quantity}</div>`).join('')}
+              ${(o.items || []).map(i => `<div style="font-size:0.8rem;">${i.name} (${i.size}) × ${i.quantity}</div>`).join('')}
             </td>
             <td>
-              <strong>${formatBDT(o.pricing.total)}</strong>
-              ${o.referral?.code ? `<div style="font-size:0.7rem; color:var(--admin-gold);">Ref: ${o.referral.code}</div>` : ''}
+              <strong style="color:#fff;">${formatBDT(o.pricing.total)}</strong>
             </td>
             <td>
               <span class="badge badge-${o.payment.status}">${o.payment.status}</span>
               <div style="font-size:0.75rem; color:var(--admin-text-muted); margin-top:2px;">
-                ${o.payment.method === 'bkash_manual' ? 'bKash Trx: ' + (o.payment.bkashTrxId || 'None') : 'COD'}
+                ${o.payment.method === 'bkash_manual' ? 'bKash Trx: ' + (o.payment.bkashTrxId || 'Pending') : 'Cash on Delivery'}
               </div>
             </td>
             <td>
@@ -443,7 +397,7 @@
           </tr>
         `).join('');
       } else {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--admin-text-muted);">No orders match the current filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--admin-text-muted);">No orders match the current criteria.</td></tr>`;
       }
     } catch (err) {
       console.error('Orders load error:', err);
@@ -451,7 +405,7 @@
   }
 
   // ==========================================
-  // 7. ANALYTICS & VISITOR MAP
+  // 6. ANALYTICS & PRODUCT-WISE CONVERSION
   // ==========================================
   async function loadAnalytics() {
     const days = document.getElementById('analytics-days-filter')?.value || 7;
@@ -459,48 +413,68 @@
       const res = await adminFetch(`/api/admin/analytics?days=${days}`);
       const data = await res.json();
 
-      document.getElementById('analytics-visitors').textContent = data.visitors;
-      document.getElementById('analytics-pageviews').textContent = data.pageviews;
-      document.getElementById('analytics-conv-rate').textContent = data.funnel.overallConversionRate + '%';
+      document.getElementById('analytics-visitors').textContent = data.visitors || 0;
+      document.getElementById('analytics-pageviews').textContent = data.pageviews || 0;
+      document.getElementById('analytics-total-addtocart').textContent = data.funnel?.addToBags || 0;
+      document.getElementById('analytics-conv-rate').textContent = (data.funnel?.overallConversionRate || '0.0') + '%';
 
-      // Devices
-      const dev = data.devices || {};
-      document.getElementById('analytics-devices').textContent = `Mobile: ${dev.mobile || 0} • Desktop: ${dev.desktop || 0} • Tablet: ${dev.tablet || 0}`;
+      // Funnel Details
+      document.getElementById('funnel-p-views').textContent = data.funnel?.productViews || 0;
+      document.getElementById('funnel-add-bag').textContent = data.funnel?.addToBags || 0;
+      document.getElementById('funnel-checkout').textContent = data.funnel?.checkoutStarts || 0;
+      document.getElementById('funnel-purchase').textContent = data.funnel?.purchases || 0;
 
-      // Funnel
-      document.getElementById('funnel-p-views').textContent = data.funnel.productViews;
-      document.getElementById('funnel-add-bag').textContent = data.funnel.addToBags;
-      document.getElementById('funnel-checkout').textContent = data.funnel.checkoutStarts;
-      document.getElementById('funnel-purchase').textContent = data.funnel.purchases;
+      document.getElementById('funnel-cart-rate').textContent = `(${data.funnel?.cartRate || 0}% of views)`;
+      document.getElementById('funnel-chk-rate').textContent = `(${data.funnel?.checkoutRate || 0}% of carts)`;
+      document.getElementById('funnel-buy-rate').textContent = `(${data.funnel?.purchaseRate || 0}% of checkouts)`;
 
-      document.getElementById('funnel-cart-rate').textContent = `${data.funnel.cartRate}% rate`;
-      document.getElementById('funnel-chk-rate').textContent = `${data.funnel.checkoutRate}% rate`;
-      document.getElementById('funnel-buy-rate').textContent = `${data.funnel.purchaseRate}% rate`;
+      // Product-wise Performance Table
+      const perfTbody = document.getElementById('analytics-product-performance-tbody');
+      const products = data.productPerformance || [];
 
-      // Top Products
-      const prodList = document.getElementById('analytics-top-products');
-      if (data.topProducts && data.topProducts.length > 0) {
-        prodList.innerHTML = data.topProducts.map(p => `
-          <li style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--admin-border); font-size:0.875rem;">
-            <span>${p.name}</span>
-            <strong>${p.count} views</strong>
-          </li>
+      if (products.length > 0) {
+        perfTbody.innerHTML = products.map(p => `
+          <tr>
+            <td>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <img src="${p.image}" style="width:36px;height:36px;border-radius:4px;object-fit:cover;background:#222;" onerror="this.src='/images/delice-01.jpg'">
+                <div>
+                  <strong>${p.name}</strong>
+                  <div style="font-size:0.75rem; color:var(--admin-text-muted);">${formatBDT(p.salePrice || p.price)}</div>
+                </div>
+              </div>
+            </td>
+            <td><strong>${p.views}</strong> views</td>
+            <td><strong style="color:var(--admin-gold);">${p.addToBag}</strong> adds</td>
+            <td><strong>${p.unitsSold}</strong> bottles (${p.ordersCount} orders)</td>
+            <td><strong style="color:#68D391;">${formatBDT(p.revenue)}</strong></td>
+            <td>
+              <span class="badge ${parseFloat(p.cartToBuyRate) > 15 ? 'badge-delivered' : 'badge-pending'}" style="font-size:0.8rem;">
+                ${p.cartToBuyRate}%
+              </span>
+            </td>
+            <td>
+              <span style="font-size:0.85rem; color:var(--admin-text-main);">
+                ${p.viewToBuyRate}%
+              </span>
+            </td>
+          </tr>
         `).join('');
       } else {
-        prodList.innerHTML = `<li style="color:var(--admin-text-muted); font-size:0.85rem; padding:8px 0;">No product telemetry yet.</li>`;
+        perfTbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:32px; color:var(--admin-text-muted);">No product event telemetry recorded yet.</td></tr>`;
       }
 
-      // District Map / Table
+      // Districts
       const locContainer = document.getElementById('analytics-district-breakdown');
       if (data.locations && data.locations.length > 0) {
         locContainer.innerHTML = data.locations.map(loc => `
-          <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--admin-border); font-size:0.875rem;">
+          <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--admin-border); font-size:0.85rem;">
             <span>📍 ${loc.district}</span>
             <strong>${loc.visitors} sessions</strong>
           </div>
         `).join('');
       } else {
-        locContainer.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.85rem; padding:12px;">Real-time visitor telemetry active. No district clusters recorded in selected range.</p>`;
+        locContainer.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.85rem;">No district data yet.</p>`;
       }
 
     } catch (err) {
@@ -509,289 +483,484 @@
   }
 
   // ==========================================
-  // 8. REFERRALS & CUSTOMERS
+  // 7. AUTO LAV GENERATOR (PROFIT ENGINE)
   // ==========================================
-  async function loadReferrals() {
-    try {
-      const res = await adminFetch('/api/admin/referrals');
-      const { codes, payouts } = await res.json();
-
-      const tbody = document.getElementById('referrals-table-tbody');
-      if (codes && codes.length > 0) {
-        tbody.innerHTML = codes.map(r => `
-          <tr>
-            <td><strong style="color:var(--admin-gold);">${r.code}</strong></td>
-            <td>${r.ownerName}<br><small style="color:var(--admin-text-muted);">${r.ownerPhone}</small></td>
-            <td>${r.commissionPercent}% / ${r.refereeDiscountPercent}%</td>
-            <td>${r.stats?.totalUses || 0}</td>
-            <td>${formatBDT(r.stats?.totalRevenueGenerated || 0)}</td>
-            <td>
-              <span style="color:#F6AD55;">${formatBDT(r.stats?.pendingCommission || 0)}</span>
-            </td>
-            <td>
-              <span style="color:#68D391;">${formatBDT(r.stats?.paidCommission || 0)}</span>
-            </td>
-            <td>
-              <button onclick="window.DeliceAdmin.toggleReferral('${r.code}', ${!r.isActive})" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;">
-                ${r.isActive ? 'Deactivate' : 'Activate'}
-              </button>
-            </td>
-          </tr>
-        `).join('');
-      } else {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:32px; color:var(--admin-text-muted);">No referral programs active.</td></tr>`;
-      }
-
-      // Payouts Ledger
-      const ledgerTbody = document.getElementById('payouts-table-tbody');
-      if (payouts && payouts.length > 0) {
-        ledgerTbody.innerHTML = payouts.map(p => `
-          <tr>
-            <td><strong>${p.payoutReference}</strong></td>
-            <td>${p.referralCode} (${p.recipientName})</td>
-            <td>${p.payoutMethod.toUpperCase()} (${p.accountNumber})</td>
-            <td><strong>${formatBDT(p.amount)}</strong></td>
-            <td>${formatDate(p.createdAt)} by ${p.processedByAdmin}</td>
-          </tr>
-        `).join('');
-      } else {
-        ledgerTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--admin-text-muted);">No payouts recorded.</td></tr>`;
-      }
-
-      // Also load customers
-      const custRes = await adminFetch('/api/admin/customers');
-      const { customers } = await custRes.json();
-      const custTbody = document.getElementById('customers-table-tbody');
-      if (customers && customers.length > 0) {
-        custTbody.innerHTML = customers.map(c => `
-          <tr>
-            <td><strong>${c.name}</strong></td>
-            <td>${c.phone}</td>
-            <td>${c.defaultAddress?.district || '—'}</td>
-            <td>${c.totalOrdersCount} orders</td>
-            <td><strong>${formatBDT(c.totalSpentAmount)}</strong></td>
-          </tr>
-        `).join('');
-      } else {
-        custTbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--admin-text-muted);">No patrons registered yet.</td></tr>`;
-      }
-
-    } catch (err) {
-      console.error('Referrals load error:', err);
+  function loadProfitCalculator() {
+    // Populate product selector
+    const sel = document.getElementById('profit-product-select');
+    if (sel) {
+      sel.innerHTML = `<option value="">-- Custom Calculation (or Select Product) --</option>` +
+        cachedProducts.map(p => {
+          const v = (p.variants && p.variants[0]) || { price: 500 };
+          return `<option value="${p._id || p.id}" data-price="${v.salePrice || v.price}">${p.name} (${formatBDT(v.salePrice || v.price)})</option>`;
+        }).join('');
     }
+
+    calculateProfit();
+    renderCatalogProfitMatrix();
+  }
+
+  function calculateProfit() {
+    const P = parseFloat(document.getElementById('profit-price')?.value) || 0;
+    const M = parseFloat(document.getElementById('profit-making')?.value) || 0;
+    const S = parseFloat(document.getElementById('profit-savings')?.value) || 0;
+    const C = parseFloat(document.getElementById('profit-charity')?.value) || 0;
+    const EmpSal = parseFloat(document.getElementById('profit-emp-salary')?.value) || 0;
+    const EmpCount = parseFloat(document.getElementById('profit-emp-count')?.value) || 0;
+    const Pkg = parseFloat(document.getElementById('profit-packaging')?.value) || 0;
+
+    const EmpTotal = EmpSal * EmpCount;
+    document.getElementById('profit-emp-total-preview').textContent = `৳${EmpTotal.toLocaleString()} (${EmpCount} জন × ৳${EmpSal})`;
+
+    const TotalDeductions = M + S + C + EmpTotal + Pkg;
+    const NetProfit = P - TotalDeductions;
+    const ProfitMargin = P > 0 ? ((NetProfit / P) * 100).toFixed(1) : '0.0';
+
+    // Update KPI results
+    const netEl = document.getElementById('profit-result-net');
+    netEl.textContent = formatBDT(NetProfit);
+    netEl.style.color = NetProfit >= 0 ? '#68D391' : '#FC8181';
+
+    document.getElementById('profit-result-margin').textContent = `Margin: ${ProfitMargin}%`;
+    document.getElementById('profit-result-deductions').textContent = formatBDT(TotalDeductions);
+
+    // Update Visual Breakdown Bar & Legend
+    if (P > 0) {
+      const pM = Math.max(1, ((M / P) * 100));
+      const pS = Math.max(1, ((S / P) * 100));
+      const pC = Math.max(0.5, ((C / P) * 100));
+      const pStaff = Math.max(1, ((EmpTotal / P) * 100));
+      const pProf = Math.max(0, ((Math.max(0, NetProfit) / P) * 100));
+
+      document.getElementById('bar-making').style.width = `${pM}%`;
+      document.getElementById('bar-making').textContent = `${pM.toFixed(0)}%`;
+
+      document.getElementById('bar-savings').style.width = `${pS}%`;
+      document.getElementById('bar-savings').textContent = `${pS.toFixed(0)}%`;
+
+      document.getElementById('bar-charity').style.width = `${pC}%`;
+      document.getElementById('bar-charity').textContent = `${pC.toFixed(0)}%`;
+
+      document.getElementById('bar-staff').style.width = `${pStaff}%`;
+      document.getElementById('bar-staff').textContent = `${pStaff.toFixed(0)}%`;
+
+      document.getElementById('bar-profit').style.width = `${pProf}%`;
+      document.getElementById('bar-profit').textContent = `${pProf.toFixed(0)}%`;
+    }
+
+    document.getElementById('legend-making').textContent = formatBDT(M);
+    document.getElementById('legend-savings').textContent = formatBDT(S);
+    document.getElementById('legend-charity').textContent = formatBDT(C);
+    document.getElementById('legend-staff').textContent = formatBDT(EmpTotal);
+    document.getElementById('legend-profit').textContent = formatBDT(NetProfit);
+
+    // Update Monthly Volume Simulator
+    const volume = parseInt(document.getElementById('sim-volume-range')?.value || 100, 10);
+    updateMonthlySim(volume, { P, M, S, C, EmpTotal, NetProfit, EmpCount });
+  }
+
+  function updateMonthlySim(volume, overrides = null) {
+    const P = overrides ? overrides.P : (parseFloat(document.getElementById('profit-price')?.value) || 0);
+    const M = overrides ? overrides.M : (parseFloat(document.getElementById('profit-making')?.value) || 0);
+    const S = overrides ? overrides.S : (parseFloat(document.getElementById('profit-savings')?.value) || 0);
+    const C = overrides ? overrides.C : (parseFloat(document.getElementById('profit-charity')?.value) || 0);
+    const EmpSal = parseFloat(document.getElementById('profit-emp-salary')?.value) || 0;
+    const EmpCount = parseFloat(document.getElementById('profit-emp-count')?.value) || 0;
+    const EmpTotal = EmpSal * EmpCount;
+    const NetProfit = P - (M + S + C + EmpTotal);
+
+    document.getElementById('sim-volume-badge').textContent = volume;
+
+    document.getElementById('sim-total-turnover').textContent = formatBDT(P * volume);
+    document.getElementById('sim-total-making').textContent = formatBDT(M * volume);
+    document.getElementById('sim-total-savings').textContent = formatBDT(S * volume);
+    document.getElementById('sim-total-charity').textContent = formatBDT(C * volume);
+    document.getElementById('sim-total-staff').textContent = `${formatBDT(EmpTotal * volume)} (প্রতিজন ${formatBDT((EmpTotal * volume) / (EmpCount || 1))})`;
+    document.getElementById('sim-total-profit').textContent = formatBDT(NetProfit * volume);
+  }
+
+  function renderCatalogProfitMatrix() {
+    const tbody = document.getElementById('profit-catalog-matrix-tbody');
+    if (!tbody) return;
+
+    if (!cachedProducts || cachedProducts.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:var(--admin-text-muted);">No products in catalog.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = cachedProducts.map(p => {
+      const v = (p.variants && p.variants[0]) || { price: 500, salePrice: null };
+      const selling = v.salePrice || v.price;
+      // Formula based on 50% making, 10% emergency, 1% charity, 16% staff payroll (80 / 500)
+      const estMaking = Math.round(selling * 0.50);
+      const estSavings = Math.round(selling * 0.10);
+      const estCharity = Math.round(selling * 0.01);
+      const estStaff = Math.round(selling * 0.16);
+      const estDeductions = estMaking + estSavings + estCharity + estStaff;
+      const estNetProfit = selling - estDeductions;
+      const margin = ((estNetProfit / selling) * 100).toFixed(1);
+
+      return `
+        <tr>
+          <td>
+            <strong>${p.name}</strong>
+            <div style="font-size:0.75rem; color:var(--admin-text-muted);">${v.size || '100ml'}</div>
+          </td>
+          <td><strong style="color:#fff;">${formatBDT(selling)}</strong></td>
+          <td>${formatBDT(estMaking)}</td>
+          <td>${formatBDT(estSavings + estCharity + estStaff)}</td>
+          <td><strong style="color:#68D391;">${formatBDT(estNetProfit)}</strong></td>
+          <td><span class="badge badge-delivered">${margin}%</span></td>
+          <td>
+            <button onclick="window.DeliceAdmin.loadProductIntoCalculator('${p._id || p.id}')" class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;">
+              Calculate &rarr;
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   // ==========================================
-  // 9. SETTINGS & SECURITY
-  // ==========================================
-  async function loadSettings() {
-    try {
-      const res = await adminFetch('/api/admin/settings');
-      const settings = await res.json();
-
-      document.getElementById('sett-store-name').value = settings.storeName || 'DÉLICE';
-      document.getElementById('sett-tagline').value = settings.tagline || '';
-      document.getElementById('sett-email').value = settings.contact?.email || '';
-      document.getElementById('sett-phone').value = settings.contact?.phone || '';
-      document.getElementById('sett-whatsapp').value = settings.contact?.whatsapp || '';
-      document.getElementById('sett-address').value = settings.contact?.address || '';
-
-      document.getElementById('sett-dhaka-charge').value = settings.deliveryZones?.[0]?.charge ?? 80;
-      document.getElementById('sett-outside-charge').value = settings.deliveryZones?.[1]?.charge ?? 150;
-      document.getElementById('sett-free-threshold').value = settings.freeDeliveryThreshold ?? 5000;
-
-      document.getElementById('sett-cod-enabled').checked = settings.paymentMethods?.cod?.enabled ?? true;
-      document.getElementById('sett-bkash-enabled').checked = settings.paymentMethods?.bkashManual?.enabled ?? true;
-      document.getElementById('sett-bkash-num').value = settings.paymentMethods?.bkashManual?.number || '';
-      document.getElementById('sett-bkash-instruct').value = settings.paymentMethods?.bkashManual?.instructions || '';
-
-      document.getElementById('sett-policy-delivery').value = settings.policies?.delivery || '';
-      document.getElementById('sett-policy-returns').value = settings.policies?.returns || '';
-      document.getElementById('sett-policy-privacy').value = settings.policies?.privacy || '';
-      document.getElementById('sett-policy-terms').value = settings.policies?.terms || '';
-
-      // Audit logs
-      const auditRes = await adminFetch('/api/admin/audit-logs');
-      const logs = await auditRes.json();
-      const auditContainer = document.getElementById('admin-audit-logs-list');
-      if (logs && logs.length > 0) {
-        auditContainer.innerHTML = logs.map(l => `
-          <div style="padding:10px 0; border-bottom:1px solid var(--admin-border); font-size:0.8rem; display:flex; justify-content:space-between;">
-            <div>
-              <strong style="color:var(--admin-gold);">${l.action}</strong>
-              <span style="color:var(--admin-text-muted);"> (${l.targetType}${l.targetId ? ': ' + l.targetId : ''})</span>
-            </div>
-            <div style="color:var(--admin-text-dim);">${formatDateTime(l.createdAt)} by ${l.adminUsername}</div>
-          </div>
-        `).join('');
-      } else {
-        auditContainer.innerHTML = `<p style="color:var(--admin-text-muted); font-size:0.85rem;">No administrative audit entries yet.</p>`;
-      }
-
-    } catch (err) {
-      console.error('Settings load error:', err);
-    }
-  }
-
-  // ==========================================
-  // EXPOSE GLOBAL ACTIONS FOR ADMIN UI
+  // EXPOSE GLOBAL ACTIONS FOR UI
   // ==========================================
   window.DeliceAdmin = {
     showToast: showAdminToast,
+    switchTab,
 
-    // Quick Publish Demo Product
-    quickPublishProduct: async (id) => {
+    // Hero Section Actions
+    addNewHeroSlide: async () => {
+      const fileInput = document.getElementById('hero-slide-file-input');
+      const urlInput = document.getElementById('hero-slide-url-input');
+      const titleInput = document.getElementById('hero-slide-title-input');
+      const linkInput = document.getElementById('hero-slide-link-input');
+
+      let imageUrl = urlInput.value.trim();
+
+      if (fileInput.files && fileInput.files[0]) {
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        formData.append('altText', titleInput.value.trim() || 'Hero Slide');
+
+        try {
+          showAdminToast('Uploading slide image...');
+          const uploadRes = await adminFetch('/api/admin/media/upload', {
+            method: 'POST',
+            body: formData
+          });
+          const uploadData = await uploadRes.json();
+          imageUrl = uploadData.url;
+        } catch (e) {
+          showAdminToast('Could not upload image: ' + e.message, true);
+          return;
+        }
+      }
+
+      if (!imageUrl) {
+        showAdminToast('Please upload an image file or enter an image URL.', true);
+        return;
+      }
+
+      if (!cachedHomepage.hero.slides) cachedHomepage.hero.slides = [];
+
+      cachedHomepage.hero.slides.push({
+        id: 'slide_' + Date.now(),
+        imageUrl,
+        title: titleInput.value.trim(),
+        subtitle: document.getElementById('edit-hero-desc')?.value.trim() || '',
+        link: linkInput.value.trim() || '#collection'
+      });
+
+      renderHeroSlides();
+      fileInput.value = '';
+      urlInput.value = '';
+      titleInput.value = '';
+      linkInput.value = '';
+      showAdminToast('New slide added. Click "Publish Live" to show on the main page.');
+    },
+
+    deleteHeroSlide: (idx) => {
+      if (!confirm('Remove this slide from the slideshow?')) return;
+      cachedHomepage.hero.slides.splice(idx, 1);
+      renderHeroSlides();
+      showAdminToast('Slide removed.');
+    },
+
+    saveHeroDraft: async () => {
+      const draftData = Object.assign({}, cachedHomepage, {
+        hero: {
+          ...cachedHomepage.hero,
+          headline: document.getElementById('edit-hero-headline').value.trim(),
+          description: document.getElementById('edit-hero-desc').value.trim(),
+          ctaText: document.getElementById('edit-hero-cta-text').value.trim(),
+          ctaLink: document.getElementById('edit-hero-cta-link').value.trim(),
+          slides: cachedHomepage.hero.slides || []
+        }
+      });
+
       try {
-        await adminFetch(`/api/admin/products/${id}`, {
-          method: 'PUT',
+        await adminFetch('/api/admin/homepage/draft', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'published', isFeatured: true })
+          body: JSON.stringify(draftData)
         });
-        showAdminToast('Product published to storefront live!');
+        showAdminToast('Hero slideshow draft saved successfully.');
+      } catch (err) {
+        showAdminToast(err.message, true);
+      }
+    },
+
+    publishHeroLive: async () => {
+      try {
+        await window.DeliceAdmin.saveHeroDraft();
+        await adminFetch('/api/admin/homepage/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ note: 'Updated Hero Slideshow' })
+        });
+        showAdminToast('Hero section & slideshow published live to the main page!');
+        loadHeroEditor();
+      } catch (err) {
+        showAdminToast(err.message, true);
+      }
+    },
+
+    // Product Modal & Multi-Image Manager
+    openCreateProductModal: () => {
+      document.getElementById('product-modal-title').textContent = '+ Add New Fragrance Edition';
+      document.getElementById('edit-prod-id').value = '';
+      document.getElementById('edit-prod-name').value = '';
+      document.getElementById('edit-prod-sku').value = '';
+      document.getElementById('edit-prod-family').value = 'Fresh Woody';
+      document.getElementById('edit-prod-status').value = 'published';
+      document.getElementById('edit-prod-size').value = '100ml';
+      document.getElementById('edit-prod-price').value = '12500';
+      document.getElementById('edit-prod-sale-price').value = '';
+      document.getElementById('edit-prod-stock').value = '15';
+      document.getElementById('edit-prod-short-desc').value = '';
+      document.getElementById('edit-prod-full-desc').value = '';
+      document.getElementById('edit-prod-notes-top').value = 'Bergamot, Coriander';
+      document.getElementById('edit-prod-notes-heart').value = 'Atlas Cedarwood, Lavender';
+      document.getElementById('edit-prod-notes-base').value = 'Vetiver, White Musk';
+      document.getElementById('delete-product-btn').style.display = 'none';
+
+      currentModalProductImages = [];
+      renderProductModalImages();
+      document.getElementById('product-modal').classList.add('active');
+    },
+
+    openEditProductModal: (id) => {
+      const p = cachedProducts.find(item => (item._id || item.id) === id);
+      if (!p) return;
+
+      document.getElementById('product-modal-title').textContent = `Edit — ${p.name}`;
+      document.getElementById('edit-prod-id').value = p._id || p.id;
+      document.getElementById('edit-prod-name').value = p.name || '';
+      document.getElementById('edit-prod-sku').value = p.sku || '';
+      document.getElementById('edit-prod-family').value = p.scentFamily || '';
+      document.getElementById('edit-prod-status').value = p.status || 'published';
+
+      const v = (p.variants && p.variants[0]) || {};
+      document.getElementById('edit-prod-size').value = v.size || '100ml';
+      document.getElementById('edit-prod-price').value = v.price || '';
+      document.getElementById('edit-prod-sale-price').value = v.salePrice || '';
+      document.getElementById('edit-prod-stock').value = (typeof v.stock === 'number') ? v.stock : 15;
+
+      document.getElementById('edit-prod-short-desc').value = p.shortDescription || '';
+      document.getElementById('edit-prod-full-desc').value = p.fullDescription || '';
+
+      const notes = p.scentNotes || {};
+      document.getElementById('edit-prod-notes-top').value = (notes.top || []).join(', ');
+      document.getElementById('edit-prod-notes-heart').value = (notes.heart || []).join(', ');
+      document.getElementById('edit-prod-notes-base').value = (notes.base || []).join(', ');
+
+      document.getElementById('delete-product-btn').style.display = 'block';
+
+      currentModalProductImages = (p.images && p.images.length > 0)
+        ? JSON.parse(JSON.stringify(p.images))
+        : [];
+
+      renderProductModalImages();
+      document.getElementById('product-modal').classList.add('active');
+    },
+
+    handleProductFilesUpload: async (fileInput) => {
+      const files = Array.from(fileInput.files || []);
+      if (files.length === 0) return;
+
+      if (currentModalProductImages.length + files.length > 6) {
+        showAdminToast('You can upload up to 5 images per product.', true);
+      }
+
+      for (const file of files.slice(0, 5 - currentModalProductImages.length)) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('altText', file.name);
+
+        try {
+          showAdminToast(`Uploading ${file.name}...`);
+          const res = await adminFetch('/api/admin/media/upload', {
+            method: 'POST',
+            body: formData
+          });
+          const media = await res.json();
+          currentModalProductImages.push({
+            id: 'img_' + Date.now() + Math.random().toString(36).substr(2, 5),
+            url: media.url,
+            thumbnailUrl: media.thumbnailUrl || media.url,
+            altText: file.name,
+            isPrimary: currentModalProductImages.length === 0
+          });
+        } catch (e) {
+          showAdminToast('Upload failed: ' + e.message, true);
+        }
+      }
+
+      fileInput.value = '';
+      renderProductModalImages();
+      showAdminToast('Images uploaded to product gallery.');
+    },
+
+    addProductImageByUrl: () => {
+      const urlInput = document.getElementById('edit-prod-image-url-input');
+      const url = urlInput.value.trim();
+      if (!url) return;
+
+      if (currentModalProductImages.length >= 5) {
+        showAdminToast('Maximum 5 images allowed per product.', true);
+        return;
+      }
+
+      currentModalProductImages.push({
+        id: 'img_' + Date.now(),
+        url,
+        altText: 'Product photo',
+        isPrimary: currentModalProductImages.length === 0
+      });
+
+      urlInput.value = '';
+      renderProductModalImages();
+    },
+
+    setPrimaryProductImage: (index) => {
+      currentModalProductImages.forEach((img, idx) => {
+        img.isPrimary = (idx === index);
+      });
+      renderProductModalImages();
+    },
+
+    deleteProductImage: (index) => {
+      currentModalProductImages.splice(index, 1);
+      if (currentModalProductImages.length > 0 && !currentModalProductImages.some(i => i.isPrimary)) {
+        currentModalProductImages[0].isPrimary = true;
+      }
+      renderProductModalImages();
+    },
+
+    saveProduct: async () => {
+      const pId = document.getElementById('edit-prod-id').value;
+      const name = document.getElementById('edit-prod-name').value.trim();
+      const sku = document.getElementById('edit-prod-sku').value.trim();
+      const scentFamily = document.getElementById('edit-prod-family').value.trim();
+      const status = document.getElementById('edit-prod-status').value;
+      const size = document.getElementById('edit-prod-size').value.trim() || '100ml';
+      const price = parseFloat(document.getElementById('edit-prod-price').value);
+      const salePriceRaw = document.getElementById('edit-prod-sale-price').value.trim();
+      const salePrice = salePriceRaw ? parseFloat(salePriceRaw) : null;
+      const stock = parseInt(document.getElementById('edit-prod-stock').value, 10) || 0;
+      const shortDesc = document.getElementById('edit-prod-short-desc').value.trim();
+      const fullDesc = document.getElementById('edit-prod-full-desc').value.trim() || shortDesc;
+
+      if (!name || !sku || !scentFamily || isNaN(price)) {
+        showAdminToast('Please fill in Name, SKU, Scent Family, and Regular Price.', true);
+        return;
+      }
+
+      const topNotes = document.getElementById('edit-prod-notes-top').value.split(',').map(s => s.trim()).filter(Boolean);
+      const heartNotes = document.getElementById('edit-prod-notes-heart').value.split(',').map(s => s.trim()).filter(Boolean);
+      const baseNotes = document.getElementById('edit-prod-notes-base').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      const productPayload = {
+        name,
+        sku,
+        scentFamily,
+        status,
+        shortDescription: shortDesc,
+        fullDescription: fullDesc,
+        scentNotes: {
+          top: topNotes,
+          heart: heartNotes,
+          base: baseNotes
+        },
+        images: currentModalProductImages.length > 0 ? currentModalProductImages : [{
+          id: 'default',
+          url: '/images/delice-01.jpg',
+          altText: name,
+          isPrimary: true
+        }],
+        variants: [
+          {
+            size,
+            volumeMl: parseInt(size, 10) || 100,
+            price,
+            salePrice,
+            stock,
+            sku: `${sku}-${size}`.toUpperCase()
+          }
+        ]
+      };
+
+      try {
+        if (pId) {
+          // Update product
+          await adminFetch(`/api/admin/products/${pId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productPayload)
+          });
+          showAdminToast(`"${name}" updated successfully.`);
+        } else {
+          // Create product
+          await adminFetch('/api/admin/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productPayload)
+          });
+          showAdminToast(`New fragrance "${name}" added to catalog.`);
+        }
+
+        document.getElementById('product-modal').classList.remove('active');
         loadProducts();
       } catch (err) {
         showAdminToast(err.message, true);
       }
     },
 
-    // Save Homepage Draft
-    saveDraft: async () => {
-      const data = {
-        announcementBar: {
-          enabled: document.getElementById('edit-announcement-enabled').checked,
-          text: document.getElementById('edit-announcement-text').value.trim(),
-          linkUrl: document.getElementById('edit-announcement-link').value.trim()
-        },
-        hero: {
-          headline: document.getElementById('edit-hero-headline').value.trim(),
-          description: document.getElementById('edit-hero-desc').value.trim(),
-          ctaText: document.getElementById('edit-hero-cta-text').value.trim(),
-          ctaLink: document.getElementById('edit-hero-cta-link').value.trim(),
-          desktopImageUrl: document.getElementById('edit-hero-desktop-img').value.trim(),
-          mobileImageUrl: document.getElementById('edit-hero-mobile-img').value.trim(),
-          focalPoint: {
-            x: parseInt(document.getElementById('edit-hero-focal-x').value, 10),
-            y: parseInt(document.getElementById('edit-hero-focal-y').value, 10)
-          }
-        },
-        brandStory: {
-          enabled: true,
-          title: document.getElementById('edit-story-title').value.trim(),
-          subtitle: document.getElementById('edit-story-subtitle').value.trim(),
-          paragraph1: document.getElementById('edit-story-p1').value.trim(),
-          paragraph2: document.getElementById('edit-story-p2').value.trim(),
-          imageUrl: document.getElementById('edit-story-img').value.trim()
-        },
-        customerExperiences: {
-          enabled: document.getElementById('edit-exp-enabled').checked,
-          items: cachedHomepage?.customerExperiences?.items || []
-        },
-        sectionVisibility: {
-          hero: document.getElementById('vis-hero').checked,
-          collection: document.getElementById('vis-collection').checked,
-          story: document.getElementById('vis-story').checked,
-          experiences: document.getElementById('vis-experiences').checked
-        }
-      };
+    deleteCurrentProduct: async () => {
+      const pId = document.getElementById('edit-prod-id').value;
+      const name = document.getElementById('edit-prod-name').value;
+      if (!pId) return;
+
+      if (!confirm(`Are you sure you want to delete "${name}" permanently? This cannot be undone.`)) {
+        return;
+      }
 
       try {
-        await adminFetch('/api/admin/homepage/draft', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        showAdminToast('Homepage draft saved (not yet published).');
+        await adminFetch(`/api/admin/products/${pId}`, { method: 'DELETE' });
+        showAdminToast(`"${name}" has been deleted.`);
+        document.getElementById('product-modal').classList.remove('active');
+        loadProducts();
       } catch (err) {
         showAdminToast(err.message, true);
       }
     },
 
-    // Publish Homepage
-    publishHomepage: async () => {
-      const note = prompt('Enter a short change note for this revision snapshot:', 'Updated storefront presentation');
-      if (note === null) return;
-
+    quickDeleteProduct: async (id, name) => {
+      if (!confirm(`Delete fragrance "${name}" permanently?`)) return;
       try {
-        await window.DeliceAdmin.saveDraft();
-        const res = await adminFetch('/api/admin/homepage/publish', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ note })
-        });
-        showAdminToast('Homepage successfully published to live storefront!');
-        loadHomepageEditor();
-      } catch (err) {
-        showAdminToast(err.message, true);
-      }
-    },
-
-    // Restore Revision
-    restoreRevision: async (revId) => {
-      if (!confirm('Restore this revision snapshot and make it live on the storefront?')) return;
-      try {
-        await adminFetch(`/api/admin/homepage/restore/${revId}`, { method: 'POST' });
-        showAdminToast('Revision restored successfully!');
-        loadHomepageEditor();
-      } catch (err) {
-        showAdminToast(err.message, true);
-      }
-    },
-
-    // Preview Mode (Desktop / Mobile)
-    togglePreview: (mode) => {
-      const modal = document.getElementById('preview-modal');
-      const iframe = document.getElementById('preview-iframe');
-      modal.classList.add('active');
-      iframe.style.width = mode === 'mobile' ? '390px' : '100%';
-      iframe.src = '/';
-    },
-
-    closePreview: () => {
-      document.getElementById('preview-modal').classList.remove('active');
-    },
-
-    // Media Upload
-    uploadMediaFile: async (fileInput) => {
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('altText', file.name);
-
-      try {
-        showAdminToast('Uploading and optimizing image with Sharp...');
-        const res = await adminFetch('/api/admin/media/upload', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!res.ok) throw new Error('Failed to upload file');
-        showAdminToast('Image processed into optimized WebP and stored.');
-        fileInput.value = '';
-        loadMediaLibrary();
-      } catch (err) {
-        showAdminToast(err.message, true);
-      }
-    },
-
-    // Delete Media with Safety Check
-    deleteMediaAsset: async (filename) => {
-      const checkRes = await adminFetch(`/api/admin/media/usage?url=/uploads/${filename}`);
-      const checkData = await checkRes.json();
-
-      if (!checkData.canDeleteSafely) {
-        if (!confirm(`Warning: This image is used in ${checkData.usedIn.join(', ')}.\nAre you sure you want to delete it anyway?`)) {
-          return;
-        }
-      } else {
-        if (!confirm('Are you sure you want to remove this media asset?')) return;
-      }
-
-      try {
-        await adminFetch(`/api/admin/media/${filename}?force=true`, { method: 'DELETE' });
-        showAdminToast('Media asset removed.');
-        loadMediaLibrary();
+        await adminFetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+        showAdminToast(`"${name}" deleted.`);
+        loadProducts();
       } catch (err) {
         showAdminToast(err.message, true);
       }
@@ -799,11 +968,11 @@
 
     // Stock Adjustment Modal
     openStockModal: (productId) => {
-      const p = cachedProducts.find(i => i._id === productId);
+      const p = cachedProducts.find(i => (i._id || i.id) === productId);
       if (!p) return;
 
       document.getElementById('stock-modal-title').textContent = `Adjust Stock — ${p.name}`;
-      document.getElementById('stock-modal-product-id').value = p._id;
+      document.getElementById('stock-modal-product-id').value = p._id || p.id;
 
       const select = document.getElementById('stock-modal-variant-select');
       select.innerHTML = (p.variants || []).map(v => `
@@ -832,7 +1001,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ variantSize: size, newStock, reason })
         });
-        showAdminToast('Stock updated and recorded in inventory ledger.');
+        showAdminToast('Stock updated successfully.');
         document.getElementById('stock-modal').classList.remove('active');
         loadProducts();
       } catch (err) {
@@ -840,7 +1009,7 @@
       }
     },
 
-    // Manage Order Modal
+    // Orders Modal
     openOrderModal: async (orderReference) => {
       try {
         const res = await adminFetch(`/api/admin/orders/${orderReference}`);
@@ -853,10 +1022,10 @@
           <strong>${order.customer.name}</strong><br>
           Phone: ${order.customer.phone}<br>
           Email: ${order.customer.email || 'None'}<br>
-          Address: ${order.customer.fullAddress}, ${order.customer.area}, ${order.customer.district}
+          Delivery Address: ${order.customer.fullAddress}, ${order.customer.area || ''}, ${order.customer.district}
         `;
 
-        document.getElementById('order-modal-items').innerHTML = order.items.map(i => `
+        document.getElementById('order-modal-items').innerHTML = (order.items || []).map(i => `
           <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.875rem;">
             <span>${i.name} (${i.size}) × ${i.quantity}</span>
             <span>${formatBDT(i.subtotal)}</span>
@@ -865,16 +1034,14 @@
 
         document.getElementById('order-modal-total').textContent = formatBDT(order.pricing.total);
 
-        // Status Selectors
         document.getElementById('order-fulfillment-select').value = order.fulfillment.status;
         document.getElementById('order-courier-name').value = order.fulfillment.courierName || '';
         document.getElementById('order-tracking-num').value = order.fulfillment.trackingNumber || '';
 
         document.getElementById('order-payment-select').value = order.payment.status;
-        document.getElementById('order-payment-method-desc').textContent = `Method: ${order.payment.method === 'bkash_manual' ? 'Manual bKash (Sender: ' + (order.payment.bkashSenderNumber || 'None') + ', TrxID: ' + (order.payment.bkashTrxId || 'None') + ')' : 'Cash on Delivery'}`;
+        document.getElementById('order-payment-method-desc').textContent = `Payment Method: ${order.payment.method === 'bkash_manual' ? 'Manual bKash (Sender: ' + (order.payment.bkashSenderNumber || 'None') + ', TrxID: ' + (order.payment.bkashTrxId || 'None') + ')' : 'Cash on Delivery'}`;
 
         document.getElementById('order-modal-notes').value = order.internalNotes || '';
-
         document.getElementById('order-modal').classList.add('active');
       } catch (err) {
         showAdminToast(err.message, true);
@@ -890,21 +1057,18 @@
       const internalNote = document.getElementById('order-modal-notes').value.trim();
 
       try {
-        // Update fulfillment
         await adminFetch(`/api/admin/orders/${ref}/fulfillment`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: fulfillmentStatus, courierName, trackingNumber })
         });
 
-        // Update payment
         await adminFetch(`/api/admin/orders/${ref}/payment`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: paymentStatus })
         });
 
-        // Add note if modified
         if (internalNote) {
           await adminFetch(`/api/admin/orders/${ref}/notes`, {
             method: 'POST',
@@ -921,100 +1085,58 @@
       }
     },
 
-    // Referrals
-    createReferralCode: async () => {
-      const code = prompt('Enter new Referral Code (e.g. VIP10):');
-      if (!code) return;
-      const ownerName = prompt('Enter Ambassador / Patron Name:');
-      if (!ownerName) return;
-      const ownerPhone = prompt('Enter Ambassador Phone Number:');
-      if (!ownerPhone) return;
+    // Profit Calculator Actions
+    calculateProfit,
+    updateMonthlySim,
 
-      try {
-        await adminFetch('/api/admin/referrals', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            code: code.toUpperCase(),
-            ownerName,
-            ownerPhone,
-            commissionPercent: 5,
-            refereeDiscountPercent: 10
-          })
-        });
-        showAdminToast(`Referral code ${code.toUpperCase()} activated.`);
-        loadReferrals();
-      } catch (err) {
-        showAdminToast(err.message, true);
+    onProfitProductSelect: (prodId) => {
+      if (!prodId) {
+        window.DeliceAdmin.resetProfitDefaults();
+        return;
       }
+      const p = cachedProducts.find(i => (i._id || i.id) === prodId);
+      if (!p) return;
+
+      const v = (p.variants && p.variants[0]) || { price: 500 };
+      const price = v.salePrice || v.price;
+
+      document.getElementById('profit-price').value = price;
+      // Proportional production cost (approx 50% for perfume crafting)
+      document.getElementById('profit-making').value = Math.round(price * 0.5);
+      document.getElementById('profit-savings').value = Math.round(price * 0.1);
+      document.getElementById('profit-charity').value = Math.max(5, Math.round(price * 0.01));
+      calculateProfit();
     },
 
-    toggleReferral: async (code, isActive) => {
-      try {
-        await adminFetch(`/api/admin/referrals/${code}/toggle`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isActive })
-        });
-        showAdminToast(`Referral code ${code} is now ${isActive ? 'active' : 'inactive'}.`);
-        loadReferrals();
-      } catch (err) {
-        showAdminToast(err.message, true);
-      }
+    loadProductIntoCalculator: (prodId) => {
+      document.getElementById('profit-product-select').value = prodId;
+      window.DeliceAdmin.onProfitProductSelect(prodId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
-    // Save Settings
-    saveStoreSettings: async () => {
-      const data = {
-        storeName: document.getElementById('sett-store-name').value.trim(),
-        tagline: document.getElementById('sett-tagline').value.trim(),
-        contact: {
-          email: document.getElementById('sett-email').value.trim(),
-          phone: document.getElementById('sett-phone').value.trim(),
-          whatsapp: document.getElementById('sett-whatsapp').value.trim(),
-          address: document.getElementById('sett-address').value.trim()
-        },
-        deliveryZones: [
-          { id: 'dhaka_metro', name: 'Inside Dhaka Metropolitan Area', charge: parseInt(document.getElementById('sett-dhaka-charge').value, 10) || 80 },
-          { id: 'outside_dhaka', name: 'Outside Dhaka (All Bangladesh Districts)', charge: parseInt(document.getElementById('sett-outside-charge').value, 10) || 150 }
-        ],
-        freeDeliveryThreshold: parseInt(document.getElementById('sett-free-threshold').value, 10) || 5000,
-        paymentMethods: {
-          cod: { enabled: document.getElementById('sett-cod-enabled').checked },
-          bkashManual: {
-            enabled: document.getElementById('sett-bkash-enabled').checked,
-            number: document.getElementById('sett-bkash-num').value.trim(),
-            instructions: document.getElementById('sett-bkash-instruct').value.trim()
-          }
-        },
-        policies: {
-          delivery: document.getElementById('sett-policy-delivery').value.trim(),
-          returns: document.getElementById('sett-policy-returns').value.trim(),
-          privacy: document.getElementById('sett-policy-privacy').value.trim(),
-          terms: document.getElementById('sett-policy-terms').value.trim()
-        }
-      };
-
-      try {
-        await adminFetch('/api/admin/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        showAdminToast('Store configuration saved.');
-        loadSettings();
-      } catch (err) {
-        showAdminToast(err.message, true);
-      }
+    resetProfitDefaults: () => {
+      document.getElementById('profit-price').value = 500;
+      document.getElementById('profit-making').value = 250;
+      document.getElementById('profit-savings').value = 50;
+      document.getElementById('profit-charity').value = 5;
+      document.getElementById('profit-emp-salary').value = 20;
+      document.getElementById('profit-emp-count').value = 4;
+      document.getElementById('profit-packaging').value = 0;
+      document.getElementById('profit-product-select').value = '';
+      calculateProfit();
     },
 
-    // Admin Password Change
+    // Settings Modal
+    openSettingsModal: () => {
+      document.getElementById('settings-modal').classList.add('active');
+    },
+
     changeAdminPassword: async () => {
       const curr = document.getElementById('pw-curr').value;
       const next = document.getElementById('pw-next').value;
 
       if (!curr || !next) {
-        showAdminToast('Please fill in both current and new passwords.', true);
+        showAdminToast('Please fill in current and new password.', true);
         return;
       }
 

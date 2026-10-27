@@ -20,7 +20,15 @@ const HomepageSchema = new mongoose.Schema({
     headline: { type: String, default: 'A Signature, Remembered.' },
     description: { type: String, default: 'Haute perfumery crafted in Grasse and bottled for discerning souls in Bangladesh.' },
     ctaText: { type: String, default: 'Discover DÉLICE' },
-    ctaLink: { type: String, default: '#collection' }
+    ctaLink: { type: String, default: '#collection' },
+    slides: [{
+      id: { type: String },
+      imageUrl: { type: String, required: true },
+      title: { type: String, default: '' },
+      subtitle: { type: String, default: '' },
+      link: { type: String, default: '' },
+      order: { type: Number, default: 0 }
+    }]
   },
 
   featuredProducts: [{ type: String }], // Array of product slugs/IDs in display order

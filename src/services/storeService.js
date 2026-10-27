@@ -224,6 +224,22 @@ class StoreService {
     return list[idx];
   }
 
+  async deleteProduct(id, adminUsername = 'Admin') {
+    let removed = null;
+    if (getIsConnected()) {
+      removed = await Product.findByIdAndDelete(id);
+    } else {
+      const list = localStore.getCollection('products');
+      const idx = list.findIndex(p => p._id === id || p.id === id);
+      if (idx !== -1) {
+        removed = list.splice(idx, 1)[0];
+        localStore.save();
+      }
+    }
+    if (!removed) throw new Error('Product not found or already deleted');
+    return removed;
+  }
+
   async adjustStock({ productId, variantSize, newStock, reason, adminUsername = 'Admin', orderReference = null }) {
     let product = await this.getProductById(productId);
     if (!product) throw new Error('Product not found');
@@ -288,6 +304,12 @@ class StoreService {
       if (!home) {
         home = await Homepage.create({});
       }
+      if (home && home.hero && (!home.hero.slides || home.hero.slides.length === 0)) {
+        home.hero.slides = [
+          { id: 'slide-1', imageUrl: home.hero.desktopImageUrl || '/images/hero-desktop.jpg', title: home.hero.headline || 'A Signature, Remembered.', subtitle: home.hero.description || 'Haute Parfumerie Bangladesh', link: home.hero.ctaLink || '#collection' },
+          { id: 'slide-2', imageUrl: '/images/brand-story.jpg', title: 'The Philosophy of Quiet Luxury', subtitle: 'Raw Essence, Meticulous Restraint', link: '#story' }
+        ];
+      }
       return home;
     }
 
@@ -308,7 +330,11 @@ class StoreService {
           headline: 'A Signature, Remembered.',
           description: 'Quiet luxury fragrances distilled in Grasse, bottled for the discerning connoisseur in Bangladesh.',
           ctaText: 'Discover DÉLICE',
-          ctaLink: '#collection'
+          ctaLink: '#collection',
+          slides: [
+            { id: 'slide-1', imageUrl: '/images/hero-desktop.jpg', title: 'A Signature, Remembered.', subtitle: 'Haute Parfumerie Bangladesh', link: '#collection' },
+            { id: 'slide-2', imageUrl: '/images/brand-story.jpg', title: 'The Philosophy of Quiet Luxury', subtitle: 'Raw Essence, Meticulous Restraint', link: '#story' }
+          ]
         },
         featuredProducts: ['delice-no-01', 'delice-no-02'],
         brandStory: {
@@ -351,11 +377,13 @@ class StoreService {
       localStore.save();
     }
 
-    if (isDraft && localStore.data.homepageDraft) {
-      return localStore.data.homepageDraft;
+    const target = (isDraft && localStore.data.homepageDraft) ? localStore.data.homepageDraft : localStore.data.homepage;
+    if (target && target.hero && (!target.hero.slides || target.hero.slides.length === 0)) {
+      target.hero.slides = [
+        { id: 'slide-1', imageUrl: target.hero.desktopImageUrl || '/images/hero-desktop.jpg', title: target.hero.headline || 'A Signature, Remembered.', subtitle: 'Haute Parfumerie Bangladesh', link: target.hero.ctaLink || '#collection' }
+      ];
     }
-
-    return localStore.data.homepage;
+    return target;
   }
 
   async saveHomepageDraft(draftData, adminUsername = 'Admin') {
@@ -1244,6 +1272,61 @@ class StoreService {
       overallConversionRate: uniqueSessions > 0 ? ((purchases / uniqueSessions) * 100).toFixed(2) : 0
     };
 
+    // Product-wise Performance & Conversion Analytics
+    const allProducts = await this.getProducts({ includeArchived: true });
+    let ordersList = [];
+    if (getIsConnected()) {
+      ordersList = await Order.find({ createdAt: { $gte: cutoff } });
+    } else {
+      ordersList = localStore.getCollection('orders').filter(o => new Date(o.createdAt) >= cutoff);
+    }
+
+    const productPerformance = allProducts.map(p => {
+      const pId = p._id ? p._id.toString() : p.id;
+      const views = events.filter(e => e.eventType === 'product_view' && (e.productSlug === p.slug || e.productName === p.name)).length;
+      const addBags = events.filter(e => e.eventType === 'add_to_bag' && (e.productSlug === p.slug || e.productName === p.name)).length;
+      
+      let unitsSold = 0;
+      let revenue = 0;
+      let orderMatches = 0;
+
+      ordersList.forEach(order => {
+        let matchedInOrder = false;
+        (order.items || []).forEach(item => {
+          if (item.slug === p.slug || item.productId === pId || item.name === p.name) {
+            unitsSold += (item.quantity || 1);
+            revenue += (item.subtotal || ((item.unitPrice || 0) * (item.quantity || 1)));
+            matchedInOrder = true;
+          }
+        });
+        if (matchedInOrder) orderMatches++;
+      });
+
+      const cartToBuyRate = addBags > 0 
+        ? Math.min(100, (orderMatches / addBags) * 100).toFixed(1)
+        : (orderMatches > 0 ? '100.0' : '0.0');
+
+      const viewToBuyRate = views > 0 
+        ? Math.min(100, (orderMatches / views) * 100).toFixed(1)
+        : (orderMatches > 0 ? '100.0' : '0.0');
+
+      return {
+        id: pId,
+        name: p.name,
+        slug: p.slug,
+        image: (p.images && p.images[0]) ? p.images[0].url : '/images/delice-01.jpg',
+        price: (p.variants && p.variants[0]) ? p.variants[0].price : 0,
+        salePrice: (p.variants && p.variants[0]) ? p.variants[0].salePrice : null,
+        views,
+        addToBag: addBags,
+        ordersCount: orderMatches,
+        unitsSold,
+        revenue,
+        cartToBuyRate,
+        viewToBuyRate
+      };
+    });
+
     return {
       timeframeDays,
       visitors: uniqueSessions,
@@ -1252,7 +1335,8 @@ class StoreService {
       topPages,
       topProducts,
       locations,
-      funnel
+      funnel,
+      productPerformance
     };
   }
 

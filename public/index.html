@@ -98,13 +98,17 @@
     <!-- 3. HERO SECTION -->
     <section id="hero" class="hero-section">
       <div class="hero-media-wrapper">
-        <img 
-          id="hero-img" 
-          class="hero-image" 
-          src="/images/hero-desktop.jpg" 
-          alt="DÉLICE Haute Parfumerie signature bottle"
-          style="object-position: 50% 50%;"
-        >
+        <div id="hero-slides-container" class="hero-slides-container">
+          <div class="hero-slide active">
+            <img 
+              id="hero-img" 
+              class="hero-image" 
+              src="/images/hero-desktop.jpg" 
+              alt="DÉLICE Haute Parfumerie signature bottle"
+              style="object-position: 50% 50%;"
+            >
+          </div>
+        </div>
         <div class="hero-overlay"></div>
       </div>
       <div class="container">
@@ -116,6 +120,13 @@
           </p>
           <a id="hero-cta" href="#collection" class="btn btn-primary">Discover DÉLICE</a>
         </div>
+      </div>
+
+      <!-- Hero Slider Navigation Controls -->
+      <div id="hero-slider-nav" class="hero-slider-nav" style="display: none;">
+        <button id="hero-slide-prev" class="hero-nav-arrow" aria-label="Previous Slide">&#10094;</button>
+        <div id="hero-slider-dots" class="hero-slider-dots"></div>
+        <button id="hero-slide-next" class="hero-nav-arrow" aria-label="Next Slide">&#10095;</button>
       </div>
     </section>
 
@@ -279,6 +290,85 @@
   <!-- STOREFRONT JAVASCRIPT & PAGE INITIALIZER -->
   <script src="/js/storefront.js"></script>
   <script>
+    let heroSlides = [];
+    let currentSlideIndex = 0;
+    let slideTimer = null;
+
+    function initHeroSlider(slides) {
+      if (!slides || slides.length === 0) return;
+      heroSlides = slides;
+      currentSlideIndex = 0;
+
+      const container = document.getElementById('hero-slides-container');
+      const nav = document.getElementById('hero-slider-nav');
+      const dotsContainer = document.getElementById('hero-slider-dots');
+
+      container.innerHTML = slides.map((s, idx) => `
+        <div class="hero-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+          <img src="${s.imageUrl}" class="hero-image" alt="${s.title || 'DÉLICE Parfums'}" style="object-position: 50% 50%;">
+        </div>
+      `).join('');
+
+      if (slides.length > 1) {
+        nav.style.display = 'flex';
+        dotsContainer.innerHTML = slides.map((_, idx) => `
+          <button class="hero-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}" aria-label="Go to slide ${idx + 1}"></button>
+        `).join('');
+
+        dotsContainer.querySelectorAll('.hero-dot').forEach(dot => {
+          dot.addEventListener('click', () => {
+            goToSlide(parseInt(dot.getAttribute('data-index'), 10));
+            restartSlideTimer();
+          });
+        });
+
+        document.getElementById('hero-slide-prev')?.addEventListener('click', () => {
+          goToSlide(currentSlideIndex - 1);
+          restartSlideTimer();
+        });
+
+        document.getElementById('hero-slide-next')?.addEventListener('click', () => {
+          goToSlide(currentSlideIndex + 1);
+          restartSlideTimer();
+        });
+
+        startSlideTimer();
+      } else {
+        nav.style.display = 'none';
+      }
+    }
+
+    function goToSlide(index) {
+      if (!heroSlides || heroSlides.length === 0) return;
+      currentSlideIndex = (index + heroSlides.length) % heroSlides.length;
+
+      document.querySelectorAll('.hero-slide').forEach((slide, idx) => {
+        slide.classList.toggle('active', idx === currentSlideIndex);
+      });
+
+      document.querySelectorAll('.hero-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentSlideIndex);
+      });
+
+      const activeSlide = heroSlides[currentSlideIndex];
+      if (activeSlide) {
+        if (activeSlide.title) document.getElementById('hero-headline').textContent = activeSlide.title;
+        if (activeSlide.subtitle) document.getElementById('hero-description').textContent = activeSlide.subtitle;
+        if (activeSlide.link) document.getElementById('hero-cta').href = activeSlide.link;
+      }
+    }
+
+    function startSlideTimer() {
+      if (slideTimer) clearInterval(slideTimer);
+      slideTimer = setInterval(() => {
+        goToSlide(currentSlideIndex + 1);
+      }, 4500);
+    }
+
+    function restartSlideTimer() {
+      startSlideTimer();
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('current-year').textContent = new Date().getFullYear();
 
@@ -299,19 +389,18 @@
           document.getElementById('announcement-bar').style.display = 'none';
         }
 
-        // 2. Hero Section
+        // 2. Hero Section & Slideshow Engine
         if (homepage.hero) {
-          const heroImg = document.getElementById('hero-img');
-          const isMobile = window.innerWidth < 768;
-          heroImg.src = (isMobile && homepage.hero.mobileImageUrl) ? homepage.hero.mobileImageUrl : homepage.hero.desktopImageUrl;
-          
-          if (homepage.hero.focalPoint) {
-            heroImg.style.objectPosition = `${homepage.hero.focalPoint.x}% ${homepage.hero.focalPoint.y}%`;
-          }
           if (homepage.hero.headline) document.getElementById('hero-headline').textContent = homepage.hero.headline;
           if (homepage.hero.description) document.getElementById('hero-description').textContent = homepage.hero.description;
           if (homepage.hero.ctaText) document.getElementById('hero-cta').textContent = homepage.hero.ctaText;
           if (homepage.hero.ctaLink) document.getElementById('hero-cta').href = homepage.hero.ctaLink;
+
+          let slides = (homepage.hero.slides && homepage.hero.slides.length > 0)
+            ? homepage.hero.slides
+            : [{ imageUrl: homepage.hero.desktopImageUrl || '/images/hero-desktop.jpg', title: homepage.hero.headline, subtitle: homepage.hero.description, link: homepage.hero.ctaLink }];
+
+          initHeroSlider(slides);
         }
 
         // 3. Products Grid
@@ -321,6 +410,8 @@
             const primaryImg = (p.images || []).find(i => i.isPrimary) || (p.images || [])[0];
             const defaultVariant = (p.variants || [])[0] || { size: '100ml', price: 12500, stock: 10 };
             const isSoldOut = (p.variants || []).every(v => v.stock <= 0);
+            const hasDiscount = Boolean(defaultVariant.salePrice && defaultVariant.salePrice < defaultVariant.price);
+            const discountAmount = hasDiscount ? (defaultVariant.price - defaultVariant.salePrice) : 0;
 
             return `
               <article class="product-card">
@@ -329,7 +420,7 @@
                     <img src="${primaryImg ? primaryImg.url : '/images/delice-01.jpg'}" alt="${primaryImg ? primaryImg.altText : p.name}" loading="lazy">
                   </a>
                   ${isSoldOut ? '<span class="badge-soldout">Sold Out</span>' : ''}
-                  ${defaultVariant.salePrice ? '<span class="badge-sale">Courtesy Offer</span>' : ''}
+                  ${hasDiscount ? `<span class="badge-sale">৳${discountAmount.toLocaleString()} OFF</span>` : ''}
                 </div>
                 <div class="product-card-body">
                   <span class="product-family">${p.scentFamily}</span>
@@ -339,7 +430,7 @@
                   <div class="product-card-footer">
                     <div class="product-price-wrap">
                       <span class="product-price">${window.Delice.formatBDT(defaultVariant.salePrice || defaultVariant.price)}</span>
-                      ${defaultVariant.salePrice ? `<span class="product-original-price">${window.Delice.formatBDT(defaultVariant.price)}</span>` : ''}
+                      ${hasDiscount ? `<span class="product-original-price">${window.Delice.formatBDT(defaultVariant.price)}</span>` : ''}
                     </div>
                     <a href="/product/${p.slug}" class="btn btn-secondary" style="padding: 10px 20px; font-size: 0.775rem;">
                       View Details
