@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details — DÉLICE Fragrances</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/monogram.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+  <style>
+    .gallery-thumbs {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+    .thumb-btn {
+      width: 72px;
+      height: 72px;
+      border: 1.5px solid #E0D4C3;
+      border-radius: 6px;
+      padding: 4px;
+      background: #FFFFFF;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .thumb-btn:hover, .thumb-btn.active {
+      border-color: #4A102A;
+      box-shadow: 0 4px 10px rgba(74, 16, 42, 0.15);
+    }
+    .thumb-btn img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <span class="badge-pill">Opening Offer</span>
+    <span>Special Launch Price: <strong>৳799</strong> (Regular ৳850) on all 30ml Editions &bull; Delivery across Bangladesh</span>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="/" class="navbar-brand">
+          <img src="/assets/images/logo.svg" alt="DÉLICE" height="46">
+        </a>
+        <ul class="nav-menu">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/index.html#collection" class="nav-link active">Shop</a></li>
+          <li><a href="/index.html#story" class="nav-link">Our Story</a></li>
+          <li><a href="/index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <div class="nav-actions">
+          <button type="button" class="cart-toggle-btn" data-cart-open aria-label="Open Shopping Bag">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span class="cart-count">0</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <nav style="margin-bottom:2rem; font-size:0.85rem; color:#59555B;">
+        <a href="/" style="color:#4A102A; font-weight:600;">Home</a> / <a href="/index.html#collection" style="color:#4A102A;">Collection</a> / <span id="breadcrumbCurrent">Product</span>
+      </nav>
+
+      <div class="product-detail-grid" id="productDetailContainer">
+        <!-- Rendered by JavaScript -->
+        <div style="text-align:center; padding:3rem; grid-column:1/-1;">
+          <p>Loading fragrance details...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved. Brand Owner: Mohaiminul Islam.</div>
+        <div>Dhaka, Bangladesh &bull; Make It Yours.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Slide-out Cart Drawer -->
+  <div class="cart-drawer-overlay" id="cartOverlay"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+      <h3>Your Shopping Bag</h3>
+      <button type="button" class="drawer-close-btn" data-cart-close>&times;</button>
+    </div>
+    <div class="cart-drawer-items" id="drawerCartItems"></div>
+    <div class="cart-drawer-footer" id="drawerCartFooter">
+      <div class="cart-summary-line">
+        <span>Product Subtotal</span>
+        <strong id="drawerSubtotal">৳0</strong>
+      </div>
+      <div class="cart-summary-line" style="font-size:0.8rem; color:#FF665C;">
+        <span id="drawerSavings"></span>
+      </div>
+      <a href="/checkout.html" class="btn btn-primary btn-block">Proceed to Checkout</a>
+    </div>
+  </aside>
+
+  <script src="/js/cart.js?v=4.1.0"></script>
+  <script src="/js/app.js?v=4.1.0"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const prodId = urlParams.get('id') || 'delice-bloom';
+
+      let product = (typeof DEFAULT_PRODUCTS !== 'undefined' ? DEFAULT_PRODUCTS.find(p => p.id === prodId) : null) || (typeof DEFAULT_PRODUCTS !== 'undefined' ? DEFAULT_PRODUCTS[0] : null) || { id: prodId, name: 'DÉLICE Fragrance' };
+
+      try {
+        const res = await fetch(`/api/products/${prodId}?t=${Date.now()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.name) product = data;
+        }
+      } catch (e) {
+        console.warn('Failed to fetch dynamic product details:', e);
+      }
+
+      document.title = `${product.name} (30ml) — DÉLICE Fragrances`;
+      const bc = document.getElementById('breadcrumbCurrent');
+      if (bc) bc.textContent = product.name;
+
+      // Match packaging box SVG fallback
+      let boxImg = '/assets/images/bloom-box.svg';
+      if (product.id.includes('momentum')) boxImg = '/assets/images/momentum-box.svg';
+      if (product.id.includes('enigma')) boxImg = '/assets/images/enigma-box.svg';
+
+      // Up to 4 product pictures
+      const imgs = (product.images && product.images.length > 0)
+        ? product.images
+        : [product.image, boxImg, '/assets/images/hero-slide-1.svg', '/assets/images/brand-story.svg'].filter(Boolean);
+
+      const container = document.getElementById('productDetailContainer');
+      if (container) {
+        window.detailImgs = imgs.slice(0, 4);
+        window.detailCurrentIndex = 0;
+
+        container.innerHTML = `
+          <div>
+            <div class="detail-gallery" id="mainGalleryFrame" style="background:#FAF6F0; border-radius:8px; padding:2.5rem; display:flex; align-items:center; justify-content:center; min-height:420px; position:relative;">
+              <!-- Left Arrow Button -->
+              <button type="button" class="page-gallery-arrow page-gallery-prev" 
+                aria-label="Previous Image" 
+                title="Previous Angle"
+                onclick="slideDetailPage(-1, event)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+
+              <img src="${imgs[0] || product.image}" id="mainDetailImage" alt="${product.name} 30ml Bottle" style="max-height:400px; width:auto; object-fit:contain; transition:opacity 0.18s ease;">
+
+              <!-- Right Arrow Button -->
+              <button type="button" class="page-gallery-arrow page-gallery-next" 
+                aria-label="Next Image" 
+                title="Next Angle"
+                onclick="slideDetailPage(1, event)">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+            <!-- Dynamic 4-Photo Thumbnails -->
+            <div class="gallery-thumbs" id="detailGalleryThumbs" style="display:flex; justify-content:center; gap:0.75rem; margin-top:1rem; flex-wrap:wrap;">
+              ${imgs.slice(0, 4).map((img, i) => `
+                <button type="button" class="thumb-btn ${i === 0 ? 'active' : ''}" id="thumb-${i}" onclick="setDetailPageImageIndex(${i})" style="width:58px; height:58px; border-radius:6px; overflow:hidden; border:2px solid ${i === 0 ? '#4A102A' : '#E0D4C3'}; background:#FFF; cursor:pointer; padding:2px;">
+                  <img src="${img}" alt="Angle ${i + 1}" style="width:100%; height:100%; object-fit:cover;">
+                </button>
+              `).join('')}
+            </div>
+            <p style="text-align:center; font-size:0.75rem; color:#87828A; margin-top:0.65rem;">Explore all 4 angles: Bottle Flacon, Unboxing Box, Campaign &amp; Editorial</p>
+          </div>
+
+          <div class="detail-content">
+            <div class="detail-meta-header">
+              <span class="tagline-sub">AUTHENTIC 30ML EDITION</span>
+              <h1 class="detail-title">${product.name}</h1>
+              <div class="detail-pricing">
+                <span class="price-current">৳${product.price}</span>
+                <span class="price-original">৳${product.originalPrice}</span>
+                <span class="badge-offer">Opening Offer &bull; Save ৳${product.originalPrice - product.price}</span>
+              </div>
+            </div>
+
+            <div style="margin-bottom:1.75rem;">
+              <h4 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.1em; color:#4A102A; margin-bottom:0.5rem;">Scent Profile</h4>
+              <p style="font-size:1.05rem; line-height:1.7; color:#181619;">${product.description}</p>
+            </div>
+
+            <div style="margin-bottom:2rem;">
+              <h4 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.1em; color:#4A102A; margin-bottom:0.65rem;">Recommended Occasions</h4>
+              <div class="occasion-pill-list">
+                ${(product.occasions || []).map(occ => `<span class="occasion-pill">${occ}</span>`).join('')}
+              </div>
+            </div>
+
+            <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:8px; padding:1.25rem; margin-bottom:2rem;">
+              <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A102A" stroke-width="2">
+                  <rect x="1" y="3" width="15" height="13"></rect>
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                  <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                  <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+                <strong style="font-size:0.9rem;">Estimated Delivery in Bangladesh:</strong>
+              </div>
+              <p style="font-size:0.85rem; color:#59555B; margin:0;">Inside Dhaka: 1–2 business days (৳60) &bull; Outside Dhaka: 2–4 business days (৳120)</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+              <button type="button" class="btn btn-primary" onclick="DeliceCart.addItem(window.currentActiveProduct, 1)" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700;">
+                Add to Cart
+              </button>
+              <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700; text-align:center;">
+                Buy Now
+              </a>
+            </div>
+          </div>
+        `;
+        window.currentActiveProduct = product;
+      }
+    });
+
+    function setDetailPageImageIndex(index) {
+      const imgs = window.detailImgs || [];
+      if (!imgs.length) return;
+      if (index < 0) index = imgs.length - 1;
+      if (index >= imgs.length) index = 0;
+      window.detailCurrentIndex = index;
+
+      const mainImg = document.getElementById('mainDetailImage');
+      if (mainImg) {
+        mainImg.src = imgs[index];
+      }
+      document.querySelectorAll('#detailGalleryThumbs .thumb-btn').forEach((btn, i) => {
+        if (i === index) {
+          btn.classList.add('active');
+          btn.style.borderColor = '#4A102A';
+        } else {
+          btn.classList.remove('active');
+          btn.style.borderColor = '#E0D4C3';
+        }
+      });
+    }
+    window.setDetailPageImageIndex = setDetailPageImageIndex;
+
+    function slideDetailPage(direction, event) {
+      if (event) event.stopPropagation();
+      setDetailPageImageIndex((window.detailCurrentIndex || 0) + direction);
+    }
+    window.slideDetailPage = slideDetailPage;
+
+    function switchDetailView(imgSrc, activeThumbId) {
+      const idx = (window.detailImgs || []).indexOf(imgSrc);
+      if (idx !== -1) {
+        setDetailPageImageIndex(idx);
+      } else {
+        const mainImg = document.getElementById('mainDetailImage');
+        if (mainImg) mainImg.src = imgSrc;
+      }
+    }
+
+    // Touch swipe support on main gallery frame
+    document.addEventListener('touchstart', (e) => {
+      const frame = e.target.closest('#mainGalleryFrame');
+      if (!frame) return;
+      frame._touchStartX = e.changedTouches[0].screenX;
+      frame._touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      const frame = e.target.closest('#mainGalleryFrame');
+      if (!frame || frame._touchStartX === undefined) return;
+      const diffX = e.changedTouches[0].screenX - frame._touchStartX;
+      const diffY = e.changedTouches[0].screenY - frame._touchStartY;
+      if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
+        slideDetailPage(diffX < 0 ? 1 : -1, e);
+      }
+    }, { passive: true });
+
+    // Keyboard arrow key navigation on product page
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        slideDetailPage(-1, e);
+      } else if (e.key === 'ArrowRight') {
+        slideDetailPage(1, e);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" width="100%" height="100%">
+  <defs>
+    <radialGradient id="boxBgM" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#F4EFE9" />
+      <stop offset="100%" stop-color="#E2D9CC" />
+    </radialGradient>
+    <filter id="cartonShadowM" x="-20%" y="-10%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="30" stdDeviation="22" flood-color="#181619" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <rect width="600" height="750" fill="url(#boxBgM)" />
+  <ellipse cx="300" cy="650" rx="140" ry="14" fill="#181619" opacity="0.16" filter="blur(10px)" />
+
+  <g filter="url(#cartonShadowM)" transform="translate(180, 160)">
+    <rect x="0" y="0" width="240" height="470" rx="4" fill="#FDFBF7" stroke="#181619" stroke-width="1.2" />
+    <rect x="12" y="12" width="216" height="446" rx="2" fill="none" stroke="#C5A46D" stroke-width="0.8" opacity="0.4" stroke-dasharray="3 3" />
+
+    <rect x="0" y="0" width="240" height="14" rx="4" fill="#181619" />
+
+    <circle cx="120" cy="80" r="28" fill="#FAF6F0" stroke="#181619" stroke-width="1.2" />
+    <circle cx="120" cy="80" r="24" fill="none" stroke="#C5A46D" stroke-width="0.6" opacity="0.6" />
+    <text x="120" y="90" font-family="'Bodoni Moda', serif" font-weight="700" font-size="24" fill="#181619" text-anchor="middle">D</text>
+
+    <text x="120" y="165" font-family="'Bodoni Moda', Georgia, serif" font-weight="700" font-size="28" fill="#181619" text-anchor="middle" letter-spacing="3">DÉLICE</text>
+    <text x="120" y="188" font-family="'Manrope', sans-serif" font-weight="600" font-size="9" fill="#4A102A" text-anchor="middle" letter-spacing="4">MAKE IT YOURS.</text>
+
+    <line x1="60" y1="215" x2="180" y2="215" stroke="#181619" stroke-width="1" />
+
+    <text x="120" y="260" font-family="'Bodoni Moda', Georgia, serif" font-weight="700" font-size="24" fill="#181619" text-anchor="middle" letter-spacing="3">MOMENTUM</text>
+    <text x="120" y="285" font-family="'Manrope', sans-serif" font-weight="600" font-size="10" fill="#4A102A" text-anchor="middle" letter-spacing="2">EAU DE PARFUM</text>
+    <text x="120" y="305" font-family="'Manrope', sans-serif" font-weight="500" font-size="9" fill="#59555B" text-anchor="middle">NATURAL SPRAY &bull; VAPORISATEUR</text>
+
+    <text x="120" y="415" font-family="'Manrope', sans-serif" font-weight="700" font-size="13" fill="#181619" text-anchor="middle" letter-spacing="2">30 ml e 1.01 fl. oz.</text>
+    <text x="120" y="435" font-family="'Manrope', sans-serif" font-weight="600" font-size="8" fill="#C5A46D" text-anchor="middle" letter-spacing="1">AUTHENTIC BATCH &bull; DHAKA, BANGLADESH</text>
+  </g>
+</svg>

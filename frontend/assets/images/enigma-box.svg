@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" width="100%" height="100%">
+  <defs>
+    <radialGradient id="boxBgE" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="60%" stop-color="#F2EBE5" />
+      <stop offset="100%" stop-color="#DDCBC3" />
+    </radialGradient>
+    <linearGradient id="goldFoiling" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EED397" />
+      <stop offset="50%" stop-color="#FFF2D6" />
+      <stop offset="100%" stop-color="#9C7738" />
+    </linearGradient>
+    <filter id="cartonShadowE" x="-20%" y="-10%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="30" stdDeviation="22" flood-color="#4A102A" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <rect width="600" height="750" fill="url(#boxBgE)" />
+  <ellipse cx="300" cy="650" rx="140" ry="14" fill="#4A102A" opacity="0.2" filter="blur(10px)" />
+
+  <!-- Folding Carton Box (Rich Velvet Burgundy with Gold Foiling) -->
+  <g filter="url(#cartonShadowE)" transform="translate(180, 160)">
+    <rect x="0" y="0" width="240" height="470" rx="4" fill="#4A102A" stroke="#C5A46D" stroke-width="1.5" />
+    <rect x="12" y="12" width="216" height="446" rx="2" fill="none" stroke="#C5A46D" stroke-width="0.8" opacity="0.4" stroke-dasharray="4 4" />
+
+    <!-- Top Cap Strip (Gold accent) -->
+    <rect x="0" y="0" width="240" height="14" rx="4" fill="url(#goldFoiling)" />
+
+    <!-- Embossed Gold Seal -->
+    <circle cx="120" cy="80" r="28" fill="#380B1F" stroke="url(#goldFoiling)" stroke-width="1.4" />
+    <circle cx="120" cy="80" r="24" fill="none" stroke="#C5A46D" stroke-width="0.6" opacity="0.5" />
+    <text x="120" y="90" font-family="'Bodoni Moda', serif" font-weight="700" font-size="24" fill="url(#goldFoiling)" text-anchor="middle">D</text>
+
+    <!-- Brand Typography -->
+    <text x="120" y="165" font-family="'Bodoni Moda', Georgia, serif" font-weight="700" font-size="28" fill="#F6F0E8" text-anchor="middle" letter-spacing="3">DÉLICE</text>
+    <text x="120" y="188" font-family="'Manrope', sans-serif" font-weight="600" font-size="9" fill="url(#goldFoiling)" text-anchor="middle" letter-spacing="4">MAKE IT YOURS.</text>
+
+    <line x1="60" y1="215" x2="180" y2="215" stroke="url(#goldFoiling)" stroke-width="1" />
+
+    <!-- Variant Title -->
+    <text x="120" y="260" font-family="'Bodoni Moda', Georgia, serif" font-weight="700" font-size="24" fill="#F6F0E8" text-anchor="middle" letter-spacing="3">ENIGMA</text>
+    <text x="120" y="285" font-family="'Manrope', sans-serif" font-weight="600" font-size="10" fill="url(#goldFoiling)" text-anchor="middle" letter-spacing="2">EAU DE PARFUM</text>
+    <text x="120" y="305" font-family="'Manrope', sans-serif" font-weight="500" font-size="9" fill="#E0D4C3" opacity="0.8" text-anchor="middle">NATURAL SPRAY &bull; VAPORISATEUR</text>
+
+    <!-- Bottom Specs -->
+    <text x="120" y="415" font-family="'Manrope', sans-serif" font-weight="700" font-size="13" fill="#F6F0E8" text-anchor="middle" letter-spacing="2">30 ml e 1.01 fl. oz.</text>
+    <text x="120" y="435" font-family="'Manrope', sans-serif" font-weight="600" font-size="8" fill="url(#goldFoiling)" text-anchor="middle" letter-spacing="1">AUTHENTIC BATCH &bull; DHAKA, BANGLADESH</text>
+  </g>
+</svg>

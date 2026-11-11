@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="100%" height="100%">
+  <defs>
+    <radialGradient id="hero3Grad" cx="60%" cy="50%" r="85%">
+      <stop offset="0%" stop-color="#220B15" />
+      <stop offset="50%" stop-color="#181619" />
+      <stop offset="100%" stop-color="#0E0D0F" />
+    </radialGradient>
+    <linearGradient id="warmSpot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C5A46D" stop-opacity="0.3" />
+      <stop offset="60%" stop-color="#FF665C" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.9" />
+    </linearGradient>
+    <filter id="softGlow3" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="60" />
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#hero3Grad)" />
+  <rect width="1600" height="900" fill="url(#warmSpot)" />
+
+  <circle cx="1100" cy="400" r="320" fill="#4A102A" opacity="0.45" filter="url(#softGlow3)" />
+  <circle cx="950" cy="550" r="240" fill="#C5A46D" opacity="0.2" filter="url(#softGlow3)" />
+
+  <!-- Single Enigma Hero Bottle on right -->
+  <g transform="translate(1050, 160)">
+    <rect x="0" y="200" width="200" height="400" rx="20" fill="#DDA675" opacity="0.95" />
+    <rect x="-5" y="190" width="210" height="415" rx="22" fill="none" stroke="#FFFFFF" stroke-width="8" opacity="0.4" />
+    <!-- Label -->
+    <rect x="30" y="300" width="140" height="190" rx="4" fill="#4A102A" stroke="#C5A46D" stroke-width="1.2" />
+    <text x="100" y="345" font-family="'Bodoni Moda', serif" font-weight="700" font-size="20" fill="#F6F0E8" text-anchor="middle">DÉLICE</text>
+    <text x="100" y="395" font-family="'Bodoni Moda', serif" font-weight="700" font-size="18" fill="#F6F0E8" text-anchor="middle">ENIGMA</text>
+    <text x="100" y="425" font-family="'Manrope', sans-serif" font-weight="500" font-size="9" fill="#C5A46D" text-anchor="middle">EAU DE PARFUM</text>
+    <text x="100" y="455" font-family="'Manrope', sans-serif" font-weight="600" font-size="10" fill="#F6F0E8" text-anchor="middle">30 ml</text>
+    <!-- Cap -->
+    <rect x="60" y="75" width="80" height="110" rx="8" fill="#C5A46D" />
+    <rect x="60" y="185" width="80" height="15" fill="#4A102A" />
+    <circle cx="100" cy="120" r="14" fill="#4A102A" />
+    <text x="100" y="125" font-family="'Bodoni Moda', serif" font-weight="700" font-size="14" fill="#F6F0E8" text-anchor="middle">D</text>
+  </g>
+
+  <!-- Editorial Text -->
+  <g transform="translate(120, 240)">
+    <text x="0" y="0" font-family="'Manrope', sans-serif" font-weight="600" font-size="13" fill="#FF665C" letter-spacing="4">ELEVATE YOUR PRESENCE</text>
+    <text x="0" y="70" font-family="'Bodoni Moda', Georgia, serif" font-weight="700" font-size="64" fill="#F6F0E8" letter-spacing="1">Your Mood.</text>
+    <text x="0" y="145" font-family="'Bodoni Moda', Georgia, serif" font-style="italic" font-weight="500" font-size="66" fill="#C5A46D" letter-spacing="1">Your Moments.</text>
+    <text x="0" y="210" font-family="'Manrope', sans-serif" font-weight="400" font-size="18" fill="#F6F0E8" opacity="0.85">
+      <tspan x="0" dy="0">Because luxury is the feeling of choosing something thoughtfully for yourself.</tspan>
+      <tspan x="0" dy="28">Compact 30ml travel-friendly format. Long-lasting confidence.</tspan>
+    </text>
+
+    <g transform="translate(0, 280)">
+      <rect width="210" height="42" rx="21" fill="#FF665C" />
+      <text x="105" y="26" font-family="'Manrope', sans-serif" font-weight="700" font-size="13" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">SHOP ENIGMA ৳799</text>
+    </g>
+  </g>
+</svg>

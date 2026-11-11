@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Shopping Bag — DÉLICE Fragrances</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/monogram.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <span class="badge-pill">Opening Offer</span>
+    <span>Special Launch Price: <strong>৳799</strong> on all 30ml Editions &bull; Nationwide Delivery</span>
+  </div>
+
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="/" class="navbar-brand">
+          <img src="/assets/images/logo.svg" alt="DÉLICE" height="46">
+        </a>
+        <ul class="nav-menu">
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/index.html#collection" class="nav-link">Shop</a></li>
+          <li><a href="/index.html#story" class="nav-link">Our Story</a></li>
+          <li><a href="/index.html#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <div class="nav-actions">
+          <button type="button" class="cart-toggle-btn" data-cart-open aria-label="Open Shopping Bag">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span class="cart-count">0</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container container-narrow">
+      <div class="section-header" style="text-align:left; margin-bottom:2rem;">
+        <span class="tagline-sub">REVIEW YOUR SELECTION</span>
+        <h2>Your Shopping Bag</h2>
+      </div>
+
+      <div class="checkout-card" id="cartPageCard">
+        <div id="cartPageList">
+          <!-- Populated by script -->
+        </div>
+
+        <div id="cartPageSummary" style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid #E0D4C3;">
+          <div class="cart-summary-line">
+            <span>Product Subtotal</span>
+            <strong id="cartPageSubtotal">৳0</strong>
+          </div>
+          <div class="cart-summary-line" style="color:#FF665C;">
+            <span id="cartPageSavings"></span>
+          </div>
+          <p style="font-size:0.85rem; color:#59555B; margin: 1rem 0 1.5rem;">
+            Delivery fees (৳60 Inside Dhaka / ৳120 Outside Dhaka) will be added at checkout.
+          </p>
+          <div style="display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+            <a href="/index.html#collection" class="btn btn-secondary">Continue Shopping</a>
+            <a href="/checkout.html" class="btn btn-primary" id="cartPageCheckoutBtn">Proceed to Checkout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved. Brand Owner: Mohaiminul Islam.</div>
+        <div>Dhaka, Bangladesh &bull; Make It Yours.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/cart.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    function renderCartPage() {
+      const items = DeliceCart.getItems();
+      const listEl = document.getElementById('cartPageList');
+      const sumEl = document.getElementById('cartPageSummary');
+      const subtotalEl = document.getElementById('cartPageSubtotal');
+      const savingsEl = document.getElementById('cartPageSavings');
+      const chkBtn = document.getElementById('cartPageCheckoutBtn');
+
+      if (!items.length) {
+        listEl.innerHTML = `
+          <div class="cart-empty-message">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <p>Your shopping bag is currently empty.</p>
+            <a href="/index.html#collection" class="btn btn-primary" style="margin-top:1.5rem;">Explore Fragrances</a>
+          </div>
+        `;
+        if (sumEl) sumEl.style.display = 'none';
+        return;
+      }
+
+      if (sumEl) sumEl.style.display = 'block';
+
+      listEl.innerHTML = items.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-thumb">
+            <img src="${item.image}" alt="${item.name}">
+          </div>
+          <div class="cart-item-info">
+            <h4>${item.name}</h4>
+            <div class="cart-item-price">৳${item.price} <span style="font-size:0.75rem; color:#87828A;">(${item.volume})</span></div>
+            <div class="quantity-control">
+              <button type="button" class="qty-btn" onclick="DeliceCart.updateQuantity('${item.id}', ${item.quantity - 1}); renderCartPage();">−</button>
+              <span class="qty-val">${item.quantity}</span>
+              <button type="button" class="qty-btn" onclick="DeliceCart.updateQuantity('${item.id}', ${item.quantity + 1}); renderCartPage();">+</button>
+            </div>
+          </div>
+          <button type="button" class="cart-item-remove" title="Remove item" onclick="DeliceCart.removeItem('${item.id}'); renderCartPage();">&times;</button>
+        </div>
+      `).join('');
+
+      const sub = DeliceCart.getSubtotal();
+      const sav = DeliceCart.getSavings();
+      if (subtotalEl) subtotalEl.textContent = `৳${sub}`;
+      if (savingsEl) savingsEl.textContent = sav > 0 ? `Saved ৳${sav} with Opening Offer` : '';
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCartPage);
+    window.addEventListener('delice:cartUpdated', renderCartPage);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DÉLICE — Executive Admin Portal</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/monogram.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+  <link rel="stylesheet" href="/admin/admin.css?v=4.1.0">
+</head>
+<body class="admin-body">
+
+  <!-- AUTHENTICATION OVERLAY MODAL -->
+  <div class="auth-overlay" id="authOverlay" style="display:none;">
+    <div class="auth-card">
+      <div style="text-align:center; margin-bottom:2rem;">
+        <img src="/assets/images/logo.svg" alt="DÉLICE" height="42" style="margin:0 auto 0.75rem;">
+        <span class="tagline-sub">MANAGEMENT &bull; FINANCIAL PORTAL</span>
+        <h2 style="font-size:1.4rem; color:#4A102A;">Sign In to Executive Admin</h2>
+      </div>
+
+      <div id="loginAlert" style="display:none; padding:0.75rem; border-radius:4px; margin-bottom:1rem; font-size:0.85rem; background:#FEE2E2; color:#B91C1C;"></div>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label class="form-label" for="loginUser">Username or Email</label>
+          <input type="text" id="loginUser" class="form-control" placeholder="admin" required value="admin">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPass">Password</label>
+          <input type="password" id="loginPass" class="form-control" placeholder="••••••••••••" required value="Admin@Delice2026">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.5rem;" id="loginSubmitBtn">
+          Sign In Securely
+        </button>
+      </form>
+
+      <div style="margin-top:1.5rem; text-align:center; font-size:0.75rem; color:#87828A;">
+        Initial Credentials: <code>admin</code> / <code>Admin@Delice2026</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN APP LAYOUT -->
+  <div class="admin-layout" id="adminApp">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="/" target="_blank" title="View Storefront">
+          <img src="/assets/images/logo-light.svg" alt="DÉLICE" height="34">
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-link active" data-view="overview">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>1. Overview</span>
+        </div>
+
+        <div class="sidebar-link" data-view="orders">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>2. Orders</span>
+        </div>
+
+        <div class="sidebar-link" data-view="products">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <span>3. Shop</span>
+        </div>
+
+        <div class="sidebar-link" data-view="inventory">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          </svg>
+          <span>4. Inventory</span>
+        </div>
+
+        <div class="sidebar-link" data-view="delice-profit">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 4 7 2 7 6a3.5 3.5 0 0 1-7 0"></path>
+          </svg>
+          <span>5. DÉLICE Profit Calculation</span>
+        </div>
+
+        <div class="sidebar-link" data-view="hero-slides">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span>6. Hero Slides</span>
+        </div>
+
+        <div class="sidebar-link" data-view="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>7. Settings</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="btn btn-secondary btn-block" style="color:#FFF; border-color:rgba(255,255,255,0.2); font-size:0.75rem;" id="adminLogoutBtn">
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <span style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D;">Brand Management</span>
+          <h2 style="font-size:1.35rem; margin:0;" id="viewTitle">1. Executive Overview</h2>
+        </div>
+        <div style="display:flex; align-items:center; gap:1.5rem;">
+          <a href="/" target="_blank" class="btn btn-secondary" style="padding:0.4rem 0.9rem; font-size:0.8rem;">
+            View Live Storefront &nearr;
+          </a>
+          <span style="font-size:0.85rem; font-weight:600; color:#4A102A;" id="adminUserName">Admin</span>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <!-- ==================== 1. OVERVIEW VIEW ==================== -->
+        <section class="dashboard-view active" id="view-overview">
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-card-title">Total Orders</div>
+              <div class="stat-card-val" id="statTotalOrders">0</div>
+              <div class="stat-card-sub" id="statPendingOrders">0 Pending Payment</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-title">Bottles Sold</div>
+              <div class="stat-card-val" id="statUnitsSold">0</div>
+              <div class="stat-card-sub">30ml Editions</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-title">Gross Revenue (Paid)</div>
+              <div class="stat-card-val" id="statGrossRevenue">৳0</div>
+              <div class="stat-card-sub" id="statProductRevenue">Product: ৳0</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-title">Delivery Fees Collected</div>
+              <div class="stat-card-val" id="statDeliveryCollected">৳0</div>
+              <div class="stat-card-sub">Recorded separately</div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-card-title">Total Expenses &amp; COGS</div>
+              <div class="stat-card-val" id="statTotalExpenses">৳0</div>
+              <div class="stat-card-sub">COGS + Courier + Ops</div>
+            </div>
+
+            <div class="stat-card" style="border-left:4px solid #15803D;">
+              <div class="stat-card-title">True Net Profit</div>
+              <div class="stat-card-val" style="color:#15803D;" id="statNetProfit">৳0</div>
+              <div class="stat-card-sub">After all fees &amp; costs</div>
+            </div>
+          </div>
+
+          <!-- DÉLICE CAPITAL RECOVERY & PROFIT STATUS WIDGET (CONNECTED TO TAB 5) -->
+          <div style="background:linear-gradient(135deg, #4A102A 0%, #2A0817 100%); color:#F6F0E8; border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:2rem; border:1px solid rgba(197, 164, 109, 0.4); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.25rem; box-shadow:0 6px 18px rgba(74, 16, 42, 0.15);">
+            <div style="flex:1; min-width:280px;">
+              <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.25rem;">
+                <span style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#C5A46D;">DÉLICE Capital Recovery &amp; Profit Engine</span>
+                <span id="overviewRepaymentBadge" class="delice-repaid-badge" style="display:none; padding:0.2rem 0.6rem; font-size:0.65rem;">Fully Repaid</span>
+              </div>
+              <h3 style="margin:0 0 0.4rem; font-size:1.15rem; color:#FFF;">Initial Investment: ৳73,260 (100 Bottles Batch)</h3>
+              <!-- Progress Bar -->
+              <div class="delice-progress-track" style="margin:0.5rem 0; height:14px;">
+                <div class="delice-progress-fill" id="overviewProgressFill" style="width:0%;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:rgba(246, 240, 232, 0.85);">
+                <span>Repaid: <strong id="overviewRepaidVal" style="color:#C5A46D;">৳0.00</strong></span>
+                <span>Outstanding: <strong id="overviewOutstandingVal" style="color:#FF665C;">৳73,260.00</strong></span>
+                <span>Progress: <strong id="overviewProgressPercent" style="color:#FFF;">0%</strong></span>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
+              <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(197, 164, 109, 0.3); border-radius:6px; padding:0.6rem 0.9rem; text-align:center;">
+                <div style="font-size:0.7rem; color:#C5A46D; text-transform:uppercase;">Distributable Profit</div>
+                <div id="overviewProfitVal" style="font-size:1.15rem; font-weight:700; color:#FFF;">৳0.00</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(197, 164, 109, 0.3); border-radius:6px; padding:0.6rem 0.9rem; text-align:center;">
+                <div style="font-size:0.7rem; color:#C5A46D; text-transform:uppercase;">Employee Salary (60%)</div>
+                <div id="overviewSalaryVal" style="font-size:1.15rem; font-weight:700; color:#FFF;">৳0.00</div>
+              </div>
+              <button class="btn btn-primary" style="background:#C5A46D; color:#181619; font-weight:700; font-size:0.8rem; padding:0.65rem 1rem; border:none;" onclick="switchTab('delice-profit')">
+                View 11. Profit Engine &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Recent Orders Table -->
+          <div class="data-table-card">
+            <div class="data-table-header">
+              <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Recent Verified Orders</h3>
+              <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="switchTab('orders')">
+                View All Orders
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Products</th>
+                    <th>Total</th>
+                    <th>Capital Recovery Status</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="overviewRecentOrdersBody">
+                  <tr><td colspan="9" style="text-align:center;">Loading orders...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        
+
+        <!-- ==================== 2. ORDERS VIEW ==================== -->
+        <section class="dashboard-view" id="view-orders">
+          <div class="data-table-card">
+            <div class="data-table-header" style="flex-wrap:wrap; gap:1rem;">
+              <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Orders Management</h3>
+              <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+                <input type="text" id="orderSearchInput" class="form-control" placeholder="Search order, phone, customer..." style="width:220px; padding:0.4rem 0.8rem; font-size:0.85rem;">
+                <select id="orderStatusFilter" class="form-control" style="width:150px; padding:0.4rem 0.8rem; font-size:0.85rem;">
+                  <option value="all">All Statuses</option>
+                  <option value="pending_payment">Pending Payment</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+                <button class="btn btn-primary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="loadOrders()">Filter</button>
+                <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="exportCourierCSV()">📥 Export Courier CSV</button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Order #</th>
+                    <th>Payment / TrxID</th>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Method</th>
+                    <th>Advance Paid</th>
+                    <th>Cash Due (Rider)</th>
+                    <th>Net Profit</th>
+                    <th>Capital Recovery</th>
+                    <th>Payment Status</th>
+                    <th>Fulfillment</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        
+
+        <!-- ==================== 3. SHOP / PRODUCTS VIEW ==================== -->
+        <section class="dashboard-view" id="view-products">
+          <!-- DÉLICE CAPITAL RECOVERY MATRIX BANNER -->
+          <div style="background:#FAF6F0; border-left:4px solid #C5A46D; border-radius:6px; padding:0.85rem 1.25rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+            <div>
+              <strong style="color:#4A102A; font-size:0.9rem;">DÉLICE Capital Recovery Matrix:</strong>
+              <span style="font-size:0.85rem; color:#6B7280; margin-left:0.5rem;">Retail Price: <strong>৳799</strong> | Principal Repayment: <strong style="color:#C5A46D;">৳732.60 (91.69%)</strong> | Distributable Profit: <strong style="color:#15803D;">৳66.40 (8.31%)</strong></span>
+            </div>
+            <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.75rem;" onclick="switchTab('delice-profit')">
+              View Profit Rules (Tab 5) &rarr;
+            </button>
+          </div>
+
+          <div class="data-table-card">
+            <div class="data-table-header">
+              <div>
+                <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Shop Management (Fragrance Editions)</h3>
+                <small style="color:#6B7280;">Manage 4-image gallery, name, scent profile, usage tags, regular &amp; offer pricing.</small>
+              </div>
+              <button class="btn btn-primary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="openProductModal()">
+                + Add New Fragrance Edition
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Images</th>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Usage Tags</th>
+                    <th>Offer Price</th>
+                    <th>Regular Price</th>
+                    <th>Capital Recovery Share</th>
+                    <th>Unit COGS</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        
+
+        <!-- ==================== 4. INVENTORY VIEW ==================== -->
+        <section class="dashboard-view" id="view-inventory">
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-card-title">Inventory Valuation (At Cost)</div>
+              <div class="stat-card-val" id="invTotalCost">৳0</div>
+              <div class="stat-card-sub">Sum of Stock × Unit COGS</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Inventory Valuation (Retail)</div>
+              <div class="stat-card-val" id="invTotalRetail">৳0</div>
+              <div class="stat-card-sub">Sum of Stock × Offer Price</div>
+            </div>
+            <div class="stat-card" style="border-left:3px solid #C5A46D;">
+              <div class="stat-card-title">Capital Recovery Batch Progress</div>
+              <div class="stat-card-val" id="invDeliceBatchBottles" style="color:#C5A46D;">0 / 100</div>
+              <div class="stat-card-sub" id="invDeliceBatchRepaid">৳0.00 / ৳73,260 Repaid</div>
+            </div>
+          </div>
+
+          <div class="data-table-card">
+            <div class="data-table-header">
+              <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Stock Levels &amp; Reorder Status</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Volume</th>
+                    <th>Stock On Hand</th>
+                    <th>Unit COGS</th>
+                    <th>Asset Value</th>
+                    <th>Health Status</th>
+                    <th>Quick Adjust</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        
+
+        <!-- ==================== 5. DÉLICE PROFIT CALCULATION & CAPITAL RECOVERY VIEW ==================== -->
+        <section class="dashboard-view" id="view-delice-profit">
+          <!-- TOP ACTIONS TOOLBAR -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; background:#FFFFFF; padding:1.25rem 1.5rem; border-radius:8px; border:1px solid #E5E7EB; box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+            <div>
+              <span style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#C5A46D;">Automated Accounting Engine</span>
+              <h3 style="font-size:1.2rem; color:#4A102A; margin:0.15rem 0 0;">Capital Recovery &amp; Fund-Based Profit Distribution</h3>
+            </div>
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button class="btn btn-secondary" style="font-size:0.8rem; padding:0.45rem 0.85rem;" onclick="openDeliceSettingsModal()">
+                Financial Settings
+              </button>
+              <button class="btn btn-secondary" style="font-size:0.8rem; padding:0.45rem 0.85rem;" onclick="openDeliceEmployeesModal()">
+                Employee Slots
+              </button>
+              <button class="btn btn-secondary" style="font-size:0.8rem; padding:0.45rem 0.85rem;" onclick="openDeliceExpenseModal()">
+                Record Expense
+              </button>
+              <button class="btn btn-secondary" style="font-size:0.8rem; padding:0.45rem 0.85rem;" onclick="openDeliceReportModal()">
+                Generate Report
+              </button>
+              <button class="btn btn-primary" style="font-size:0.8rem; padding:0.45rem 0.95rem;" onclick="exportDeliceSalesCSV()">
+                Export CSV &darr;
+              </button>
+            </div>
+          </div>
+
+          <!-- EXECUTIVE KPI STATS GRID (8 CARDS) -->
+          <div class="stat-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
+            <div class="stat-card" style="border-left: 3px solid #4A102A;">
+              <div class="stat-card-title">1. Total Bottles Sold</div>
+              <div class="stat-card-val" id="dpStatBottles">0</div>
+              <div class="stat-card-sub">Eligible bottles delivered</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #181619;">
+              <div class="stat-card-title">2. Total Sales Revenue</div>
+              <div class="stat-card-val" id="dpStatRevenue">৳0.00</div>
+              <div class="stat-card-sub">Excludes delivery fees</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #C5A46D;">
+              <div class="stat-card-title">3. Principal Repaid</div>
+              <div class="stat-card-val" id="dpStatRepaid" style="color:#C5A46D;">৳0.00</div>
+              <div class="stat-card-sub">Capital recovered so far</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #FF665C;">
+              <div class="stat-card-title">4. Outstanding Principal</div>
+              <div class="stat-card-val" id="dpStatOutstanding" style="color:#FF665C;">৳73,260.00</div>
+              <div class="stat-card-sub">Remaining investment balance</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #15803D;">
+              <div class="stat-card-title">5. Distributable Profit</div>
+              <div class="stat-card-val" id="dpStatProfit" style="color:#15803D;">৳0.00</div>
+              <div class="stat-card-sub">Net profit allocated to funds</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #181619;">
+              <div class="stat-card-title">6. Employee Salary Fund</div>
+              <div class="stat-card-val" id="dpStatEmployeeSalary">৳0.00</div>
+              <div class="stat-card-sub">60% of total distributable profit</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #C5A46D;">
+              <div class="stat-card-title">7. Development Fund</div>
+              <div class="stat-card-val" id="dpStatDevFund">৳0.00</div>
+              <div class="stat-card-sub">20% of total distributable profit</div>
+            </div>
+            <div class="stat-card" style="border-left: 3px solid #34495E;">
+              <div class="stat-card-title">8. Reserve Fund</div>
+              <div class="stat-card-val" id="dpStatReserveFund">৳0.00</div>
+              <div class="stat-card-sub">2% emergency buffer</div>
+            </div>
+          </div>
+
+          <!-- INVESTMENT REPAYMENT PROGRESS BAR -->
+          <div class="delice-profit-hero">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+              <div>
+                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Capital Recovery Status</span>
+                <h3 style="font-size:1.35rem; margin:0.25rem 0 0; color:#FFFFFF;">Investment Repayment Progress</h3>
+              </div>
+              <div id="dpRepaymentBadgeContainer">
+                <span class="delice-repaid-badge" id="dpRepaymentBadge" style="display:none;">
+                  &check; Initial Investment Fully Repaid
+                </span>
+              </div>
+            </div>
+
+            <div class="delice-progress-track">
+              <div class="delice-progress-fill" id="dpProgressFill" style="width: 0%;"></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; font-size:0.85rem; color:rgba(246, 240, 232, 0.9);">
+              <div>Initial Investment: <strong id="dpInitialInvestmentLabel">৳73,260</strong></div>
+              <div>Repaid: <strong id="dpRepaidLabel" style="color:#C5A46D;">৳0.00</strong></div>
+              <div>Remaining: <strong id="dpRemainingLabel" style="color:#FF665C;">৳73,260.00</strong></div>
+              <div>Progress: <strong id="dpProgressPercentLabel" style="color:#FFFFFF; font-size:1rem;">0%</strong></div>
+            </div>
+          </div>
+
+          <!-- FUND-WISE FINANCIAL BREAKDOWN (6 FUNDS) -->
+          <div style="margin-bottom:2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <div>
+                <h3 style="font-size:1.15rem; color:#4A102A; margin:0;">Fund-Wise Financial Breakdown</h3>
+                <small style="color:#6B7280;">Configured 100% distribution across six dedicated brand accounts with penny-level rounding reconciliation.</small>
+              </div>
+            </div>
+
+            <div class="delice-fund-grid" id="dpFundsGrid">
+              <!-- Dynamically populated by admin.js -->
+            </div>
+          </div>
+
+          <!-- EMPLOYEE SALARY DISTRIBUTION SECTION -->
+          <div class="data-table-card" style="margin-bottom:2rem;">
+            <div class="data-table-header">
+              <div>
+                <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Employee Salary Distribution (4 Team Members)</h3>
+                <small style="color:#6B7280;">Employee Salary Fund (60%) is divided equally: each team member receives 15% of distributable profit (৳9.96 / bottle at base rate).</small>
+              </div>
+              <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="openDeliceEmployeesModal()">
+                Configure Employee Names
+              </button>
+            </div>
+            <div style="padding:1.5rem;">
+              <div class="delice-employee-grid" id="dpEmployeesGrid">
+                <!-- Dynamically populated by admin.js -->
+              </div>
+            </div>
+          </div>
+
+          <!-- SALES AND ALLOCATION HISTORY TABLE -->
+          <div class="data-table-card">
+            <div class="data-table-header" style="flex-direction:column; align-items:flex-start; gap:0.5rem;">
+              <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                <div>
+                  <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Sales &amp; Allocation History</h3>
+                  <small style="color:#6B7280;">Idempotent sale allocations recorded per confirmed bottle. Reversals logged on cancellation/refund.</small>
+                </div>
+                <button class="btn btn-primary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="exportDeliceSalesCSV()">
+                  Download CSV Table
+                </button>
+              </div>
+            </div>
+
+            <!-- FILTER TOOLBAR -->
+            <div class="delice-filter-bar">
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <label style="font-size:0.8rem; font-weight:600; color:#4A102A;">Period:</label>
+                <select id="dpFilterDateRange" class="form-control" style="width:auto; padding:0.35rem 0.75rem; font-size:0.8rem;" onchange="handleDeliceFilterChange()">
+                  <option value="all">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">Last 7 Days</option>
+                  <option value="month">Last 30 Days</option>
+                  <option value="custom">Custom Date Range</option>
+                </select>
+              </div>
+
+              <div id="dpCustomDateContainer" style="display:none; gap:0.5rem; align-items:center;">
+                <input type="date" id="dpFilterStartDate" class="form-control" style="width:auto; padding:0.35rem; font-size:0.8rem;">
+                <span style="font-size:0.8rem; color:#6B7280;">to</span>
+                <input type="date" id="dpFilterEndDate" class="form-control" style="width:auto; padding:0.35rem; font-size:0.8rem;">
+              </div>
+
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <label style="font-size:0.8rem; font-weight:600; color:#4A102A;">Product:</label>
+                <select id="dpFilterProduct" class="form-control" style="width:auto; padding:0.35rem 0.75rem; font-size:0.8rem;" onchange="handleDeliceFilterChange()">
+                  <option value="all">All Fragrances</option>
+                  <option value="delice-bloom">DÉLICE BLOOM</option>
+                  <option value="delice-momentum">DÉLICE MOMENTUM</option>
+                  <option value="delice-enigma">DÉLICE ENIGMA</option>
+                </select>
+              </div>
+
+              <div style="display:flex; gap:0.5rem; align-items:center; flex-grow:1; max-width:320px;">
+                <input type="text" id="dpFilterSearch" class="form-control" placeholder="Search Order # or Customer..." style="padding:0.35rem 0.75rem; font-size:0.8rem;">
+                <button class="btn btn-secondary" style="padding:0.35rem 0.75rem; font-size:0.8rem;" onclick="handleDeliceFilterChange()">Search</button>
+              </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Date &amp; Time</th>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Bottles</th>
+                    <th>Unit Price</th>
+                    <th>Total Revenue</th>
+                    <th>Principal Repaid</th>
+                    <th>Profit</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="dpAllocationsTableBody">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== 6. HERO SLIDES VIEW ==================== -->
+        <section class="dashboard-view" id="view-hero-slides">
+          <div class="data-table-card">
+            <div class="data-table-header">
+              <div>
+                <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Hero Slides Management</h3>
+                <small style="color:#6B7280;">Upload images, configure big editorial titles, subtitles, and direct Buy Now / Add to Cart triggers.</small>
+              </div>
+              <button class="btn btn-primary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="openSlideModal()">
+                + Add New Hero Slide
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Big Title</th>
+                    <th>Subtitle</th>
+                    <th>Badge</th>
+                    <th>Target Product</th>
+                    <th>Price</th>
+                    <th>Order</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="heroSlidesTableBody">
+                  <!-- Populated by admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== 7. SETTINGS VIEW ==================== -->
+        <section class="dashboard-view" id="view-settings">
+          <div class="data-table-card" style="padding:2rem;">
+            <h3 style="font-size:1.25rem; color:#4A102A; margin-bottom:1.5rem;">System &amp; Financial Settings</h3>
+
+            <form id="settingsForm">
+              <!-- Official bKash / Nagad Payment Receiver Number -->
+              <div class="form-group" style="background:#FAF6F0; border:1.5px solid #C5A46D; border-radius:6px; padding:1rem; margin-bottom:1.5rem;">
+                <label class="form-label" for="setBkashNagad" style="font-weight:700; color:#4A102A;">Official bKash &amp; Nagad Send Money Number (Personal) <span class="required">*</span></label>
+                <input type="text" id="setBkashNagad" class="form-control" value="01731101780" required pattern="^01[3-9]\d{8}$" style="font-weight:700; font-size:1.1rem; color:#4A102A; font-family:monospace;">
+                <small style="color:#6B7280; font-size:0.75rem;">Customers send 100% online payments or advance delivery fees (৳60 inside Dhaka / ৳120 outside Dhaka) to this number.</small>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="setDhaka">Delivery Charge: Inside Dhaka (৳)</label>
+                  <input type="number" id="setDhaka" class="form-control" required min="0" value="60">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="setOutside">Delivery Charge: Outside Dhaka (৳)</label>
+                  <input type="number" id="setOutside" class="form-control" required min="0" value="120">
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="setCOGS">Default Product Unit COGS (৳)</label>
+                  <input type="number" id="setCOGS" class="form-control" required min="0" value="320">
+                  <small style="color:#6B7280; font-size:0.75rem;">Used as snapshot baseline for profit calculation</small>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="setFee">SSLCOMMERZ Gateway Fee (%)</label>
+                  <input type="number" id="setFee" class="form-control" required step="0.1" min="0" max="10" value="2.5">
+                  <small style="color:#6B7280; font-size:0.75rem;">Default bank fee deduction on online charges</small>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="setPhone">Customer Support Phone</label>
+                  <input type="text" id="setPhone" class="form-control" value="+880 1700-000000">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="setEmail">Customer Support Email</label>
+                  <input type="email" id="setEmail" class="form-control" value="care@delicefragrance.com">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setFb">Official Facebook URL</label>
+                <input type="url" id="setFb" class="form-control" value="https://facebook.com/delicefragrance">
+              </div>
+
+              <!-- DÉLICE CAPITAL RECOVERY & PROFIT BASELINE SETTINGS (CONNECTED TO TAB 5) -->
+              <div style="background:#FAF6F0; border:1.5px solid #4A102A; border-radius:6px; padding:1.25rem; margin-top:1.5rem; margin-bottom:1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                  <div>
+                    <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Financial Architecture</span>
+                    <h4 style="font-size:1rem; color:#4A102A; margin:0.15rem 0 0; font-weight:700;">DÉLICE Capital Recovery &amp; Financial Baseline</h4>
+                  </div>
+                  <span style="font-size:0.75rem; background:#4A102A; color:#F6F0E8; padding:0.25rem 0.65rem; border-radius:9999px;">Syncs with Tab 5</span>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Initial Investment / Principal (৳)</label>
+                    <input type="number" step="0.01" id="setInitialPrincipal" class="form-control" value="73260">
+                    <small style="color:#6B7280; font-size:0.75rem;">Total principal to recover (৳73,260)</small>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Total Initial Stock (Bottles)</label>
+                    <input type="number" id="setInitialStock" class="form-control" value="100">
+                    <small style="color:#6B7280; font-size:0.75rem;">100 bottles initial batch</small>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Unit Cost / Principal Repayment per bottle (৳)</label>
+                    <input type="number" step="0.01" id="setUnitCost" class="form-control" value="732.60">
+                    <small style="color:#6B7280; font-size:0.75rem;">Includes initial production &amp; marketing</small>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Default Selling Price per bottle (৳)</label>
+                    <input type="number" step="0.01" id="setSellingPrice" class="form-control" value="799">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Distributable Profit per bottle (৳)</label>
+                    <input type="number" step="0.01" id="setProfitPerBottle" class="form-control" value="66.40" readonly style="background:#F3F4F6;">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">4 Employee Slots (15% Profit Share each)</label>
+                    <div style="font-size:0.8rem; color:#4A102A; padding-top:0.4rem;">
+                      Employee 1, Employee 2, Employee 3, Employee 4 (<a href="javascript:void(0)" onclick="openDeliceEmployeesModal()" style="color:#C5A46D; font-weight:700;">Edit Names in Tab 5 &rarr;</a>)
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:2rem;">
+                <button type="submit" class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      
+  </div>
+
+  <!-- ORDER DETAILS & FINANCIAL SNAPSHOT MODAL -->
+  <div class="modal-overlay" id="orderModal">
+    <div class="modal-card" style="max-width:720px;">
+      <div class="modal-header">
+        <h3 id="modalOrderTitle">Order Details</h3>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body" id="modalOrderContent">
+        <!-- Rendered by admin.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-card" style="max-width:640px;">
+      <div class="modal-header">
+        <h3 id="modalProductTitle">Add Fragrance Edition</h3>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="productForm">
+          <input type="hidden" id="prodEditId">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Product ID (slug) <span class="required">*</span></label>
+              <input type="text" id="prodId" class="form-control" placeholder="delice-bloom" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product Name / Title <span class="required">*</span></label>
+              <input type="text" id="prodName" class="form-control" placeholder="DÉLICE BLOOM" required>
+            </div>
+          </div>
+
+          <!-- 4 PRODUCT IMAGES UPLOAD -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight:700; color:#4A102A;">4 Product Pictures (Upload Files or Enter Paths)</label>
+            <small style="display:block; margin-bottom:0.75rem; color:#6B7280; font-size:0.75rem;">
+              Upload 4 distinct photographs (1: Main Bottle, 2: Luxury Packaging Box, 3: Lifestyle Angle, 4: Editorial Details).
+            </small>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.85rem;">
+              <!-- Picture 1 (Primary / Bottle) -->
+              <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.65rem;">
+                <label style="font-size:0.75rem; font-weight:700; color:#4A102A; display:block; margin-bottom:0.25rem;">1. Main Bottle (Primary) *</label>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                  <input type="file" id="prodFileInput1" accept="image/*" class="form-control" style="padding:0.25rem; font-size:0.75rem;">
+                  <img id="prodFilePreview1" src="/assets/images/uploads/delice_Bottle-1_1794420148574.png" alt="Preview 1" style="width:40px; height:40px; object-fit:contain; border:1px solid #E0D4C3; border-radius:3px; background:#FFF; flex-shrink:0;">
+                </div>
+                <input type="text" id="prodImage1" class="form-control" value="/assets/images/uploads/delice_Bottle-1_1794420148574.png" style="margin-top:0.35rem; font-size:0.75rem;" placeholder="/assets/images/uploads/delice_Bottle-1_1794420148574.png" required>
+              </div>
+
+              <!-- Picture 2 (Packaging Box) -->
+              <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.65rem;">
+                <label style="font-size:0.75rem; font-weight:700; color:#4A102A; display:block; margin-bottom:0.25rem;">2. Packaging Box (Unboxing)</label>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                  <input type="file" id="prodFileInput2" accept="image/*" class="form-control" style="padding:0.25rem; font-size:0.75rem;">
+                  <img id="prodFilePreview2" src="/assets/images/bloom-box.svg" alt="Preview 2" style="width:40px; height:40px; object-fit:contain; border:1px solid #E0D4C3; border-radius:3px; background:#FFF; flex-shrink:0;">
+                </div>
+                <input type="text" id="prodImage2" class="form-control" value="/assets/images/bloom-box.svg" style="margin-top:0.35rem; font-size:0.75rem;" placeholder="/assets/images/bloom-box.svg">
+              </div>
+
+              <!-- Picture 3 (Lifestyle Angle) -->
+              <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.65rem;">
+                <label style="font-size:0.75rem; font-weight:700; color:#4A102A; display:block; margin-bottom:0.25rem;">3. Lifestyle / Handheld Angle</label>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                  <input type="file" id="prodFileInput3" accept="image/*" class="form-control" style="padding:0.25rem; font-size:0.75rem;">
+                  <img id="prodFilePreview3" src="/assets/images/hero-slide-1.svg" alt="Preview 3" style="width:40px; height:40px; object-fit:cover; border:1px solid #E0D4C3; border-radius:3px; background:#181619; flex-shrink:0;">
+                </div>
+                <input type="text" id="prodImage3" class="form-control" value="/assets/images/hero-slide-1.svg" style="margin-top:0.35rem; font-size:0.75rem;" placeholder="/assets/images/hero-slide-1.svg">
+              </div>
+
+              <!-- Picture 4 (Editorial / Notes) -->
+              <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.65rem;">
+                <label style="font-size:0.75rem; font-weight:700; color:#4A102A; display:block; margin-bottom:0.25rem;">4. Editorial / Fragrance Notes</label>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                  <input type="file" id="prodFileInput4" accept="image/*" class="form-control" style="padding:0.25rem; font-size:0.75rem;">
+                  <img id="prodFilePreview4" src="/assets/images/brand-story.svg" alt="Preview 4" style="width:40px; height:40px; object-fit:cover; border:1px solid #E0D4C3; border-radius:3px; background:#181619; flex-shrink:0;">
+                </div>
+                <input type="text" id="prodImage4" class="form-control" value="/assets/images/brand-story.svg" style="margin-top:0.35rem; font-size:0.75rem;" placeholder="/assets/images/brand-story.svg">
+              </div>
+            </div>
+          </div>
+
+          <!-- ABOUT / DESCRIPTION -->
+          <div class="form-group">
+            <label class="form-label">About / Description (Scent Notes &amp; Feeling) <span class="required">*</span></label>
+            <textarea id="prodDesc" class="form-control" rows="3" placeholder="Scent notes, feelings, and occasion description..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Usage Tags ("কবে কোথায় কীভাবে ব্যবহার করা যাবে") <span class="required">*</span></label>
+            <input type="text" id="prodOccasions" class="form-control" placeholder="e.g. Everyday use, University, Formal occasions, Daytime outings" required>
+            <small style="color:#6B7280; font-size:0.75rem;">Comma-separated usage occasions displayed on storefront.</small>
+          </div>
+
+          <!-- PRICING & AUTO DISCOUNT PERCENTAGE -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Regular Price (৳) <span class="required">*</span></label>
+              <input type="number" id="prodOrigPrice" class="form-control" value="850" required min="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Offer Price (৳) <span class="required">*</span></label>
+              <input type="number" id="prodPrice" class="form-control" value="799" required min="1">
+            </div>
+          </div>
+
+          <!-- AUTO-CALCULATED OFFER PERCENTAGE BANNER -->
+          <div id="prodDiscountBanner" style="background:#FAF6F0; border:1.5px dashed #C5A46D; border-radius:6px; padding:0.75rem 1rem; margin-bottom:1.25rem; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.85rem; color:#4A102A; font-weight:600;">Calculated Customer Discount:</span>
+            <strong id="prodDiscountText" style="color:#FF665C; font-size:1rem;">Save ৳51 (6% OFF)</strong>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Unit COGS (৳) <span class="required">*</span></label>
+              <input type="number" id="prodCOGS" class="form-control" value="320" required>
+              <small style="color:#6B7280; font-size:0.75rem;">Cost of goods sold (for profit accounting)</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stock Quantity <span class="required">*</span></label>
+              <input type="number" id="prodStock" class="form-control" value="100" required min="0">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.5rem;" id="saveProdBtn">Save Fragrance Edition</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT HERO SLIDE MODAL -->
+  <div class="modal-overlay" id="slideModal">
+    <div class="modal-card" style="max-width:640px;">
+      <div class="modal-header">
+        <h3 id="modalSlideTitle">Add Hero Slide Banner</h3>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="slideForm">
+          <input type="hidden" id="slideEditId">
+
+          <!-- SLIDE IMAGE UPLOAD -->
+          <div class="form-group">
+            <label class="form-label">Slide Image (Upload File or Enter Image Path) <span class="required">*</span></label>
+            <div style="display:flex; gap:0.75rem; align-items:center;">
+              <input type="file" id="slideFileInput" accept="image/*" class="form-control" style="padding:0.4rem; font-size:0.85rem;">
+              <img id="slideFilePreview" src="/assets/images/hero-slide-1.svg" alt="Slide Preview" style="width:70px; height:48px; object-fit:cover; border:1px solid #E0D4C3; border-radius:4px; background:#181619; flex-shrink:0;">
+            </div>
+            <input type="text" id="slideImage" class="form-control" value="/assets/images/hero-slide-1.svg" style="margin-top:0.4rem; font-size:0.85rem;" placeholder="/assets/images/hero-slide-1.svg" required>
+            <small style="font-size:0.75rem; color:#6B7280;">High-resolution editorial perfume photography (16:9 or 1600x900 recommended).</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Internal Slide Name / Label (For Admin Reference)</label>
+            <input type="text" id="slideTitle" class="form-control" placeholder="e.g. Bloom Signature Campaign" value="Bloom Banner">
+            <small style="font-size:0.75rem; color:#6B7280;">Text is embedded in your uploaded banner graphic; hero slide displays the 3 clean action buttons.</small>
+          </div>
+
+          <div class="form-row" style="display:none;">
+            <input type="hidden" id="slideBadge" value="">
+            <input type="hidden" id="slideHighlight" value="">
+            <input type="hidden" id="slideSubtitle" value="">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Linked Product for Buy / Add to Bag</label>
+              <select id="slideProductId" class="form-control">
+                <option value="delice-bloom">DÉLICE BLOOM</option>
+                <option value="delice-momentum">DÉLICE MOMENTUM</option>
+                <option value="delice-enigma">DÉLICE ENIGMA</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Offer Price (৳)</label>
+              <input type="number" id="slideOfferPrice" class="form-control" value="799">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Regular Price (৳)</label>
+              <input type="number" id="slideOrigPrice" class="form-control" value="850">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Display Order (1, 2, 3...)</label>
+              <input type="number" id="slideOrder" class="form-control" value="1" min="1">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.5rem;" id="saveSlideBtn">Save Hero Slide</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- 1. DÉLICE PROFIT SETTINGS MODAL -->
+  <div class="modal-overlay" id="deliceSettingsModal">
+    <div class="modal-card" style="max-width:560px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Financial Baseline</span>
+          <h3 style="margin:0.2rem 0 0; color:#4A102A;">DÉLICE Profit Calculation Settings</h3>
+        </div>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:#FAF6F0; border-left:3px solid #C5A46D; padding:0.75rem 1rem; border-radius:0 4px 4px 0; margin-bottom:1.25rem; font-size:0.8rem; color:#4A102A;">
+          <strong>Historical Snapshot Guarantee:</strong> Changing these settings will only apply to future sales. Past allocations and historical records will NEVER be altered.
+        </div>
+        <form id="deliceSettingsForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Initial Investment / Principal (৳) <span class="required">*</span></label>
+              <input type="number" step="0.01" id="dpSetPrincipal" class="form-control" value="73260" required>
+              <small style="color:#6B7280; font-size:0.75rem;">Total initial principal to be recovered (৳73,260)</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Total Initial Stock (Bottles) <span class="required">*</span></label>
+              <input type="number" id="dpSetStock" class="form-control" value="100" required min="1">
+              <small style="color:#6B7280; font-size:0.75rem;">Baseline batch size (100 bottles)</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Default Selling Price / Bottle (৳) <span class="required">*</span></label>
+              <input type="number" step="0.01" id="dpSetPrice" class="form-control" value="799" required min="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Unit Cost / Principal Repayment (৳) <span class="required">*</span></label>
+              <input type="number" step="0.01" id="dpSetUnitCost" class="form-control" value="732.60" required min="0">
+              <small style="color:#6B7280; font-size:0.75rem;">Includes initial production &amp; marketing</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Distributable Profit / Bottle (৳)</label>
+            <input type="number" step="0.01" id="dpSetProfit" class="form-control" value="66.40" readonly style="background:#F3F4F6;">
+            <small style="color:#6B7280; font-size:0.75rem;">Automatically calculated: Selling Price - Unit Cost (৳799 - ৳732.60 = ৳66.40)</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Post-Repayment Policy (After 100% Principal Repaid)</label>
+            <select id="dpSetPolicy" class="form-control">
+              <option value="full_revenue_as_profit">Distribute Full Revenue as Profit (Principal repayment stops at ৳0)</option>
+              <option value="development_fund_boost">Direct Unit Cost Share to DÉLICE Development Fund</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.25rem;">Save Settings</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. DÉLICE EMPLOYEE SLOTS MODAL -->
+  <div class="modal-overlay" id="deliceEmployeesModal">
+    <div class="modal-card" style="max-width:520px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Team Configuration</span>
+          <h3 style="margin:0.2rem 0 0; color:#4A102A;">Configure Employee Slots</h3>
+        </div>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.85rem; color:#6B7280; margin-bottom:1.25rem;">
+          The Employee Salary Fund receives 60% of total distributable profit (৳39.84/bottle at base rate). Each of the 4 team members receives an equal 15% share (৳9.96/bottle).
+        </p>
+        <form id="deliceEmployeesForm">
+          <div class="form-group">
+            <label class="form-label">Employee 1 Name (15% Share) <span class="required">*</span></label>
+            <input type="text" id="dpEmpName1" class="form-control" placeholder="e.g. Employee 1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Employee 2 Name (15% Share) <span class="required">*</span></label>
+            <input type="text" id="dpEmpName2" class="form-control" placeholder="e.g. Employee 2" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Employee 3 Name (15% Share) <span class="required">*</span></label>
+            <input type="text" id="dpEmpName3" class="form-control" placeholder="e.g. Employee 3" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Employee 4 Name (15% Share) <span class="required">*</span></label>
+            <input type="text" id="dpEmpName4" class="form-control" placeholder="e.g. Employee 4" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.5rem;">Update Employee Slots</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. RECORD FUND EXPENSE MODAL -->
+  <div class="modal-overlay" id="deliceExpenseModal">
+    <div class="modal-card" style="max-width:520px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Fund Debit</span>
+          <h3 style="margin:0.2rem 0 0; color:#4A102A;">Record Fund Expense</h3>
+        </div>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="deliceExpenseForm">
+          <div class="form-group">
+            <label class="form-label">Target Fund <span class="required">*</span></label>
+            <select id="dpExpFundKey" class="form-control" required>
+              <option value="developmentFund">DÉLICE Development Fund (20%)</option>
+              <option value="marketingFund">Marketing Fund (5%)</option>
+              <option value="reserveFund">Reserve &amp; Emergency Fund (2%)</option>
+              <option value="charityFund">Charity Fund (3%)</option>
+              <option value="financeMember">NirmAN Finance Member Profit (10%)</option>
+              <option value="employeeSalaryFund">Employee Salary Fund (60%)</option>
+            </select>
+            <small style="color:#6B7280; font-size:0.75rem;">Amount will be debited from this specific fund's available balance.</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expense Title / Reason <span class="required">*</span></label>
+            <input type="text" id="dpExpTitle" class="form-control" placeholder="e.g. Packaging R&amp;D sample batch" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Amount (৳) <span class="required">*</span></label>
+              <input type="number" step="0.01" id="dpExpAmount" class="form-control" required min="1" placeholder="1000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expense Date</label>
+              <input type="date" id="dpExpDate" class="form-control">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <input type="text" id="dpExpCategory" class="form-control" placeholder="e.g. Product Development, Campaign, Emergency">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Voucher / Receipt Notes</label>
+            <input type="text" id="dpExpNote" class="form-control" placeholder="Invoice # or approval reference">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.25rem;">Record Fund Expense</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. FUND TRANSACTION LEDGER MODAL -->
+  <div class="modal-overlay" id="deliceLedgerModal">
+    <div class="modal-card" style="max-width:760px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Account Ledger</span>
+          <h3 id="dpLedgerTitle" style="margin:0.2rem 0 0; color:#4A102A;">Fund Transactions</h3>
+        </div>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; margin-bottom:1.5rem; text-align:center;">
+          <div style="background:#FAF6F0; padding:1rem; border-radius:6px; border:1px solid #E0D4C3;">
+            <div style="font-size:0.75rem; color:#6B7280; text-transform:uppercase;">Total Credited</div>
+            <div id="dpLedgerCredits" style="font-size:1.3rem; font-weight:700; color:#15803D;">৳0.00</div>
+          </div>
+          <div style="background:#FAF6F0; padding:1rem; border-radius:6px; border:1px solid #E0D4C3;">
+            <div style="font-size:0.75rem; color:#6B7280; text-transform:uppercase;">Total Debited (Expenses)</div>
+            <div id="dpLedgerDebits" style="font-size:1.3rem; font-weight:700; color:#B91C1C;">৳0.00</div>
+          </div>
+          <div style="background:#FAF6F0; padding:1rem; border-radius:6px; border:1px solid #E0D4C3;">
+            <div style="font-size:0.75rem; color:#6B7280; text-transform:uppercase;">Current Available</div>
+            <div id="dpLedgerBalance" style="font-size:1.3rem; font-weight:700; color:#4A102A;">৳0.00</div>
+          </div>
+        </div>
+
+        <div class="table-responsive" style="max-height:360px; overflow-y:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Amount (৳)</th>
+                <th>Running Balance (৳)</th>
+              </tr>
+            </thead>
+            <tbody id="dpLedgerTableBody">
+              <!-- Rendered by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. SALE CALCULATION BREAKDOWN MODAL -->
+  <div class="modal-overlay" id="deliceBreakdownModal">
+    <div class="modal-card" style="max-width:680px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Auditable Mathematics</span>
+          <h3 id="dpBreakdownOrderNum" style="margin:0.2rem 0 0; color:#4A102A;">Sale Calculation Breakdown</h3>
+        </div>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body" id="dpBreakdownContent">
+        <!-- Rendered by admin.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. FINANCIAL REPORT MODAL -->
+  <div class="modal-overlay" id="deliceReportModal">
+    <div class="modal-card" style="max-width:760px;">
+      <div class="modal-header">
+        <div>
+          <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Financial Reporting</span>
+          <h3 style="margin:0.2rem 0 0; color:#4A102A;">DÉLICE Periodic Financial Statement</h3>
+        </div>
+        <button type="button" class="drawer-close-btn" data-modal-close>&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:center;">
+          <button class="btn btn-secondary" onclick="loadDeliceReport('daily')">Today (Daily)</button>
+          <button class="btn btn-secondary" onclick="loadDeliceReport('weekly')">This Week</button>
+          <button class="btn btn-secondary" onclick="loadDeliceReport('monthly')">This Month</button>
+          <button class="btn btn-secondary" onclick="loadDeliceReport('overall')">Overall All-Time</button>
+          <button class="btn btn-primary" onclick="exportDeliceReportCSV()">Export Statement CSV &darr;</button>
+        </div>
+
+        <div id="dpReportContent">
+          <!-- Populated by admin.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin/admin.js?v=4.1.0"></script>
+</body>
+</html>

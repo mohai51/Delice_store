@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Unsuccessful — DÉLICE Fragrances</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/monogram.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar" style="justify-content:center;">
+        <a href="/" class="navbar-brand">
+          <img src="/assets/images/logo.svg" alt="DÉLICE" height="46">
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container container-narrow">
+      <div class="payment-result-card">
+        <div class="status-icon-wrapper status-icon-failed">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </div>
+
+        <span class="tagline-sub" style="color:#FF665C;">TRANSACTION NOT COMPLETED</span>
+        <h1 style="font-size:2rem; margin-bottom:0.5rem; color:#4A102A;">Payment Could Not Be Processed</h1>
+        <p style="color:#59555B; margin-bottom:1.5rem;" id="failReasonText">
+          Your payment attempt was cancelled or could not be verified by the banking gateway. No funds were debited from your account.
+        </p>
+
+        <div class="receipt-breakdown" id="failDetails">
+          <div class="receipt-row">
+            <span>Payment Status:</span>
+            <strong style="color:#FF665C;">UNPAID / FAILED</strong>
+          </div>
+          <div class="receipt-row">
+            <span>Reference ID:</span>
+            <code id="failRefCode">Pending</code>
+          </div>
+          <div class="receipt-row">
+            <span>Notice:</span>
+            <span>Unpaid orders are automatically held and never dispatched.</span>
+          </div>
+        </div>
+
+        <div style="background:#FAF6F0; border-radius:6px; padding:1.25rem; margin:1.5rem 0; text-align:left; font-size:0.875rem;">
+          <h4 style="color:#4A102A; margin-bottom:0.35rem;">Need Assistance Completing Your Payment?</h4>
+          <p style="color:#59555B; margin:0;">
+            If you experienced a network interruption or bank OTP timeout, you can retry immediately. For help, contact customer care at <strong>care@delicefragrance.com</strong> or WhatsApp <strong>+880 1700-000000</strong>.
+          </p>
+        </div>
+
+        <div style="display:flex; justify-content:center; gap:1rem; margin-top:2rem; flex-wrap:wrap;">
+          <a href="/checkout.html" class="btn btn-primary">Retry Payment</a>
+          <a href="/" class="btn btn-secondary">Return to Store</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved. Brand Owner: Mohaiminul Islam.</div>
+        <div>Dhaka, Bangladesh &bull; Make It Yours.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tranId = urlParams.get('tran_id') || urlParams.get('tranId') || 'FAILED-' + Date.now().toString().slice(-6);
+      const reason = urlParams.get('reason') || urlParams.get('error_reason');
+
+      const refEl = document.getElementById('failRefCode');
+      if (refEl) refEl.textContent = tranId;
+
+      const reasonEl = document.getElementById('failReasonText');
+      if (reason && reasonEl) {
+        reasonEl.textContent = `Gateway message: ${decodeURIComponent(reason)}. No funds were debited from your account.`;
+      }
+    });
+  </script>
+</body>
+</html>

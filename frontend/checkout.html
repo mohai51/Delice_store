@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — DÉLICE Fragrances</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/images/monogram.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=4.1.0">
+  <style>
+    .spin-icon {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="announcement-bar">
+    <span>Bank-Grade 256-bit Encrypted SSLCOMMERZ Payment &bull; Instant Confirmation</span>
+  </div>
+
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="/" class="navbar-brand">
+          <img src="/assets/images/logo.svg" alt="DÉLICE" height="46">
+        </a>
+        <div style="font-size:0.85rem; font-weight:600; color:#4A102A; display:flex; align-items:center; gap:0.5rem;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Secure Checkout
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section-header" style="text-align:left; margin-bottom:2.5rem;">
+        <span class="tagline-sub">STEP 2 OF 2 &bull; FINAL CONFIRMATION</span>
+        <h2>Delivery &amp; Online Payment</h2>
+        <p>Please enter your exact delivery details. Delivery charges are calculated transparently and added to your order summary.</p>
+      </div>
+
+      <div class="checkout-grid">
+        <!-- Delivery Information Form -->
+        <div class="checkout-card">
+          <h3 style="margin-bottom:1.5rem; font-size:1.35rem; color:#4A102A;">1. Recipient Details</h3>
+          
+          <form id="checkoutForm">
+            <div class="form-group">
+              <label class="form-label" for="fullName">Full Name <span class="required">*</span></label>
+              <input type="text" id="fullName" class="form-control" placeholder="e.g. Tanvir Ahmed" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="phone">Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="phone" class="form-control" placeholder="017XXXXXXXX" pattern="^01[3-9]\d{8}$" title="Enter an 11-digit Bangladeshi mobile number starting with 01" required>
+                <small style="font-size:0.75rem; color:#87828A;">11-digit Bangladeshi mobile (e.g. 01712345678)</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="email">Email Address <span style="font-size:0.75rem; color:#87828A;">(Optional)</span></label>
+                <input type="email" id="email" class="form-control" placeholder="name@domain.com">
+              </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem; font-size:1.35rem; color:#4A102A;">2. Delivery Address</h3>
+
+            <div class="form-group">
+              <label class="form-label" for="districtSelect">District <span class="required">*</span></label>
+              <select id="districtSelect" class="form-control" required>
+                <option value="">Select your district...</option>
+                <optgroup label="Dhaka Division">
+                  <option value="Dhaka" selected>Dhaka (Inside City)</option>
+                  <option value="Gazipur">Gazipur</option>
+                  <option value="Narayanganj">Narayanganj</option>
+                  <option value="Narsingdi">Narsingdi</option>
+                  <option value="Manikganj">Manikganj</option>
+                  <option value="Munshiganj">Munshiganj</option>
+                  <option value="Tangail">Tangail</option>
+                  <option value="Faridpur">Faridpur</option>
+                  <option value="Gopalganj">Gopalganj</option>
+                  <option value="Madaripur">Madaripur</option>
+                  <option value="Rajbari">Rajbari</option>
+                  <option value="Shariatpur">Shariatpur</option>
+                  <option value="Kishoreganj">Kishoreganj</option>
+                </optgroup>
+                <optgroup label="Chittagong Division">
+                  <option value="Chittagong">Chittagong</option>
+                  <option value="Cox's Bazar">Cox's Bazar</option>
+                  <option value="Comilla">Comilla</option>
+                  <option value="Feni">Feni</option>
+                  <option value="Noakhali">Noakhali</option>
+                  <option value="Brahmanbaria">Brahmanbaria</option>
+                  <option value="Chandpur">Chandpur</option>
+                  <option value="Lakshmipur">Lakshmipur</option>
+                </optgroup>
+                <optgroup label="Sylhet Division">
+                  <option value="Sylhet">Sylhet</option>
+                  <option value="Moulvibazar">Moulvibazar</option>
+                  <option value="Habiganj">Habiganj</option>
+                  <option value="Sunamganj">Sunamganj</option>
+                </optgroup>
+                <optgroup label="Rajshahi Division">
+                  <option value="Rajshahi">Rajshahi</option>
+                  <option value="Bogra">Bogra</option>
+                  <option value="Pabna">Pabna</option>
+                  <option value="Sirajganj">Sirajganj</option>
+                  <option value="Naogaon">Naogaon</option>
+                  <option value="Natore">Natore</option>
+                </optgroup>
+                <optgroup label="Khulna Division">
+                  <option value="Khulna">Khulna</option>
+                  <option value="Jessore">Jessore</option>
+                  <option value="Kushtia">Kushtia</option>
+                  <option value="Satkhira">Satkhira</option>
+                </optgroup>
+                <optgroup label="Barishal Division">
+                  <option value="Barishal">Barishal</option>
+                  <option value="Patuakhali">Patuakhali</option>
+                  <option value="Bhola">Bhola</option>
+                </optgroup>
+                <optgroup label="Rangpur Division">
+                  <option value="Rangpur">Rangpur</option>
+                  <option value="Dinajpur">Dinajpur</option>
+                  <option value="Saidpur">Saidpur</option>
+                </optgroup>
+                <optgroup label="Mymensingh Division">
+                  <option value="Mymensingh">Mymensingh</option>
+                  <option value="Jamalpur">Jamalpur</option>
+                  <option value="Netrokona">Netrokona</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Delivery Zone &amp; Charge</label>
+              <div class="delivery-radio-group">
+                <label class="delivery-radio-card active">
+                  <input type="radio" name="deliveryArea" value="insideDhaka" checked>
+                  <strong>Inside Dhaka City</strong>
+                  <span class="delivery-charge-amount" id="rateInsideDhaka">৳60</span>
+                  <small style="color:#59555B; font-size:0.75rem;">1–2 Business Days</small>
+                </label>
+                <label class="delivery-radio-card">
+                  <input type="radio" name="deliveryArea" value="outsideDhaka">
+                  <strong>Outside Dhaka</strong>
+                  <span class="delivery-charge-amount" id="rateOutsideDhaka">৳120</span>
+                  <small style="color:#59555B; font-size:0.75rem;">2–4 Business Days</small>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="deliveryAddress">Detailed Delivery Address <span class="required">*</span></label>
+              <textarea id="deliveryAddress" class="form-control" rows="3" placeholder="House / Flat No., Road No., Area / Ward, Thana..." required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="orderNotes">Order / Delivery Notes <span style="font-size:0.75rem; color:#87828A;">(Optional)</span></label>
+              <input type="text" id="orderNotes" class="form-control" placeholder="Special delivery instructions, preferred delivery hour, etc.">
+            </div>
+
+            <!-- PAYMENT METHOD SELECTION (100% ONLINE vs COD WITH ADVANCE DELIVERY CHARGE) -->
+            <h3 style="margin: 2rem 0 1rem; font-size:1.35rem; color:#4A102A;">3. Select Payment Method</h3>
+
+            <div class="payment-method-selector" style="display:flex; flex-direction:column; gap:0.85rem; margin-bottom:1.5rem;">
+              <!-- Option 1: 100% Online Payment -->
+              <label class="payment-option-card active" id="payCardOnline" style="border:2px solid #4A102A; background:#FAF6F0; border-radius:8px; padding:1.15rem; cursor:pointer; display:block; transition:all 0.2s ease;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+                    <input type="radio" name="paymentMethod" value="full_online" id="radioFullOnline" checked style="margin-top:0.25rem; accent-color:#4A102A;">
+                    <div>
+                      <strong style="font-size:1rem; color:#4A102A; display:block;">1. Online Payment (100% Advance Payment)</strong>
+                      <p style="margin:0.25rem 0 0; font-size:0.8rem; color:#59555B;">
+                        Pay 100% full amount (Product + Delivery) via bKash or Nagad Send Money. Zero cash hassle at delivery.
+                      </p>
+                    </div>
+                  </div>
+                  <span class="badge-offer" style="background:#4A102A; color:#FFF; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; padding:0.2rem 0.5rem; border-radius:4px; flex-shrink:0;">
+                    Recommended
+                  </span>
+                </div>
+              </label>
+
+              <!-- Option 2: Cash on Delivery with Advance Delivery Charge -->
+              <label class="payment-option-card" id="payCardCOD" style="border:1.5px solid #E0D4C3; background:#FFFFFF; border-radius:8px; padding:1.15rem; cursor:pointer; display:block; transition:all 0.2s ease;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+                    <input type="radio" name="paymentMethod" value="cod_advance" id="radioCOD" style="margin-top:0.25rem; accent-color:#4A102A;">
+                    <div>
+                      <strong style="font-size:1rem; color:#181619; display:block;">2. Cash on Delivery (ডেলিভারি চার্জ অগ্রিম প্রযোজ্য)</strong>
+                      <p style="margin:0.25rem 0 0; font-size:0.8rem; color:#59555B;">
+                        Pay delivery charge (৳60 / ৳120) in advance via bKash/Nagad. Pay product price in cash to courier upon delivery.
+                      </p>
+                    </div>
+                  </div>
+                  <span class="badge-offer" style="background:#FF665C; color:#FFF; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em; padding:0.2rem 0.5rem; border-radius:4px; flex-shrink:0;">
+                    Advance Delivery Fee
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            <!-- PAYMENT INSTRUCTIONS & ACCOUNT CARD -->
+            <div id="paymentInstructionBox" style="background:#FAF6F0; border:1.5px solid #C5A46D; border-radius:8px; padding:1.25rem; margin-bottom:1.5rem;">
+              <!-- Populated dynamically by checkout.js -->
+            </div>
+
+            <!-- SENDER PHONE & TRANSACTION ID INPUTS -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="senderNumber">Sender Mobile Number <span class="required">*</span></label>
+                <input type="tel" id="senderNumber" class="form-control" placeholder="01XXXXXXXXX" pattern="^01[3-9]\d{8}$" required>
+                <small style="font-size:0.75rem; color:#87828A;">The bKash / Nagad mobile number you sent money from</small>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="transactionId">Transaction ID (TrxID) <span class="required">*</span></label>
+                <input type="text" id="transactionId" class="form-control" placeholder="e.g. BLA9876XYZ" required style="text-transform:uppercase; font-family:monospace; font-weight:700;">
+                <small style="font-size:0.75rem; color:#87828A;">Found in bKash / Nagad confirmation SMS or app</small>
+              </div>
+            </div>
+
+            <div style="margin-top:1.5rem;">
+              <button type="submit" class="btn btn-primary btn-block" id="paySubmitBtn" style="padding:1rem; font-size:0.95rem; text-transform:uppercase; letter-spacing:0.12em; font-weight:700;">
+                Confirm Order &amp; Submit Payment
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Order Summary Column -->
+        <div class="checkout-card" style="background:#FAF6F0;">
+          <h3 style="margin-bottom:1.5rem; font-size:1.35rem; color:#4A102A;">Order Summary</h3>
+          
+          <div id="checkoutSummaryItems">
+            <!-- Rendered by checkout.js -->
+          </div>
+
+          <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid #E0D4C3;">
+            <div class="cart-summary-line">
+              <span>Product Subtotal</span>
+              <strong id="summarySubtotal">৳0</strong>
+            </div>
+
+            <div class="cart-summary-line">
+              <span>Delivery Charge (<span id="summaryDeliveryAreaName">Inside Dhaka</span>)</span>
+              <strong id="summaryDelivery">৳60</strong>
+            </div>
+
+            <div class="cart-summary-line" style="color:#FF665C;">
+              <span id="summarySavings"></span>
+            </div>
+
+            <div class="cart-summary-total" style="padding-bottom:0.75rem; border-bottom:1px dashed #E0D4C3;">
+              <span>Total Order Value</span>
+              <span id="summaryTotal">৳0</span>
+            </div>
+
+            <!-- PAYMENT BREAKDOWN CARD -->
+            <div style="background:#FFFFFF; border:1px solid #E0D4C3; border-radius:6px; padding:0.85rem; margin-top:1rem;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem; font-size:0.85rem;">
+                <span style="font-weight:600; color:#4A102A;">Advance Paid Now (bKash/Nagad):</span>
+                <strong id="summaryAdvancePaid" style="color:#4A102A; font-size:0.95rem;">৳0</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#59555B;">Cash to Pay Courier Rider:</span>
+                <strong id="summaryCashDue" style="color:#181619; font-size:0.95rem;">৳0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid #E0D4C3;">
+            <div style="font-size:0.8rem; color:#59555B; display:flex; flex-direction:column; gap:0.5rem;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A102A" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <span>SSLCOMMERZ Secure 256-bit Encryption</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A102A" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>bKash &bull; Nagad &bull; Rocket &bull; Visa &bull; Mastercard</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved. Brand Owner: Mohaiminul Islam.</div>
+        <div>Dhaka, Bangladesh &bull; Make It Yours.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/cart.js?v=4.1.0"></script>
+  <script src="/js/app.js?v=4.1.0"></script>
+  <script src="/js/checkout.js?v=4.1.0"></script>
+</body>
+</html>
