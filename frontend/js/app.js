@@ -392,6 +392,24 @@ function attachCardSliderListeners() {
       };
     }
 
+    // Touch swipe support for product card image gallery on mobile
+    const mediaEl = card.querySelector('.product-media');
+    if (mediaEl) {
+      let tStartX = 0;
+      let tStartY = 0;
+      mediaEl.addEventListener('touchstart', (e) => {
+        tStartX = e.changedTouches[0].clientX;
+        tStartY = e.changedTouches[0].clientY;
+      }, { passive: true });
+      mediaEl.addEventListener('touchend', (e) => {
+        const diffX = e.changedTouches[0].clientX - tStartX;
+        const diffY = e.changedTouches[0].clientY - tStartY;
+        if (Math.abs(diffX) > 36 && Math.abs(diffX) > Math.abs(diffY)) {
+          slideCardImage(prodId, diffX < 0 ? 1 : -1, e);
+        }
+      }, { passive: true });
+    }
+
     const thumbs = card.querySelectorAll('.prod-card-thumb');
     thumbs.forEach((thumb, idx) => {
       thumb.onclick = (e) => {
@@ -732,11 +750,10 @@ function renderMoodFinderProduct() {
         <div class="product-tags" style="margin-bottom:1.25rem;">
           ${(matched.occasions || []).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
         </div>
-        <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-          <span style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#4A102A;">৳${matched.price}</span>
+        <div class="mood-match-actions">
+          <span class="price-display" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#4A102A;">৳${matched.price}</span>
           <button type="button" class="btn btn-primary" onclick="addProductToBag('${matched.id}')" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Add to Cart</button>
-          <a href="/checkout.html?buyNow=${matched.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Buy Now</a>
-          <button type="button" class="btn btn-secondary" onclick="viewProductDetails('${matched.id}')" style="text-transform:uppercase; letter-spacing:0.1em;">Explore Details</button>
+          <a href="/checkout.html?buyNow=${matched.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700; text-align:center;">Buy Now</a>
         </div>
       </div>
     </div>
