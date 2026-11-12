@@ -9,12 +9,12 @@ const DEFAULT_PRODUCTS = [
   {
     id: 'delice-bloom',
     name: 'DÉLICE BLOOM',
-    tagline: 'Sweet, Soft & Romantic',
+    tagline: 'Parisian Floral Romance • Soft & Graceful',
     volume: '30ml',
     originalPrice: 850,
     price: 799,
-    description: 'A sweet, soft fragrance for everyday use and formal occasions.',
-    occasions: ['Everyday use', 'University', 'Formal occasions', 'Daytime outings'],
+    description: 'An ode to youthful romance and blooming grace. Tender centifolia rose petals and velvety peonies blend with sparkling fresh bergamot and a delicate white musk base. Soft, sweet, and endlessly romantic.',
+    occasions: ['Campus & Everyday', 'Romantic Dates', 'Spring Outings', 'Daytime Events'],
     mood: 'romantic',
     image: '/assets/images/uploads/delice_Bottle-1_1794420148574.png',
     images: [
@@ -29,12 +29,12 @@ const DEFAULT_PRODUCTS = [
   {
     id: 'delice-momentum',
     name: 'DÉLICE MOMENTUM',
-    tagline: 'Bold, Fresh & Resilient',
+    tagline: 'Executive Distinction • Bold, Fresh & Dynamic',
     volume: '30ml',
     originalPrice: 850,
     price: 799,
-    description: 'A bold, strong fragrance for busy days, outdoor activities, demanding workdays, and situations involving heat, traffic, and movement.',
-    occasions: ['Busy schedules', 'Outdoor activities', 'Workdays', 'Active lifestyles'],
+    description: 'Crafted for the modern gentleman who leads with effortless charisma. Crisp Italian bergamot and neroli meet spicy black pepper, aromatic cardamom, and a commanding smoked cedarwood and vetiver foundation.',
+    occasions: ['Executive Workdays', 'Active Motion', 'Outdoor Demands', 'Signatures'],
     mood: 'energetic',
     image: '/assets/images/uploads/delice_Bottle-2_1794420107446.png',
     images: [
@@ -49,12 +49,12 @@ const DEFAULT_PRODUCTS = [
   {
     id: 'delice-enigma',
     name: 'DÉLICE ENIGMA',
-    tagline: 'Sophisticated & Intimate',
+    tagline: 'Midnight Royalty • Seductive, Rich & Mysterious',
     volume: '30ml',
     originalPrice: 850,
     price: 799,
-    description: 'A sophisticated fragrance for evenings, romantic occasions, dates, and formal events.',
-    occasions: ['Evening occasions', 'Dates', 'Romantic moments', 'Formal events'],
+    description: 'A mysterious journey into midnight opulence and regal sensuality. Rich noble oud wood is enlivened with spicy saffron, glowing pink peppercorns, and juicy dark plum, melting into deep velvet amber and smoky warmth.',
+    occasions: ['Evening Soirées', 'Intimate Dates', 'Formal Nights', 'Special Occasions'],
     mood: 'evening',
     image: '/assets/images/uploads/delice_Bottle-3_1794420022409.png',
     images: [
@@ -690,44 +690,41 @@ window.moodImageIndex = 0;
 
 const MOOD_ATMOSPHERE_CONFIG = {
   'romantic': {
-    badge: 'Soft & Romantic Atmosphere',
-    image: '/assets/images/scent-guide-bloom.jpg',
-    fallback: '/assets/images/bloom.svg',
-    alt: 'DÉLICE BLOOM — Dewy pink garden roses, blooming peony petals and gentle morning sunlight',
-    tagline: 'YOUR SIGNATURE ROMANTIC MATCH'
+    badge: 'Parisian Floral Romance',
+    image: '/assets/images/scent-guide-bloom-model.jpg',
+    fallback: '/assets/images/scent-guide-bloom.jpg',
+    alt: 'DÉLICE BLOOM — Parisian Haute Couture Floral Romance',
+    tagline: 'HAUTE PARFUMERIE &bull; SOFT, SWEET &amp; ROMANTIC',
+    accords: 'Tender Peony &bull; Grasse Rose &bull; Calabrian Bergamot &bull; White Musk',
+    story: 'An exquisite ode to youthful romance and timeless Parisian grace. Tender Centifolia rose petals and velvety peonies bloom effortlessly over a sparkling kiss of fresh bergamot, wrapped in a soft, sensual veil of white musk. Sweet, delightfully delicate, and breathtakingly feminine.'
   },
   'energetic': {
-    badge: 'Dynamic & Fresh Energy',
-    image: '/assets/images/scent-guide-momentum.jpg',
-    fallback: '/assets/images/momentum.svg',
-    alt: 'DÉLICE MOMENTUM — Vibrant sliced bergamot, aromatic cedar and fresh water energy',
-    tagline: 'YOUR SIGNATURE ENERGETIC MATCH'
+    badge: 'Executive Distinction',
+    image: '/assets/images/scent-guide-momentum-model.jpg',
+    fallback: '/assets/images/scent-guide-momentum.jpg',
+    alt: 'DÉLICE MOMENTUM — Executive Distinction & Charismatic Motion',
+    tagline: 'BRITISH LUXURY HERITAGE &bull; BOLD &amp; CONFIDENT',
+    accords: 'Italian Bergamot &bull; Neroli &bull; Cracked Black Pepper &bull; Smoked Cedarwood',
+    story: 'Crafted for the modern gentleman who moves with effortless executive poise and magnetic presence. Crisp Italian bergamot and neroli meet the spicy warmth of cracked black pepper and cardamom, grounded in an authoritative foundation of smoked cedarwood and earthy vetiver. Bold, fresh, and remarkably resilient.'
   },
   'evening': {
-    badge: 'Intimate & Seductive Evening',
-    image: '/assets/images/scent-guide-enigma.jpg',
-    fallback: '/assets/images/enigma.svg',
-    alt: 'DÉLICE ENIGMA — Deep burgundy velvet, glowing warm amber and midnight candlelight',
-    tagline: 'YOUR SIGNATURE EVENING MATCH'
+    badge: 'Midnight Royalty',
+    image: '/assets/images/scent-guide-enigma-model.jpg',
+    fallback: '/assets/images/scent-guide-enigma.jpg',
+    alt: 'DÉLICE ENIGMA — Midnight Velvet Royalty & Seductive Oud',
+    tagline: 'ROYAL ORIENTAL OPULENCE &bull; SOPHISTICATED &amp; INTIMATE',
+    accords: 'Noble Purple Oud &bull; Royal Saffron &bull; Dark Plum &bull; Golden Amber',
+    story: 'A hypnotic journey into midnight opulence and regal sensuality. Noble purple oud wood is ignited with sparkling saffron, fiery pink peppercorns, and juicy dark plum, melting seamlessly into deep velvet amber and warm smoky woods. Seductive, mysterious, and unforgettable.'
   }
 };
 
-function slideMoodImage(prodId, direction, event) {
-  if (event) event.stopPropagation();
-  const product = globalProducts.find(p => p.id === prodId);
-  if (!product) return;
-  const imgs = (product.images && product.images.length > 0) ? product.images : [product.image];
-  let newIdx = (window.moodImageIndex || 0) + direction;
-  if (newIdx < 0) newIdx = imgs.length - 1;
-  if (newIdx >= imgs.length) newIdx = 0;
-  window.moodImageIndex = newIdx;
-
-  const imgEl = document.getElementById('moodMatchMainImg');
-  if (imgEl) {
-    imgEl.src = imgs[newIdx];
-  }
-}
-window.slideMoodImage = slideMoodImage;
+window.selectMood = function(mood, clickedBtn) {
+  const buttons = document.querySelectorAll('.mood-pill-btn');
+  buttons.forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-mood') === mood);
+  });
+  renderMoodFinderProduct();
+};
 
 function renderMoodFinderProduct() {
   const activeBtn = document.querySelector('.mood-pill-btn.active');
@@ -744,10 +741,15 @@ function renderMoodFinderProduct() {
         <span class="mood-match-badge">${moodCfg.badge}</span>
         <img src="${moodCfg.image}" id="moodMatchMainImg" alt="${moodCfg.alt}" onerror="this.onerror=null; this.src='${moodCfg.fallback}';">
       </div>
-      <div>
-        <span class="tagline-sub">${moodCfg.tagline}</span>
-        <h3 style="font-size:1.6rem; margin-bottom:0.4rem; color:#181619;">${matched.name}</h3>
-        <p style="color:#59555B; margin-bottom:1rem; font-size:0.95rem; line-height:1.6;">${matched.description}</p>
+      <div class="mood-match-info">
+        <span class="tagline-sub" style="font-size:0.75rem; color:#C5A46D; font-weight:700; letter-spacing:0.12em;">${moodCfg.tagline}</span>
+        <h3 style="font-size:1.65rem; margin:0.25rem 0 0.35rem; color:#181619; letter-spacing:0.02em;">${matched.name}</h3>
+        <div style="font-size:0.82rem; font-weight:600; color:#4A102A; margin-bottom:0.75rem;">
+          ${moodCfg.accords}
+        </div>
+        <p style="color:#59555B; margin-bottom:1.15rem; font-size:0.92rem; line-height:1.65;">
+          ${moodCfg.story}
+        </p>
         <div class="product-tags" style="margin-bottom:1.25rem;">
           ${(matched.occasions || []).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
         </div>
@@ -761,18 +763,17 @@ function renderMoodFinderProduct() {
     </div>
   `;
 }
-}
 
 function initMoodFinder() {
   const buttons = document.querySelectorAll('.mood-pill-btn');
   if (!buttons.length) return;
 
   buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      buttons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderMoodFinderProduct();
-    });
+    btn.onclick = (e) => {
+      if (e) e.preventDefault();
+      const mood = btn.getAttribute('data-mood');
+      window.selectMood(mood, btn);
+    };
   });
 
   renderMoodFinderProduct();

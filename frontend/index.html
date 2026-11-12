@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=4.5.0">
+  <link rel="stylesheet" href="/css/style.css?v=4.6.0">
 </head>
 <body>
 
@@ -182,27 +182,38 @@
 
         <div class="mood-selector-wrapper">
           <div class="mood-pills">
-            <button type="button" class="mood-pill-btn active" data-mood="romantic">Everyday &amp; Campus (Soft &amp; Sweet)</button>
-            <button type="button" class="mood-pill-btn" data-mood="energetic">Work, Outdoor &amp; Motion (Bold &amp; Strong)</button>
-            <button type="button" class="mood-pill-btn" data-mood="evening">Evenings &amp; Romantic Dates (Sophisticated)</button>
+            <button type="button" class="mood-pill-btn active" data-mood="romantic" onclick="window.selectMood('romantic', this)">
+              Floral Romance (Soft &amp; Sweet)
+            </button>
+            <button type="button" class="mood-pill-btn" data-mood="energetic" onclick="window.selectMood('energetic', this)">
+              Executive Motion (Bold &amp; Fresh)
+            </button>
+            <button type="button" class="mood-pill-btn" data-mood="evening" onclick="window.selectMood('evening', this)">
+              Midnight Royalty (Intimate &amp; Seductive)
+            </button>
           </div>
 
           <div id="moodMatchResult">
             <!-- Rendered by app.js -->
             <div class="mood-match-card">
               <div class="mood-match-media" onclick="viewProductDetails('delice-bloom')" style="cursor:pointer;" title="Click to view DÉLICE BLOOM details">
-                <span class="mood-match-badge">Soft &amp; Romantic Atmosphere</span>
-                <img src="/assets/images/scent-guide-bloom.jpg" id="moodMatchMainImg" alt="DÉLICE BLOOM — Dewy pink roses, peonies and morning warmth" onerror="this.onerror=null; this.src='/assets/images/bloom.svg';">
+                <span class="mood-match-badge">Parisian Floral Romance</span>
+                <img src="/assets/images/scent-guide-bloom-model.jpg" id="moodMatchMainImg" alt="DÉLICE BLOOM — Parisian Haute Couture Floral Romance" onerror="this.onerror=null; this.src='/assets/images/scent-guide-bloom.jpg';">
               </div>
-              <div>
-                <span class="tagline-sub">YOUR SIGNATURE ROMANTIC MATCH</span>
-                <h3 style="font-size:1.6rem; margin-bottom:0.4rem; color:#181619;">DÉLICE BLOOM</h3>
-                <p style="color:#59555B; margin-bottom:1rem; font-size:0.95rem; line-height:1.6;">A sweet, soft fragrance for everyday use and formal occasions. Perfect for campus, morning walks, and daytime conversations.</p>
+              <div class="mood-match-info">
+                <span class="tagline-sub" style="font-size:0.75rem; color:#C5A46D; font-weight:700; letter-spacing:0.12em;">HAUTE PARFUMERIE &bull; SOFT, SWEET &amp; ROMANTIC</span>
+                <h3 style="font-size:1.65rem; margin:0.25rem 0 0.35rem; color:#181619; letter-spacing:0.02em;">DÉLICE BLOOM</h3>
+                <div style="font-size:0.82rem; font-weight:600; color:#4A102A; margin-bottom:0.75rem;">
+                  Tender Peony &bull; Grasse Rose &bull; Calabrian Bergamot &bull; White Musk
+                </div>
+                <p style="color:#59555B; margin-bottom:1.15rem; font-size:0.92rem; line-height:1.65;">
+                  An exquisite ode to youthful romance and timeless Parisian grace. Tender Centifolia rose petals and velvety peonies blend effortlessly over a sparkling kiss of fresh bergamot, wrapped in a soft, sensual veil of white musk. Sweet, delightfully delicate, and breathtakingly feminine.
+                </p>
                 <div class="product-tags" style="margin-bottom:1.25rem;">
-                  <span class="tag-pill">Everyday use</span>
-                  <span class="tag-pill">University</span>
-                  <span class="tag-pill">Formal occasions</span>
-                  <span class="tag-pill">Daytime outings</span>
+                  <span class="tag-pill">Campus &amp; Everyday</span>
+                  <span class="tag-pill">Romantic Dates</span>
+                  <span class="tag-pill">Spring Outings</span>
+                  <span class="tag-pill">Daytime Events</span>
                 </div>
                 <div class="mood-match-actions">
                   <span class="price-display" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#4A102A;">৳799</span>
@@ -534,6 +545,6 @@
 
   <!-- Scripts -->
   <script src="/js/cart.js?v=4.4.0"></script>
-  <script src="/js/app.js?v=4.5.0"></script>
+  <script src="/js/app.js?v=4.6.0"></script>
 </body>
 </html>
