@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=4.4.0">
+  <link rel="stylesheet" href="/css/style.css?v=4.7.0">
   <style>
     .gallery-thumbs {
       display: flex;
@@ -168,8 +168,8 @@
     </a>
   </nav>
 
-  <script src="/js/cart.js?v=4.4.0"></script>
-  <script src="/js/app.js?v=4.4.0"></script>
+  <script src="/js/cart.js?v=4.7.0"></script>
+  <script src="/js/app.js?v=4.7.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -201,10 +201,40 @@
         ? product.images
         : [product.image, boxImg, '/assets/images/hero-slide-1.svg', '/assets/images/brand-story.svg'].filter(Boolean);
 
+      const rich = (typeof PRODUCT_RICH_DETAILS !== 'undefined' && PRODUCT_RICH_DETAILS[product.id]) ||
+                   (typeof PRODUCT_RICH_DETAILS !== 'undefined' ? PRODUCT_RICH_DETAILS['delice-bloom'] : null) || {
+                     tagline: 'AUTHENTIC 30ML EDITION',
+                     name: product.name,
+                     concentration: 'Eau de Parfum (Fine-Mist Vaporisateur)',
+                     scentFamily: 'Luminous Floral Romance',
+                     keyNotes: 'French Rose, Peony, Bergamot & White Musk',
+                     topNotes: 'Sparkling Citrus & Crisp Petals',
+                     heartNotes: 'Floral Bouquet & Gentle Nectar',
+                     baseNotes: 'Velvet Woods & Soft Musk',
+                     hookStory: product.description,
+                     sprayDetails: {
+                       title: '30ml Luxury Fine-Mist Spray (Eau de Parfum)',
+                       description: 'A precision French-style micro-mist atomizer that spreads a soft, floating scent cloud around you. Spray on the neck, collarbones, and wrists.'
+                     },
+                     pocketLuxury: '30ml portable edition crafted to fit into your pocket or handbag.',
+                     bestFor: 'Daytime, evening, dates, and special occasions.',
+                     faqs: [
+                       { q: 'Is this an original DÉLICE fragrance?', a: 'Yes. DÉLICE creates its own proprietary Eau de Parfum formulations hand-blended with premium fragrance oils.' },
+                       { q: 'How long does it last?', a: 'Formulated to last 6 to 8+ hours on skin and 12+ hours on clothing.' },
+                       { q: 'What is the price and how to order in Bangladesh?', a: 'The launch price is ৳799. Nationwide delivery in Bangladesh with bKash/Nagad Send Money verification.' },
+                       { q: 'What is your replacement guarantee?', a: 'We offer a 100% free replacement if your bottle arrives damaged in transit.' }
+                     ]
+                   };
+
       const container = document.getElementById('productDetailContainer');
       if (container) {
         window.detailImgs = imgs.slice(0, 4);
         window.detailCurrentIndex = 0;
+
+        const origPrice = Number(product.originalPrice) || 850;
+        const curPrice = Number(product.price) || 799;
+        const savings = origPrice - curPrice;
+        const discountPercent = origPrice > curPrice ? Math.round(((origPrice - curPrice) / origPrice) * 100) : 0;
 
         container.innerHTML = `
           <div>
@@ -219,7 +249,7 @@
                 </svg>
               </button>
 
-              <img src="${imgs[0] || product.image}" id="mainDetailImage" alt="${product.name} 30ml Bottle" style="max-height:400px; width:auto; object-fit:contain; transition:opacity 0.18s ease;">
+              <img src="${imgs[0] || product.image}" id="mainDetailImage" alt="${rich.name} 30ml Bottle" style="max-height:400px; width:auto; object-fit:contain; transition:opacity 0.18s ease;">
 
               <!-- Right Arrow Button -->
               <button type="button" class="page-gallery-arrow page-gallery-next" 
@@ -243,49 +273,119 @@
           </div>
 
           <div class="detail-content">
-            <div class="detail-meta-header">
-              <span class="tagline-sub">AUTHENTIC 30ML EDITION</span>
-              <h1 class="detail-title">${product.name}</h1>
-              <div class="detail-pricing">
-                <span class="price-current">৳${product.price}</span>
-                <span class="price-original">৳${product.originalPrice}</span>
-                <span class="badge-offer">Opening Offer &bull; Save ৳${product.originalPrice - product.price}</span>
+            <div class="detail-meta-header" style="margin-bottom:1.25rem; padding-bottom:1.25rem;">
+              <span class="tagline-sub" style="font-size:0.78rem; color:#C5A46D; font-weight:700; letter-spacing:0.12em;">${rich.tagline}</span>
+              <h1 class="detail-title" style="margin:0.25rem 0 0.5rem; font-size:2.2rem;">${rich.name}</h1>
+              <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+                <span style="font-size:0.85rem; color:#4A102A; font-weight:700; background:#FAF6F0; padding:0.25rem 0.75rem; border-radius:4px; border:1px solid #EBE3D5;">${rich.concentration}</span>
+                <span style="font-size:0.85rem; color:#59555B; font-weight:600;">30ml Pocket Luxury Edition</span>
+              </div>
+              <div class="detail-pricing" style="display:flex; align-items:baseline; gap:1rem;">
+                <span class="price-current" style="font-size:2rem; font-weight:700; color:#4A102A;">৳${curPrice}</span>
+                <span class="price-original" style="font-size:1.15rem; text-decoration:line-through; color:#87828A;">৳${origPrice}</span>
+                <span class="badge-offer" style="background:#FF665C; color:#FFF; font-size:0.75rem; padding:0.25rem 0.6rem; border-radius:4px; font-weight:700;">
+                  SAVE ৳${savings} (${discountPercent}% OFF)
+                </span>
               </div>
             </div>
 
-            <div style="margin-bottom:1.75rem;">
-              <h4 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.1em; color:#4A102A; margin-bottom:0.5rem;">Scent Profile</h4>
-              <p style="font-size:1.05rem; line-height:1.7; color:#181619;">${product.description}</p>
+            <!-- 1. Opening Hook Story -->
+            <div class="rich-detail-hook">
+              ${rich.hookStory}
             </div>
 
-            <div style="margin-bottom:2rem;">
-              <h4 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.1em; color:#4A102A; margin-bottom:0.65rem;">Recommended Occasions</h4>
+            <!-- 2. Fragrance Notes & Olfactory Pyramid -->
+            <div class="notes-breakdown-card">
+              <div class="rich-section-title">
+                <span>Fragrance Notes</span>
+                <span class="scent-family-pill">${rich.scentFamily}</span>
+              </div>
+              <p style="font-size:0.92rem; color:#181619; margin:0 0 0.85rem; line-height:1.5;">
+                <strong>Key Notes:</strong> ${rich.keyNotes}
+              </p>
+              <table class="notes-pyramid-table">
+                <tbody>
+                  <tr>
+                    <td class="note-tier-label">Top Notes</td>
+                    <td class="note-tier-values">${rich.topNotes}</td>
+                  </tr>
+                  <tr>
+                    <td class="note-tier-label">Heart Notes</td>
+                    <td class="note-tier-values">${rich.heartNotes}</td>
+                  </tr>
+                  <tr>
+                    <td class="note-tier-label">Base Notes</td>
+                    <td class="note-tier-values">${rich.baseNotes}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 3. Atomizer & Spray Specification -->
+            <div class="spray-spec-box">
+              <div class="rich-section-title" style="font-size:0.92rem; margin-bottom:0.4rem;">
+                <span>Atomizer &amp; Format: ${rich.sprayDetails.title}</span>
+              </div>
+              <p style="font-size:0.9rem; color:#59555B; margin:0 0 0.5rem; line-height:1.6;">
+                ${rich.sprayDetails.description}
+              </p>
+              <p style="font-size:0.85rem; color:#87828A; margin:0; line-height:1.5;">
+                <strong>Pocket Portability:</strong> ${rich.pocketLuxury}
+              </p>
+            </div>
+
+            <!-- 4. Best For & Recommended Wear -->
+            <div style="margin-bottom:1.5rem;">
+              <div class="rich-section-title" style="font-size:0.92rem; margin-bottom:0.45rem;">
+                <span>Best For &amp; Recommended Wear</span>
+              </div>
+              <p style="font-size:0.92rem; color:#181619; margin:0 0 0.65rem;">${rich.bestFor}</p>
               <div class="occasion-pill-list">
                 ${(product.occasions || []).map(occ => `<span class="occasion-pill">${occ}</span>`).join('')}
               </div>
             </div>
 
-            <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:8px; padding:1.25rem; margin-bottom:2rem;">
-              <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+            <!-- 5. Bangladesh Delivery Reassurance Box -->
+            <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:8px; padding:1.15rem; margin-bottom:1.75rem;">
+              <div style="display:flex; align-items:center; gap:0.65rem; margin-bottom:0.4rem;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A102A" stroke-width="2">
                   <rect x="1" y="3" width="15" height="13"></rect>
                   <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
                   <circle cx="5.5" cy="18.5" r="2.5"></circle>
                   <circle cx="18.5" cy="18.5" r="2.5"></circle>
                 </svg>
-                <strong style="font-size:0.9rem;">Estimated Delivery in Bangladesh:</strong>
+                <strong style="font-size:0.92rem; color:#4A102A;">Nationwide Delivery in Bangladesh:</strong>
               </div>
-              <p style="font-size:0.85rem; color:#59555B; margin:0;">Inside Dhaka: 1–2 business days (৳60) &bull; Outside Dhaka: 2–4 business days (৳120)</p>
+              <p style="font-size:0.86rem; color:#59555B; margin:0;">
+                Inside Dhaka: 1–2 business days (৳60) &bull; Outside Dhaka: 2–4 business days (৳120). 100% verified bKash/Nagad Send Money.
+              </p>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-              <button type="button" class="btn btn-primary" onclick="DeliceCart.addItem(window.currentActiveProduct, 1)" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700;">
+            <!-- 6. Action Buttons -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+              <button type="button" class="btn btn-primary" onclick="DeliceCart.addItem(window.currentActiveProduct, 1)" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700; padding:0.9rem;">
                 Add to Cart
               </button>
-              <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700; text-align:center;">
+              <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700; text-align:center; padding:0.9rem;">
                 Buy Now
               </a>
             </div>
+
+            <!-- 7. Frequently Asked Questions Accordion -->
+            <div style="margin-top:2rem; border-top:1px solid #EBE3D5; padding-top:1.5rem;">
+              <h3 style="font-size:1.15rem; text-transform:uppercase; letter-spacing:0.1em; color:#4A102A; margin-bottom:0.75rem; font-weight:700;">
+                Frequently Asked Questions
+              </h3>
+              <div class="delice-faq-accordion">
+                ${rich.faqs.map(faq => `
+                  <details class="delice-faq-item">
+                    <summary>${faq.q}</summary>
+                    <div class="faq-ans">${faq.a}</div>
+                  </details>
+                `).join('')}
+              </div>
+            </div>
+
           </div>
         `;
         window.currentActiveProduct = product;

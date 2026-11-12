@@ -68,6 +68,146 @@ const DEFAULT_PRODUCTS = [
   }
 ];
 
+// Rich Product Fragrance Details (Luxury Olfactory & Spec Breakdown)
+const PRODUCT_RICH_DETAILS = {
+  'delice-bloom': {
+    id: 'delice-bloom',
+    name: 'DÉLICE BLOOM',
+    tagline: 'Parisian Haute Couture Floral Romance',
+    volume: '30ml Edition',
+    concentration: 'Eau de Parfum (Fine-Mist Vaporisateur)',
+    scentFamily: 'Chypre Floral Sweet Romance',
+    keyNotes: 'Grasse Centifolia Rose, Tender Peony, Calabrian Bergamot, Dewy Mandarin & Soft White Musk',
+    topNotes: 'Calabrian Bergamot, Sweet Mandarin, Crisp Dewdrop Accord',
+    heartNotes: 'Grasse Centifolia Rose, Velvet Pink Peony, Apricot Blossom',
+    baseNotes: 'Soft White Musk, Gentle Cashmere Woods, Subtle Sweet Amber',
+    hookStory: 'If you love delicate Parisian floral romance, this is the DÉLICE version: an enchanting floral bouquet crafted with tender Grasse rose, velvety peony, sparkling Calabrian bergamot, and a soft kiss of white musk, blended to be long-lasting and effortlessly worn from day to night.',
+    sprayDetails: {
+      title: '30ml Luxury Fine-Mist Spray (Eau de Parfum)',
+      description: 'A precision French-style micro-mist atomizer that spreads a soft, floating floral cloud around you. Spray 3–5 times onto the neck, collarbones, and wrists for an airy, elegant scent trail. Formulated with high-grade perfume oils that stay vibrant throughout a warm day in Bangladesh without staining delicate clothing.'
+    },
+    pocketLuxury: 'Crafted as a sleek 30ml pocket-luxury flacon that fits seamlessly into your handbag, vanity, or travel pouch—ready whenever you want an effortless touch-up.',
+    bestFor: 'Feminine romantic wear, campus & everyday outings, daytime dates, morning coffee, and celebratory gatherings.',
+    faqs: [
+      {
+        q: 'Is this an original DÉLICE fragrance?',
+        a: 'Yes. DÉLICE Bloom is our own bespoke Eau de Parfum formulation, hand-blended with premium imported perfume oils to capture timeless Parisian floral elegance, radiant character, and long-lasting performance at an accessible price point in Bangladesh.'
+      },
+      {
+        q: 'How long does it last?',
+        a: 'It is formulated specifically to endure a normal day in Bangladesh\'s climate. Expect 6 to 8+ hours of noticeable longevity on skin, and 12+ hours of lingering presence on fabrics. The spray projects gently for the first 2–3 hours before settling into an intimate, elegant floral scent bubble.'
+      },
+      {
+        q: 'How should I apply it for the best projection?',
+        a: 'Spray 3–5 times directly onto warm pulse points: both sides of the neck, collarbones, and inner wrists. Adding 1–2 light sprays to cotton clothing creates a long-lasting, ethereal scent cloud.'
+      },
+      {
+        q: 'What is the price of DÉLICE Bloom in Bangladesh?',
+        a: 'The special launch price is ৳799 (regular ৳850) for the 30ml Eau de Parfum edition. We deliver nationwide across all 64 districts in Bangladesh with safe packaging and prompt dispatch.'
+      },
+      {
+        q: 'How do delivery and payment work?',
+        a: 'Delivery takes 1–2 business days inside Dhaka (৳60) and 2–4 business days outside Dhaka (৳120). Payment is made easily and securely via bKash or Nagad Send Money to our official merchant hotline (01731101780).'
+      },
+      {
+        q: 'What if my bottle is damaged during courier transit?',
+        a: 'We offer a 100% hassle-free replacement guarantee. If your bottle arrives broken or the sprayer is damaged, simply contact us within 48 hours of delivery with an unboxing photo or video, and we will dispatch a replacement bottle immediately at no extra charge.'
+      }
+    ]
+  },
+  'delice-momentum': {
+    id: 'delice-momentum',
+    name: 'DÉLICE MOMENTUM',
+    tagline: 'British Executive Distinction & Dynamic Poise',
+    volume: '30ml Edition',
+    concentration: 'Eau de Parfum (Fine-Mist Vaporisateur)',
+    scentFamily: 'Aromatic Citrus Woody',
+    keyNotes: 'Italian Bergamot, Smoked Cardamom, Black Peppercorn, French Lavender, Cedarwood & Haitian Vetiver',
+    topNotes: 'Crisp Italian Bergamot, Sun-drenched Neroli, Cracked Black Pepper',
+    heartNotes: 'Smoked Green Cardamom, French Lavender, Silver Mountain Sage',
+    baseNotes: 'Smoked Atlas Cedarwood, Haitian Vetiver, Oakmoss, Warm Crystal Amber',
+    hookStory: 'If you love sharp British executive distinction, this is the DÉLICE version: a crisp aromatic woody fragrance with sparkling Italian bergamot, cracked black pepper, smoked cardamom, and rich cedarwood, blended to project authority, freshness, and poise from morning meetings to evening affairs.',
+    sprayDetails: {
+      title: '30ml Luxury Fine-Mist Spray (Eau de Parfum)',
+      description: 'A robust, high-output micro-mist atomizer engineered to project a sharp, clean, and commanding scent trail. Spray on the neck, collar, and chest for an energetic presence that keeps you fresh and confident all day.'
+    },
+    pocketLuxury: 'Engineered in a compact 30ml flacon that fits seamlessly into your suit pocket, laptop bag, or gym kit for instant revitalization before an important meeting or dinner.',
+    bestFor: 'Dynamic executive wear, corporate boardrooms, active movement, driving, evening dinners, and signature daily confidence.',
+    faqs: [
+      {
+        q: 'Is this an original DÉLICE fragrance?',
+        a: 'Yes. DÉLICE Momentum is our own exclusive Eau de Parfum creation, expertly crafted with imported aromatic concentrates to give modern leaders a distinguished, premium scent profile without luxury brand markups.'
+      },
+      {
+        q: 'How long does it last in tropical heat and commute?',
+        a: 'Engineered with deep woody base notes and dense aromatic fixatives, DÉLICE Momentum withstands tropical humidity, sweat, and active movement, providing 7 to 9+ hours of performance on skin and over 14+ hours on jackets and shirts.'
+      },
+      {
+        q: 'How should I apply it for maximum projection?',
+        a: 'Apply 2 sprays to the sides of the neck, 1 to each wrist, and 1 across the chest or shirt collar. The crisp citrus and spice open with immediate impact, drying down into an authoritative cedarwood-vetiver trail.'
+      },
+      {
+        q: 'What is the price of DÉLICE Momentum in Bangladesh?',
+        a: 'The special launch price is ৳799 (regular ৳850) for the 30ml Eau de Parfum edition. We deliver nationwide across all 64 districts in Bangladesh with safe protective packaging.'
+      },
+      {
+        q: 'How do delivery and payment work?',
+        a: 'Delivery takes 1–2 business days inside Dhaka (৳60) and 2–4 business days outside Dhaka (৳120). Payment is made conveniently via bKash or Nagad Send Money to our official merchant hotline (01731101780).'
+      },
+      {
+        q: 'What is your replacement policy if transit damage occurs?',
+        a: 'All orders are securely packaged with heavy cushioning. In the rare event of transit damage or a defective atomizer, report it within 48 hours with unboxing photos for an instant, free replacement bottle.'
+      }
+    ]
+  },
+  'delice-enigma': {
+    id: 'delice-enigma',
+    name: 'DÉLICE ENIGMA',
+    tagline: 'Midnight Royalty & Hypnotic Velvet Oud',
+    volume: '30ml Edition',
+    concentration: 'Eau de Parfum (Fine-Mist Vaporisateur)',
+    scentFamily: 'Royal Oriental Woody',
+    keyNotes: 'Noble Midnight Oud Wood, Royal Saffron, Dark Velvety Plum, Pink Peppercorn & Golden Amber Resin',
+    topNotes: 'Sparkling Royal Saffron, Fiery Pink Peppercorn, Bitter Orange Zest',
+    heartNotes: 'Dark Velvety Plum, Midnight Rose Petals, Exotic Spices',
+    baseNotes: 'Noble Midnight Oud Wood, Golden Amber Resin, Smoky Vanilla Bean, Rich Patchouli',
+    hookStory: 'If you love hypnotic midnight royalty, rare orientals, and seductive mystery, this is the DÉLICE version: an opulent oriental woody perfume with noble midnight oud wood, royal saffron, fiery pink pepper, and velvety dark plum, blended to leave a deep, intoxicating, and unforgettable trail.',
+    sprayDetails: {
+      title: '30ml Luxury Fine-Mist Spray (Eau de Parfum)',
+      description: 'A precision vaporisateur designed to disperse rich oriental resins and oud molecules evenly without staining delicate fabrics. Spray onto warm pulse points for a hypnotic, velvet aura that commands admiration.'
+    },
+    pocketLuxury: 'A sleek 30ml flacon built with dark luxury aesthetics, convenient to carry in your evening clutch or pocket for an instant touch-up before grand gatherings.',
+    bestFor: 'Intimate evening dates, VIP events, weddings, winter evenings, romantic nights, and seductive signature occasions.',
+    faqs: [
+      {
+        q: 'Is this an original DÉLICE fragrance?',
+        a: 'Yes. DÉLICE Enigma is our proprietary Eau de Parfum formulation, carefully balanced with exquisite oriental midnight oud notes and glowing saffron to offer true niche-level luxury at an honest price.'
+      },
+      {
+        q: 'How long does it last?',
+        a: 'Due to its rich concentration of heavy woods, resins, and amber, DÉLICE Enigma offers exceptional staying power: 10 to 12+ hours on skin and multiple days on fabrics like coats, blazers, and scarves. Its sillage is magnetic and memorable.'
+      },
+      {
+        q: 'Is the oud note overwhelming or harsh?',
+        a: 'Not at all. Unlike heavy traditional ouds, DÉLICE Enigma is modern, smooth, and refined. The noble oud is softened by dark juicy plum and glowing pink pepper, making it velvety, seductive, and wearable for men and women alike.'
+      },
+      {
+        q: 'What is the price of DÉLICE Enigma in Bangladesh?',
+        a: 'The special launch price is ৳799 (regular ৳850) for the 30ml Eau de Parfum edition. We deliver nationwide across all 64 districts in Bangladesh.'
+      },
+      {
+        q: 'How do delivery and payment work?',
+        a: 'Delivery takes 1–2 business days inside Dhaka (৳60) and 2–4 business days outside Dhaka (৳120). Payment is made via bKash or Nagad Send Money to our official merchant hotline (01731101780).'
+      },
+      {
+        q: 'What is your replacement policy for broken items?',
+        a: 'Every bottle is shipped in our rigid protective packaging. If your shipment arrives damaged, notify us within 48 hours of delivery with photos or video, and we will send a free replacement bottle immediately.'
+      }
+    ]
+  }
+};
+window.PRODUCT_RICH_DETAILS = PRODUCT_RICH_DETAILS;
+
 let globalProducts = DEFAULT_PRODUCTS;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -347,13 +487,18 @@ function renderProductGrid(products) {
           </div>
 
           <!-- 5. Action Buttons (Clean, Premium, Compact) -->
-          <div class="product-actions" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:auto;">
-            <button type="button" class="btn btn-primary" onclick="addProductToBag('${prod.id}')" style="padding:0.65rem 0.4rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">
-              Add to Cart
+          <div class="product-actions" style="display:flex; flex-direction:column; gap:0.4rem; margin-top:auto;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.4rem;">
+              <button type="button" class="btn btn-primary" onclick="addProductToBag('${prod.id}')" style="padding:0.65rem 0.35rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700;">
+                Add to Cart
+              </button>
+              <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-gold" style="padding:0.65rem 0.35rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; text-align:center;">
+                Buy Now
+              </a>
+            </div>
+            <button type="button" class="btn-card-details" onclick="viewProductDetails('${prod.id}')">
+              Fragrance Details &amp; Notes &rarr;
             </button>
-            <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-gold" style="padding:0.65rem 0.4rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700; text-align:center;">
-              Buy Now
-            </a>
           </div>
         </div>
       </article>
@@ -503,13 +648,16 @@ function addProductToBag(productId) {
 }
 
 function viewProductDetails(productId) {
-  const product = globalProducts.find(p => p.id === productId);
-  if (!product) return;
+  const normId = String(productId).toLowerCase().replace(/_/g, '-');
+  const product = (globalProducts && globalProducts.find(p => p.id === normId)) ||
+                  DEFAULT_PRODUCTS.find(p => p.id === normId) ||
+                  DEFAULT_PRODUCTS[0];
+  const rich = PRODUCT_RICH_DETAILS[normId] || PRODUCT_RICH_DETAILS['delice-bloom'];
 
   const modal = document.getElementById('productModal');
   const modalContent = document.getElementById('productModalContent');
   if (!modal || !modalContent) {
-    window.location.href = `/product.html?id=${productId}`;
+    window.location.href = `/product.html?id=${normId}`;
     return;
   }
 
@@ -520,8 +668,8 @@ function viewProductDetails(productId) {
 
   // Matching box image
   let boxImg = '/assets/images/bloom-box.svg';
-  if (product.id.includes('momentum')) boxImg = '/assets/images/momentum-box.svg';
-  if (product.id.includes('enigma')) boxImg = '/assets/images/enigma-box.svg';
+  if (normId.includes('momentum')) boxImg = '/assets/images/momentum-box.svg';
+  if (normId.includes('enigma')) boxImg = '/assets/images/enigma-box.svg';
 
   // Up to 4 product pictures
   const imgs = (product.images && product.images.length > 0)
@@ -532,9 +680,10 @@ function viewProductDetails(productId) {
   window.modalCurrentIndex = 0;
 
   modalContent.innerHTML = `
-    <div class="product-detail-grid">
+    <div class="product-detail-grid" style="grid-template-columns: 1fr 1.15fr; gap: 2rem; align-items: start;">
+      <!-- Left Column: Gallery & Standalone Link -->
       <div>
-        <div class="detail-gallery" style="background:#FAF6F0; border-radius:8px; padding:2rem; display:flex; align-items:center; justify-content:center; min-height:340px; position:relative;">
+        <div class="detail-gallery" id="quickModalGalleryFrame" style="background:#FAF6F0; border-radius:8px; padding:1.75rem; display:flex; align-items:center; justify-content:center; min-height:320px; position:relative;">
           <!-- Left Arrow Button -->
           <button type="button" class="modal-gallery-arrow modal-gallery-prev" 
             aria-label="Previous Image" 
@@ -545,7 +694,7 @@ function viewProductDetails(productId) {
             </svg>
           </button>
 
-          <img src="${imgs[0] || product.image}" id="quickModalMainImg" alt="${product.name}" style="max-height:320px; width:auto; margin:0 auto; object-fit:contain; transition:opacity 0.18s ease;">
+          <img src="${imgs[0] || product.image}" id="quickModalMainImg" alt="${rich.name}" style="max-height:290px; width:auto; margin:0 auto; object-fit:contain; transition:opacity 0.18s ease;">
 
           <!-- Right Arrow Button -->
           <button type="button" class="modal-gallery-arrow modal-gallery-next" 
@@ -557,6 +706,7 @@ function viewProductDetails(productId) {
             </svg>
           </button>
         </div>
+        
         <!-- 4 Image Selector for Quick View Modal with Visual Thumbnails -->
         <div id="quickModalThumbs" style="display:flex; justify-content:center; gap:0.6rem; margin-top:0.85rem; flex-wrap:wrap;">
           ${imgs.slice(0, 4).map((img, i) => `
@@ -566,45 +716,131 @@ function viewProductDetails(productId) {
             </button>
           `).join('')}
         </div>
+        <p style="text-align:center; font-size:0.75rem; color:#87828A; margin-top:0.5rem;">Explore all 4 angles: Bottle Flacon, Unboxing Box, Campaign &amp; Editorial</p>
+
+        <!-- Direct Link to Dedicated Product Page -->
+        <div style="text-align:center; margin-top:1.25rem;">
+          <a href="/product.html?id=${normId}" style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.82rem; font-weight:700; color:#4A102A; text-decoration:underline;">
+            Open Dedicated Product Page &rarr;
+          </a>
+        </div>
       </div>
+
+      <!-- Right Column: Rich Details Breakdown -->
       <div>
-        <span class="tagline-sub">AUTHENTIC 30ML EDITION</span>
-        <h2 class="detail-title" style="margin-bottom:0.5rem;">${product.name}</h2>
-        <p style="font-size:0.85rem; color:#8C7E72; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem;">30ml Edition</p>
-        <p style="color:#59555B; margin-bottom:1.5rem; line-height:1.7;">${product.description}</p>
-        
-        <div style="margin-bottom:1.5rem;">
-          <h4 style="font-size:0.9rem; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.5rem; color:#4A102A;">Recommended Occasions</h4>
+        <div class="detail-meta-header" style="margin-bottom:1rem; padding-bottom:1rem;">
+          <span class="tagline-sub" style="font-size:0.75rem; color:#C5A46D; font-weight:700; letter-spacing:0.12em;">${rich.tagline}</span>
+          <h2 class="detail-title" style="margin:0.25rem 0 0.5rem; font-size:1.75rem;">${rich.name}</h2>
+          <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+            <span style="font-size:0.82rem; color:#4A102A; font-weight:700; background:#FAF6F0; padding:0.2rem 0.6rem; border-radius:4px; border:1px solid #EBE3D5;">${rich.concentration}</span>
+            <span style="font-size:0.82rem; color:#59555B; font-weight:600;">30ml Pocket Luxury Edition</span>
+          </div>
+          <div class="detail-pricing" style="margin-top:0.75rem; display:flex; align-items:baseline; gap:0.75rem;">
+            <span class="price-current" style="font-size:1.6rem; font-weight:700; color:#4A102A;">৳${price}</span>
+            <span class="price-original" style="font-size:1.05rem; text-decoration:line-through; color:#87828A;">৳${orig}</span>
+            <span class="badge-offer" style="background:#FF665C; color:#FFF; font-size:0.72rem; padding:0.2rem 0.5rem; border-radius:4px; font-weight:700;">
+              SAVE ৳${savings} (${discountPercent}% OFF)
+            </span>
+          </div>
+        </div>
+
+        <!-- 1. Opening Hook Story -->
+        <div class="rich-detail-hook">
+          ${rich.hookStory}
+        </div>
+
+        <!-- 2. Fragrance Notes Box & Olfactory Pyramid -->
+        <div class="notes-breakdown-card">
+          <div class="rich-section-title">
+            <span>Fragrance Notes</span>
+            <span class="scent-family-pill">${rich.scentFamily}</span>
+          </div>
+          <p style="font-size:0.88rem; color:#181619; margin:0 0 0.75rem; line-height:1.5;">
+            <strong>Key Notes:</strong> ${rich.keyNotes}
+          </p>
+          <table class="notes-pyramid-table">
+            <tbody>
+              <tr>
+                <td class="note-tier-label">Top Notes</td>
+                <td class="note-tier-values">${rich.topNotes}</td>
+              </tr>
+              <tr>
+                <td class="note-tier-label">Heart Notes</td>
+                <td class="note-tier-values">${rich.heartNotes}</td>
+              </tr>
+              <tr>
+                <td class="note-tier-label">Base Notes</td>
+                <td class="note-tier-values">${rich.baseNotes}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 3. Spray or Bottle Specification -->
+        <div class="spray-spec-box">
+          <div class="rich-section-title" style="font-size:0.88rem; margin-bottom:0.35rem;">
+            <span>Atomizer &amp; Format: ${rich.sprayDetails.title}</span>
+          </div>
+          <p style="font-size:0.86rem; color:#59555B; margin:0 0 0.5rem; line-height:1.6;">
+            ${rich.sprayDetails.description}
+          </p>
+          <p style="font-size:0.82rem; color:#87828A; margin:0; line-height:1.5;">
+            <strong>Pocket Portability:</strong> ${rich.pocketLuxury}
+          </p>
+        </div>
+
+        <!-- 4. Best For & Occasions -->
+        <div style="margin-bottom:1.25rem;">
+          <div class="rich-section-title" style="font-size:0.88rem; margin-bottom:0.4rem;">
+            <span>Best For &amp; Recommended Wear</span>
+          </div>
+          <p style="font-size:0.88rem; color:#181619; margin:0 0 0.5rem;">${rich.bestFor}</p>
           <div class="product-tags">
             ${(product.occasions || []).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
           </div>
         </div>
 
-        <div class="detail-pricing" style="margin-bottom:1.5rem; padding: 1rem 0; border-top:1px solid #E0D4C3; border-bottom:1px solid #E0D4C3;">
-          <div>
-            <div style="font-size:0.75rem; text-transform:uppercase; color:#87828A;">Opening Offer Price</div>
-            <div class="price-current">৳${price}</div>
+        <!-- Reassurance & Delivery Box -->
+        <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:8px; padding:0.9rem 1.15rem; margin-bottom:1.25rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.35rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A102A" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+            <strong style="font-size:0.86rem; color:#4A102A;">Nationwide Delivery in Bangladesh:</strong>
           </div>
-          <div>
-            <div style="font-size:0.75rem; text-transform:uppercase; color:#87828A;">Regular Price</div>
-            <div class="price-original">৳${orig}</div>
-          </div>
-          <div style="margin-left:auto;">
-            <span class="badge-offer" style="background:#FF665C;">
-              ${discountPercent > 0 ? `SAVE ৳${savings} (${discountPercent}% OFF)` : 'OFFER'}
-            </span>
-          </div>
+          <p style="font-size:0.82rem; color:#59555B; margin:0;">
+            Inside Dhaka: 1–2 business days (৳60) &bull; Outside Dhaka: 2–4 business days (৳120). Official bKash/Nagad Send Money verified.
+          </p>
         </div>
 
-        <!-- BOTH "ADD TO CART" AND "BUY NOW" IN MODAL (NO EMOJIS) -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
-          <button type="button" class="btn btn-primary btn-block" onclick="addProductToBag('${product.id}'); closeModal('productModal');" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700;">
+        <!-- Action Buttons -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;">
+          <button type="button" class="btn btn-primary" onclick="addProductToBag('${normId}'); closeModal('productModal');" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
             Add to Cart
           </button>
-          <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold btn-block" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700; text-align:center;">
+          <a href="/checkout.html?buyNow=${normId}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700; text-align:center;">
             Buy Now
           </a>
         </div>
+
+        <!-- 5. Frequently Asked Questions (Accordion) -->
+        <div style="margin-top:1.5rem;">
+          <h4 style="font-size:0.95rem; text-transform:uppercase; letter-spacing:0.1em; color:#4A102A; margin-bottom:0.5rem; font-weight:700;">
+            Frequently Asked Questions
+          </h4>
+          <div class="delice-faq-accordion">
+            ${rich.faqs.map(faq => `
+              <details class="delice-faq-item">
+                <summary>${faq.q}</summary>
+                <div class="faq-ans">${faq.a}</div>
+              </details>
+            `).join('')}
+          </div>
+        </div>
+
       </div>
     </div>
   `;
@@ -713,8 +949,8 @@ const MOOD_ATMOSPHERE_CONFIG = {
     fallback: '/assets/images/scent-guide-enigma.jpg',
     alt: 'DÉLICE ENIGMA — Midnight Velvet Royalty & Seductive Oud',
     tagline: 'ROYAL ORIENTAL OPULENCE &bull; SOPHISTICATED &amp; INTIMATE',
-    accords: 'Noble Purple Oud &bull; Royal Saffron &bull; Dark Plum &bull; Golden Amber',
-    story: 'A hypnotic journey into midnight opulence and regal sensuality. Noble purple oud wood is ignited with sparkling saffron, fiery pink peppercorns, and juicy dark plum, melting seamlessly into deep velvet amber and warm smoky woods. Seductive, mysterious, and unforgettable.'
+    accords: 'Noble Midnight Oud &bull; Royal Saffron &bull; Dark Plum &bull; Golden Amber',
+    story: 'A hypnotic journey into midnight opulence and regal sensuality. Noble midnight oud wood is ignited with sparkling saffron, fiery pink peppercorns, and juicy dark plum, melting seamlessly into deep velvet amber and warm smoky woods. Seductive, mysterious, and unforgettable.'
   }
 };
 

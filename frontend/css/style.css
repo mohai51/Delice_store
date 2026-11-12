@@ -2301,3 +2301,176 @@ body, p, li, span, input, select, textarea, label {
     max-height: 175px;
   }
 }
+
+/* ==========================================================================
+   RICH FRAGRANCE DETAILS & NOTES ACCORDION (DASH-Inspired Luxury Layout)
+   ========================================================================== */
+.rich-detail-hook {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: #181619;
+  background: #FAF6F0;
+  border-left: 3px solid #C5A46D;
+  padding: 0.95rem 1.15rem;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 1.25rem;
+}
+
+.rich-section-title {
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #4A102A;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+.scent-family-pill {
+  display: inline-block;
+  background: rgba(197, 164, 109, 0.15);
+  color: #4A102A;
+  border: 1px solid rgba(197, 164, 109, 0.45);
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.notes-breakdown-card {
+  background: #FFFFFF;
+  border: 1px solid #EBE3D5;
+  border-radius: 8px;
+  padding: 1.15rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.notes-pyramid-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.notes-pyramid-table tr {
+  border-bottom: 1px dashed #EBE3D5;
+}
+
+.notes-pyramid-table tr:last-child {
+  border-bottom: none;
+}
+
+.notes-pyramid-table td {
+  padding: 0.55rem 0.25rem;
+  font-size: 0.88rem;
+  vertical-align: top;
+}
+
+.notes-pyramid-table .note-tier-label {
+  width: 105px;
+  font-weight: 700;
+  color: #4A102A;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.notes-pyramid-table .note-tier-values {
+  color: #333035;
+  line-height: 1.5;
+}
+
+.spray-spec-box {
+  background: #FAF6F0;
+  border: 1px solid #E0D4C3;
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.25rem;
+}
+
+.delice-faq-accordion {
+  margin-top: 0.75rem;
+  border-top: 1px solid #EBE3D5;
+}
+
+.delice-faq-item {
+  border-bottom: 1px solid #EBE3D5;
+  padding: 0.8rem 0;
+}
+
+.delice-faq-item summary {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #181619;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+
+.delice-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.delice-faq-item summary:hover {
+  color: #4A102A;
+}
+
+.delice-faq-item summary::after {
+  content: '+';
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #C5A46D;
+  margin-left: 0.75rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.delice-faq-item[open] summary::after {
+  content: '−';
+  color: #4A102A;
+}
+
+.delice-faq-item .faq-ans {
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #59555B;
+  padding-left: 0.15rem;
+}
+
+.btn-card-details {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: #FAF6F0;
+  color: #4A102A;
+  border: 1px solid #E0D4C3;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.4rem;
+}
+
+.btn-card-details:hover {
+  background: #4A102A;
+  color: #FFFFFF;
+  border-color: #4A102A;
+}
+
