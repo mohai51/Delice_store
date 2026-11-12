@@ -467,7 +467,9 @@ function renderProductGrid(products) {
         <div class="product-body">
           <!-- 1. Name & 30ml Badge -->
           <div class="product-header-row" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.25rem;">
-            <h3 class="product-title" onclick="viewProductDetails('${prod.id}')" style="cursor:pointer; margin:0; font-size:1.15rem; font-weight:700; color:#181619; letter-spacing:0.02em;">${prod.name}</h3>
+            <h3 class="product-title" style="margin:0; font-size:1.15rem; font-weight:700; color:#181619; letter-spacing:0.02em;">
+              <a href="/product.html?id=${prod.id}" style="color:inherit; text-decoration:none;">${prod.name}</a>
+            </h3>
             <span style="font-size:0.75rem; font-weight:600; color:#4A102A; background:#FAF6F0; padding:0.15rem 0.45rem; border-radius:4px; border:1px solid #EBE3D5;">30ml</span>
           </div>
 
@@ -496,9 +498,9 @@ function renderProductGrid(products) {
                 Buy Now
               </a>
             </div>
-            <button type="button" class="btn-card-details" onclick="viewProductDetails('${prod.id}')">
+            <a href="/product.html?id=${prod.id}" class="btn-card-details">
               Fragrance Details &amp; Notes &rarr;
-            </button>
+            </a>
           </div>
         </div>
       </article>
@@ -680,7 +682,7 @@ function viewProductDetails(productId) {
   window.modalCurrentIndex = 0;
 
   modalContent.innerHTML = `
-    <div class="product-detail-grid" style="grid-template-columns: 1fr 1.15fr; gap: 2rem; align-items: start;">
+    <div class="product-detail-grid quick-modal-grid">
       <!-- Left Column: Gallery & Standalone Link -->
       <div>
         <div class="detail-gallery" id="quickModalGalleryFrame" style="background:#FAF6F0; border-radius:8px; padding:1.75rem; display:flex; align-items:center; justify-content:center; min-height:320px; position:relative;">
@@ -847,6 +849,8 @@ function viewProductDetails(productId) {
 
   openModal('productModal');
 }
+window.viewProductDetails = viewProductDetails;
+window.addProductToBag = addProductToBag;
 
 window.modalCurrentImgs = [];
 window.modalCurrentIndex = 0;
@@ -993,7 +997,7 @@ function renderMoodFinderProduct() {
           <span class="price-display" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#4A102A;">৳${matched.price}</span>
           <button type="button" class="btn btn-primary" onclick="addProductToBag('${matched.id}')" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Add to Cart</button>
           <a href="/checkout.html?buyNow=${matched.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700; text-align:center;">Buy Now</a>
-          <button type="button" class="btn btn-secondary" onclick="viewProductDetails('${matched.id}')" style="text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Details</button>
+          <a href="/product.html?id=${matched.id}" class="btn btn-secondary" style="text-transform:uppercase; letter-spacing:0.08em; font-weight:600; text-align:center;">Details</a>
         </div>
       </div>
     </div>
@@ -1079,3 +1083,5 @@ function closeModal(modalId) {
     document.body.style.overflow = '';
   }
 }
+window.openModal = openModal;
+window.closeModal = closeModal;

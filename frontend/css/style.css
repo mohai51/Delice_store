@@ -2454,23 +2454,41 @@ body, p, li, span, input, select, textarea, label {
   justify-content: center;
   gap: 0.35rem;
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.55rem 0.5rem;
   background: #FAF6F0;
   color: #4A102A;
   border: 1px solid #E0D4C3;
   border-radius: 6px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
   cursor: pointer;
+  text-decoration: none;
   transition: all 0.2s ease;
   margin-top: 0.4rem;
+  touch-action: manipulation;
+  box-sizing: border-box;
 }
 
 .btn-card-details:hover {
   background: #4A102A;
   color: #FFFFFF;
   border-color: #4A102A;
+  text-decoration: none;
+}
+
+.quick-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .quick-modal-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
 }
 
