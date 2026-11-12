@@ -82,16 +82,16 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  // Bangladesh Payment Architecture (100% Online vs COD with Advance Delivery Fee)
+  // Bangladesh Payment Architecture (100% Online vs COD with Advance Delivery Fee via bKash/Nagad Send Money)
   paymentMethod: {
     type: String,
-    enum: ['full_online', 'cod_advance', 'sslcommerz'],
+    enum: ['full_online', 'cod_advance'],
     default: 'full_online',
     index: true
   },
   paymentProvider: {
     type: String,
-    enum: ['bkash', 'nagad', 'sslcommerz', 'other'],
+    enum: ['bkash', 'nagad', 'other'],
     default: 'bkash'
   },
   senderNumber: {
@@ -101,7 +101,7 @@ const orderSchema = new mongoose.Schema({
   advancePaid: {
     type: Number,
     default: 0,
-    comment: 'Amount received in advance via bKash/Nagad (100% for full_online, or delivery fee for COD)'
+    comment: 'Amount received in advance via bKash/Nagad Send Money (100% for full_online, or delivery fee for COD)'
   },
   cashDueOnDelivery: {
     type: Number,
@@ -122,7 +122,7 @@ const orderSchema = new mongoose.Schema({
   gatewayFee: {
     type: Number,
     default: 0,
-    comment: 'SSLCOMMERZ transaction fee (e.g. 2.5% on successful charge)'
+    comment: 'Payment processing / cash-out fee (0 for bKash/Nagad Send Money)'
   },
   netProfit: {
     type: Number,

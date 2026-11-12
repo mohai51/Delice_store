@@ -5,9 +5,9 @@ const { memoryStore, isConnected } = require('../config/db');
 const DEFAULT_SETTINGS = {
   deliveryChargeInsideDhaka: { value: 60, isPublic: true, description: 'Delivery fee for addresses inside Dhaka city' },
   deliveryChargeOutsideDhaka: { value: 120, isPublic: true, description: 'Delivery fee for outside Dhaka / nationwide' },
-  bkashNagadNumber: { value: '01731101780', isPublic: true, description: 'Official bKash and Nagad Send Money number (Personal)' },
+  bkashNagadNumber: { value: process.env.BKASH_NAGAD_NUMBER || '01731101780', isPublic: true, description: 'Official bKash and Nagad Send Money number (Personal)' },
   defaultProductCOGS: { value: 320, isPublic: false, description: 'Default cost of goods sold per 30ml bottle' },
-  gatewayFeePercentage: { value: 2.5, isPublic: false, description: 'SSLCOMMERZ transaction fee percentage' },
+  gatewayFeePercentage: { value: 0, isPublic: false, description: 'Payment cash-out / fee percentage (0% for bKash/Nagad Send Money)' },
   storePhone: { value: '+880 1700-000000', isPublic: true, description: 'Customer care phone and WhatsApp' },
   storeEmail: { value: 'care@delicefragrance.com', isPublic: true, description: 'Customer care email' },
   facebookUrl: { value: 'https://facebook.com/delicefragrance', isPublic: true, description: 'Official brand Facebook page' }

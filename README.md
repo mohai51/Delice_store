@@ -24,7 +24,7 @@ The platform adheres strictly to the brand visual identity:
 - **Frontend**: Vanilla HTML5, Modern CSS3 (Grid, Flexbox, CSS Variables), Vanilla JavaScript (ES6+), Responsive Mobile-First Architecture. (No heavy React/Vue runtime bloat).
 - **Backend**: Node.js & Express.js.
 - **Database**: MongoDB Atlas / MongoDB with Mongoose ODM.
-- **Payment Architecture**: SSLCOMMERZ Gateway Integration (Production-Ready Session Initiation, Server-Side Idempotent Validation, IPN Listener, and Sandbox Testbench Simulator).
+- **Payment Architecture**: Official bKash & Nagad Send Money Architecture (100% Online Advance vs COD with Advance Delivery Fee, Sender Number & TrxID Verification, Admin Instant Verification).
 - **Security**: Helmet HTTP Headers, CORS, Express-Rate-Limit, BCrypt Password Hashing, JWT Authentication.
 
 ---
@@ -81,13 +81,11 @@ Nine specialized management sections:
 ```
 ├── backend/
 │   ├── config/
-│   │   ├── db.js                 # MongoDB connection & configuration
-│   │   └── sslcommerz.js         # SSLCOMMERZ gateway credentials & endpoints
+│   │   └── db.js                 # MongoDB connection & configuration
 │   ├── controllers/
 │   │   ├── adminController.js    # Statistics, P&L, Inventory, Expenses, Allocations
 │   │   ├── authController.js     # Admin login & JWT verification
 │   │   ├── orderController.js    # Order fulfillment & status updates
-│   │   ├── paymentController.js  # Payment session creation, callbacks, IPN
 │   │   ├── productController.js  # Product catalog CRUD
 │   │   └── settingController.js  # Public & Admin system settings
 │   ├── middleware/
@@ -100,12 +98,10 @@ Nine specialized management sections:
 │   │   ├── FundAllocation.js     # Profit distribution rules
 │   │   ├── Order.js              # Complete order with financial snapshot
 │   │   ├── Product.js            # Product catalog with COGS
-│   │   ├── Setting.js            # System-wide configurable settings
-│   │   └── Transaction.js        # SSLCOMMERZ gateway transaction audit log
+│   │   └── Setting.js            # System-wide configurable settings
 │   ├── routes/                   # Modular Express routers
 │   ├── services/
-│   │   ├── financialService.js   # Audited accounting & P&L calculation
-│   │   └── sslcommerzService.js  # Gateway API client & validation logic
+│   │   └── financialService.js   # Audited accounting & P&L calculation
 │   ├── seed.js                   # Initial database seeder
 │   └── server.js                 # Express server entry point
 ├── frontend/
@@ -126,8 +122,7 @@ Nine specialized management sections:
 │   ├── index.html                # Editorial homepage
 │   ├── payment-failed.html       # Transaction failure page
 │   ├── payment-success.html      # Verified receipt & confirmation
-│   ├── product.html              # Dedicated fragrance details page
-│   └── sandbox-gateway.html      # SSLCOMMERZ Sandbox Simulator
+│   └── product.html              # Dedicated fragrance details page
 ├── .env.example                  # Environment configuration template
 ├── package.json                  # Dependencies & start scripts
 └── README.md                     # Documentation
@@ -182,25 +177,24 @@ Nine specialized management sections:
 
 ---
 
-## 7. SSLCOMMERZ Payment Integration & Sandbox Testing
+## 7. Payment Architecture (bKash & Nagad Send Money)
 
-### Live Production Configuration
-When your SSLCOMMERZ merchant account is approved:
-1. Update `.env`:
-   ```ini
-   SSLCOMMERZ_STORE_ID=your_merchant_store_id
-   SSLCOMMERZ_STORE_PASSWORD=your_merchant_store_password
-   SSLCOMMERZ_IS_LIVE=true
-   APP_URL=https://yourdomain.com
-   ```
-2. Set your SSLCOMMERZ IPN callback URL in merchant portal to:
-   `https://yourdomain.com/api/payment/ipn`
+The system supports Bangladesh's two primary shopping models via direct bKash and Nagad Personal Send Money:
 
-### Sandbox Testing Mode
-When `SSLCOMMERZ_STORE_ID` contains placeholder values or is in sandbox mode, the platform automatically routes transactions through the **SSLCOMMERZ Sandbox Testbench** (`/sandbox-gateway.html`). This allows testing:
-- **Successful Payment Simulation**: Verifies transaction server-side, transitions order to `processing`, updates financial snapshots, and prints receipt.
-- **Failed / Declined Payment Simulation**: Records failed transaction, cancels order, and redirects to clear guidance.
-- **Duplicate Verification Prevention**: Server checks transaction idempotency to guarantee no order is credited twice.
+1. **100% Online Payment (Advance):**
+   - Customer sends the full order amount (Products + Delivery charge) to the official bKash/Nagad number (`01731101780`).
+   - Customer enters their sender number and Transaction ID (TrxID) in the checkout form.
+   - Upon parcel delivery, customer has ৳0 cash due to the courier.
+
+2. **Cash on Delivery with Advance Delivery Charge:**
+   - Customer sends only the courier charge (৳60 inside Dhaka or ৳120 outside Dhaka) in advance via bKash/Nagad.
+   - Customer enters sender number and TrxID to confirm their booking.
+   - The remaining perfume cost is collected in cash by the courier rider upon parcel handover.
+
+3. **Admin Verification & Financial Reconciliation:**
+   - Orders arrive with status `awaiting_verification`.
+   - Admin checks the TrxID and Sender Number against their bKash/Nagad account.
+   - One-click verification marks the order `paid` and advances status to `processing` / `dispatched`.
 
 ---
 
@@ -210,7 +204,7 @@ When `SSLCOMMERZ_STORE_ID` contains placeholder values or is in sandbox mode, th
 - **Segregated Courier Funds**: Delivery fees collected (৳60/৳120) are tracked separately and compared against actual courier expenses.
 - **Snapshot Immutability**: Historical order item costs (`cogs`) and selling prices are snapshotted at the second of checkout, ensuring past accounting books remain accurate when product prices change in the future.
 - **True Net Profit**:
-  $$\text{Net Profit} = \text{Total Paid} - \text{Product COGS} - \text{Actual Courier Expense} - \text{SSLCOMMERZ Fees} - \text{General Expenses}$$
+  $$\text{Net Profit} = \text{Total Paid} - \text{Product COGS} - \text{Actual Courier Expense} - \text{Payment Fees} - \text{General Expenses}$$
 - **Real-Time Fund Distribution**: Net profit is dynamically apportioned across configured allocations (Reinvestment, Withdrawals, Marketing, Emergency, Stock).
 
 ---

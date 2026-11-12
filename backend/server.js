@@ -11,7 +11,6 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-const paymentRoutes = require('./routes/paymentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const settingRoutes = require('./routes/settingRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
@@ -33,7 +32,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'", "https://sandbox.sslcommerz.com", "https://securepay.sslcommerz.com"]
+      connectSrc: ["'self'"]
     }
   },
   crossOriginEmbedderPolicy: false
@@ -71,7 +70,6 @@ app.use(async (req, res, next) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/payment', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/upload', uploadRoutes);
@@ -95,8 +93,8 @@ app.get('/checkout', (req, res) => {
 // Centralized Error Handler
 app.use(errorHandler);
 
-// Start Server (Avoid binding port when running inside Vercel serverless environment)
-if (!process.env.VERCEL) {
+// Start Server (Avoid binding port when running inside Vercel serverless environment or automated tests)
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
   const server = app.listen(PORT, () => {
     console.log(`
   ==============================================================

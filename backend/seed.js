@@ -100,8 +100,9 @@ async function seed() {
   const settings = [
     { key: 'deliveryChargeInsideDhaka', value: 60, isPublic: true, description: 'Delivery fee for Dhaka city' },
     { key: 'deliveryChargeOutsideDhaka', value: 120, isPublic: true, description: 'Delivery fee for outside Dhaka' },
+    { key: 'bkashNagadNumber', value: process.env.BKASH_NAGAD_NUMBER || '01731101780', isPublic: true, description: 'Official bKash and Nagad Send Money number (Personal)' },
     { key: 'defaultProductCOGS', value: 320, isPublic: false, description: 'Default COGS per 30ml bottle' },
-    { key: 'gatewayFeePercentage', value: 2.5, isPublic: false, description: 'SSLCOMMERZ transaction fee percentage' },
+    { key: 'gatewayFeePercentage', value: 0, isPublic: false, description: 'Payment fee percentage (0% for bKash/Nagad Send Money)' },
     { key: 'storePhone', value: '+880 1700-000000', isPublic: true, description: 'Support phone and WhatsApp' },
     { key: 'storeEmail', value: 'care@delicefragrance.com', isPublic: true, description: 'Support email' },
     { key: 'facebookUrl', value: 'https://facebook.com/delicefragrance', isPublic: true, description: 'Official Facebook link' }

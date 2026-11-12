@@ -39,8 +39,8 @@ exports.createOrder = async (req, res, next) => {
       });
     }
 
-    // 2. Validate Payment Details
-    const validMethods = ['full_online', 'cod_advance', 'sslcommerz'];
+    // 2. Validate Payment Details (bKash & Nagad Send Money)
+    const validMethods = ['full_online', 'cod_advance'];
     const pMethod = validMethods.includes(paymentMethod) ? paymentMethod : 'full_online';
     const pProvider = (paymentProvider === 'nagad') ? 'nagad' : 'bkash';
 

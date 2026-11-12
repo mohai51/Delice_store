@@ -1,9 +1,10 @@
 /**
  * DÉLICE End-to-End Automated Test Suite
  * Verifies API endpoints, order lifecycle, server-side pricing calculation,
- * SSLCOMMERZ idempotent verification, and financial accounting logic.
+ * bKash / Nagad Send Money order processing, and receipt verification.
  */
 
+process.env.NODE_ENV = 'test';
 const http = require('http');
 const app = require('./server');
 
@@ -80,9 +81,10 @@ async function runTests() {
       assert(setRes.statusCode === 200, 'GET /api/settings/public returns HTTP 200');
       assert(setRes.data.deliveryChargeInsideDhaka === 60, 'Delivery inside Dhaka is ৳60');
       assert(setRes.data.deliveryChargeOutsideDhaka === 120, 'Delivery outside Dhaka is ৳120');
+      assert(setRes.data.bkashNagadNumber === '01731101780', 'bKash/Nagad number is 01731101780');
 
-      // TEST 3: Validation on Checkout (Invalid Phone Number)
-      const invalidCheckout = await request('POST', '/api/payment/initiate', {
+      // TEST 3: Validation on Order Placement (Invalid Phone Number)
+      const invalidCheckout = await request('POST', '/api/orders', {
         customer: {
           fullName: 'Test User',
           phone: '12345', // Invalid phone
@@ -90,13 +92,18 @@ async function runTests() {
           address: 'Road 5, Dhanmondi'
         },
         deliveryArea: 'insideDhaka',
+        paymentMethod: 'full_online',
+        paymentProvider: 'bkash',
+        senderNumber: '01711223344',
+        transactionId: 'TESTTRX001',
         items: [{ id: 'delice-bloom', quantity: 1 }]
       });
       assert(invalidCheckout.statusCode === 400, 'Rejects invalid phone number with HTTP 400');
 
-      // TEST 4: Successful Order & Payment Session Initiation
+      // TEST 4: Successful Order Placement via bKash Send Money
       // Customer tries to tamper with price in request (client sends ৳100 instead of ৳799)
-      const validCheckout = await request('POST', '/api/payment/initiate', {
+      const testTrxId = 'BKASH' + Date.now().toString().slice(-6);
+      const validCheckout = await request('POST', '/api/orders', {
         customer: {
           fullName: 'Samiul Karim',
           phone: '01712345678',
@@ -105,46 +112,41 @@ async function runTests() {
           address: 'Apartment 4B, House 12, Banani, Dhaka'
         },
         deliveryArea: 'insideDhaka',
+        paymentMethod: 'full_online',
+        paymentProvider: 'bkash',
+        senderNumber: '01712345678',
+        transactionId: testTrxId,
         items: [{ id: 'delice-bloom', quantity: 2, price: 100 }] // Price tampering test
       });
 
-      assert(validCheckout.statusCode === 200, 'Valid checkout returns HTTP 200');
-      assert(validCheckout.data.success === true, 'Checkout initiation returns success: true');
+      assert(validCheckout.statusCode === 201, 'Valid order placement returns HTTP 201');
+      assert(validCheckout.data.success === true, 'Order placement returns success: true');
       // Subtotal should be 799 * 2 = 1598, Delivery = 60, Total = 1658 (ignoring the tampered 100!)
-      assert(validCheckout.data.totalPayable === 1658, `Server-side price verification enforced: ৳1658 (received ${validCheckout.data.totalPayable})`);
-      assert(validCheckout.data.gatewayUrl && validCheckout.data.gatewayUrl.includes('sandbox-gateway'), 'Redirects to sandbox gateway testbench');
+      assert(validCheckout.data.order.totalPayable === 1658, `Server-side price verification enforced: ৳1658 (received ${validCheckout.data.order.totalPayable})`);
+      assert(validCheckout.data.order.transactionId === testTrxId, `Transaction ID saved: ${testTrxId}`);
 
-      const testTranId = validCheckout.data.tran_id;
-      assert(testTranId && testTranId.startsWith('TRAN_'), `Generated unique transaction ID: ${testTranId}`);
-
-      // TEST 5: Server-Side Payment Success Verification Callback
-      const successCallback = await request('POST', '/api/payment/success', {
-        val_id: `SANDBOX_VAL_${Date.now()}`,
-        tran_id: testTranId,
-        amount: 1658,
-        card_type: 'bKash-Payment',
-        status: 'VALID'
-      });
-      assert(successCallback.statusCode === 302, 'Successful payment verification redirects (HTTP 302)');
-      assert(successCallback.headers.location.includes('/payment-success.html'), 'Redirects customer to payment-success.html');
-
-      // TEST 6: Public Receipt Verification by Transaction ID
-      const receiptRes = await request('GET', `/api/orders/by-transaction/${testTranId}`);
+      // TEST 5: Public Receipt Retrieval by Transaction ID
+      const receiptRes = await request('GET', `/api/orders/by-transaction/${testTrxId}`);
       assert(receiptRes.statusCode === 200, 'Receipt accessible by transaction ID');
-      assert(receiptRes.data.paymentStatus === 'paid', 'Order payment status verified as PAID');
-      assert(receiptRes.data.orderStatus === 'processing', 'Order status moved to processing');
-      assert(receiptRes.data.netProfit > 0, `Net profit calculated: ৳${receiptRes.data.netProfit}`);
+      assert(receiptRes.data.orderNumber === validCheckout.data.order.orderNumber, 'Receipt matches order number');
+      assert(receiptRes.data.paymentStatus === 'awaiting_verification', 'Order status set to awaiting_verification');
 
-      // TEST 7: Idempotency Prevention
-      // Duplicate payment attempt should not cause error or double counting
-      const dupCallback = await request('POST', '/api/payment/success', {
-        val_id: `SANDBOX_VAL_${Date.now()}`,
-        tran_id: testTranId,
-        amount: 1658,
-        card_type: 'bKash-Payment',
-        status: 'VALID'
+      // TEST 6: Prevention of Duplicate Transaction ID
+      const dupOrder = await request('POST', '/api/orders', {
+        customer: {
+          fullName: 'Another User',
+          phone: '01812345678',
+          district: 'Chittagong',
+          address: 'GEC Circle'
+        },
+        deliveryArea: 'outsideDhaka',
+        paymentMethod: 'full_online',
+        paymentProvider: 'bkash',
+        senderNumber: '01812345678',
+        transactionId: testTrxId, // Duplicate!
+        items: [{ id: 'delice-bloom', quantity: 1 }]
       });
-      assert(dupCallback.statusCode === 302, 'Idempotent handling redirects cleanly without failure');
+      assert(dupOrder.statusCode === 400, 'Rejects duplicate Transaction ID with HTTP 400');
 
       console.log(`\n--- Verification Summary: ${passCount} Passed, ${failCount} Failed ---`);
       server.close();
