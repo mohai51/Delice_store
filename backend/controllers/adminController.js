@@ -92,36 +92,6 @@ exports.getProfitAndLoss = async (req, res, next) => {
 };
 
 /**
- * Get Inventory Overview
- * GET /api/admin/inventory
- */
-exports.getInventory = async (req, res, next) => {
-  try {
-    let products = [];
-    if (isConnected()) {
-      try {
-        products = await Product.find().sort({ stock: 1 });
-      } catch (e) {}
-    }
-    if (!products || products.length === 0) {
-      products = memoryStore.products.length ? memoryStore.products : DEFAULT_PRODUCTS;
-    }
-
-    const totalInventoryValue = products.reduce((acc, p) => acc + (p.stock * (p.cogs || 320)), 0);
-    const totalRetailValue = products.reduce((acc, p) => acc + (p.stock * p.price), 0);
-
-    res.json({
-      success: true,
-      totalInventoryValue,
-      totalRetailValue,
-      products
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
-/**
  * Expense Management
  */
 exports.getExpenses = async (req, res, next) => {

@@ -7,7 +7,6 @@ router.use(protectAdmin);
 
 router.get('/overview', adminController.getOverview);
 router.get('/profit-loss', adminController.getProfitAndLoss);
-router.get('/inventory', adminController.getInventory);
 
 // Expenses
 router.get('/expenses', adminController.getExpenses);
