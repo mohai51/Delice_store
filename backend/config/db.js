@@ -10,6 +10,10 @@ const memoryStore = {
 };
 
 const connectDB = async () => {
+  if (mongoose.connection && mongoose.connection.readyState >= 1) {
+    return mongoose.connection;
+  }
+
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/delice_fragrance';
   
   // Set bufferCommands to false so operations fail fast if no DB is available

@@ -85,9 +85,10 @@ app.get('/checkout', (req, res) => {
 // Centralized Error Handler
 app.use(errorHandler);
 
-// Start Server
-const server = app.listen(PORT, () => {
-  console.log(`
+// Start Server (Avoid binding port when running inside Vercel serverless environment)
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, () => {
+    console.log(`
   ==============================================================
     DÉLICE Fragrances Server Running
     Environment: ${process.env.NODE_ENV || 'development'}
@@ -95,7 +96,8 @@ const server = app.listen(PORT, () => {
     Storefront:  http://localhost:${PORT}/
     Admin Panel: http://localhost:${PORT}/admin
   ==============================================================
-  `);
-});
+    `);
+  });
+}
 
 module.exports = app;
