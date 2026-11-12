@@ -688,6 +688,30 @@ document.addEventListener('keydown', (e) => {
    ========================================================================== */
 window.moodImageIndex = 0;
 
+const MOOD_ATMOSPHERE_CONFIG = {
+  'romantic': {
+    badge: 'Soft & Romantic Atmosphere',
+    image: '/assets/images/scent-guide-bloom.jpg',
+    fallback: '/assets/images/bloom.svg',
+    alt: 'DÉLICE BLOOM — Dewy pink garden roses, blooming peony petals and gentle morning sunlight',
+    tagline: 'YOUR SIGNATURE ROMANTIC MATCH'
+  },
+  'energetic': {
+    badge: 'Dynamic & Fresh Energy',
+    image: '/assets/images/scent-guide-momentum.jpg',
+    fallback: '/assets/images/momentum.svg',
+    alt: 'DÉLICE MOMENTUM — Vibrant sliced bergamot, aromatic cedar and fresh water energy',
+    tagline: 'YOUR SIGNATURE ENERGETIC MATCH'
+  },
+  'evening': {
+    badge: 'Intimate & Seductive Evening',
+    image: '/assets/images/scent-guide-enigma.jpg',
+    fallback: '/assets/images/enigma.svg',
+    alt: 'DÉLICE ENIGMA — Deep burgundy velvet, glowing warm amber and midnight candlelight',
+    tagline: 'YOUR SIGNATURE EVENING MATCH'
+  }
+};
+
 function slideMoodImage(prodId, direction, event) {
   if (event) event.stopPropagation();
   const product = globalProducts.find(p => p.id === prodId);
@@ -712,41 +736,18 @@ function renderMoodFinderProduct() {
   if (!matchResult) return;
 
   let matched = globalProducts.find(p => p.mood === mood) || globalProducts[0];
-  const imgs = (matched.images && matched.images.length > 0) ? matched.images : [matched.image || '/assets/images/bloom.svg'];
-  window.moodImageIndex = 0;
-  const mainImg = imgs[0];
+  const moodCfg = MOOD_ATMOSPHERE_CONFIG[mood] || MOOD_ATMOSPHERE_CONFIG['romantic'];
 
   matchResult.innerHTML = `
     <div class="mood-match-card">
-      <div style="background:#FAF6F0; border-radius:8px; padding:1.5rem; text-align:center; position:relative; min-height:240px; display:flex; align-items:center; justify-content:center;">
-        <!-- Left Arrow Button -->
-        <button type="button" class="prod-slider-arrow prod-slider-prev" 
-          aria-label="Previous Image" 
-          title="Previous Angle"
-          onclick="slideMoodImage('${matched.id}', -1, event)"
-          style="left:0.5rem;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
-
-        <img src="${mainImg}" id="moodMatchMainImg" alt="${matched.name}" style="max-height:220px; width:auto; margin:0 auto; object-fit:contain; transition:opacity 0.18s ease;">
-
-        <!-- Right Arrow Button -->
-        <button type="button" class="prod-slider-arrow prod-slider-next" 
-          aria-label="Next Image" 
-          title="Next Angle"
-          onclick="slideMoodImage('${matched.id}', 1, event)"
-          style="right:0.5rem;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
+      <div class="mood-match-media" onclick="viewProductDetails('${matched.id}')" style="cursor:pointer;" title="Click to view ${matched.name} details">
+        <span class="mood-match-badge">${moodCfg.badge}</span>
+        <img src="${moodCfg.image}" id="moodMatchMainImg" alt="${moodCfg.alt}" onerror="this.onerror=null; this.src='${moodCfg.fallback}';">
       </div>
       <div>
-        <span class="tagline-sub">YOUR RECOMMENDED SIGNATURE</span>
-        <h3 style="font-size:1.6rem; margin-bottom:0.4rem;">${matched.name}</h3>
-        <p style="color:#59555B; margin-bottom:1rem; font-size:0.95rem;">${matched.description}</p>
+        <span class="tagline-sub">${moodCfg.tagline}</span>
+        <h3 style="font-size:1.6rem; margin-bottom:0.4rem; color:#181619;">${matched.name}</h3>
+        <p style="color:#59555B; margin-bottom:1rem; font-size:0.95rem; line-height:1.6;">${matched.description}</p>
         <div class="product-tags" style="margin-bottom:1.25rem;">
           ${(matched.occasions || []).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
         </div>
@@ -754,10 +755,12 @@ function renderMoodFinderProduct() {
           <span class="price-display" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#4A102A;">৳${matched.price}</span>
           <button type="button" class="btn btn-primary" onclick="addProductToBag('${matched.id}')" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Add to Cart</button>
           <a href="/checkout.html?buyNow=${matched.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700; text-align:center;">Buy Now</a>
+          <button type="button" class="btn btn-secondary" onclick="viewProductDetails('${matched.id}')" style="text-transform:uppercase; letter-spacing:0.08em; font-weight:600;">Details</button>
         </div>
       </div>
     </div>
   `;
+}
 }
 
 function initMoodFinder() {
