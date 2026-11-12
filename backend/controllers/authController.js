@@ -1,6 +1,8 @@
 const AdminUser = require('../models/AdminUser');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { JWT_SECRET } = require('../middleware/authMiddleware');
+const connectDB = require('../config/db');
 
 /**
  * Admin Login
@@ -17,13 +19,37 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    // Ensure database connection is complete before any model queries
+    await connectDB();
+
+    const cleanInput = username.toLowerCase().trim();
+
     // Find user by username or email
-    const user = await AdminUser.findOne({
+    let user = await AdminUser.findOne({
       $or: [
-        { username: username.toLowerCase().trim() },
-        { email: username.toLowerCase().trim() }
+        { username: cleanInput },
+        { email: cleanInput }
       ]
     });
+
+    // Auto-bootstrap superadmin if database is clean (e.g. fresh Vercel deployment)
+    if (!user) {
+      const userCount = await AdminUser.countDocuments();
+      if (userCount === 0) {
+        const defaultUser = process.env.ADMIN_DEFAULT_USER || 'admin';
+        const defaultPass = process.env.ADMIN_DEFAULT_PASSWORD || 'Admin@Delice2026';
+        const defaultEmail = process.env.ADMIN_DEFAULT_EMAIL || 'admin@delicefragrance.com';
+
+        const passwordHash = await bcrypt.hash(defaultPass, 10);
+        user = await AdminUser.create({
+          username: defaultUser,
+          email: defaultEmail,
+          passwordHash,
+          role: 'superadmin'
+        });
+        console.log(`[Auth Bootstrap] Default superadmin account auto-created.`);
+      }
+    }
 
     if (!user) {
       return res.status(401).json({

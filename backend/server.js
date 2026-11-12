@@ -57,6 +57,16 @@ app.use((req, res, next) => {
 });
 app.use(express.static(frontendPath, { etag: false, maxAge: 0, lastModified: false }));
 
+// Database Readiness Middleware (Ensures connection is established before API processing, critical for Vercel Serverless)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+  } catch (err) {
+    console.error('[DB Middleware] Error awaiting connection:', err.message);
+  }
+  next();
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
