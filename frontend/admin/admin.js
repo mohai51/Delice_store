@@ -108,11 +108,10 @@ async function fetchWithAuth(url, options = {}) {
 const viewTitles = {
   overview: '1. Executive Overview',
   orders: '2. Orders Management',
-  products: '3. Shop Catalog & Inventory',
-  inventory: '4. Inventory & Stock Valuation',
-  'delice-profit': '5. DÉLICE Profit Calculation & Capital Recovery',
-  'hero-slides': '6. Hero Slides Management',
-  settings: '7. System & Financial Settings'
+  products: '3. Shop Catalog & Products',
+  'delice-profit': '4. DÉLICE Profit Calculation & Capital Recovery',
+  'hero-slides': '5. Hero Slides Management',
+  settings: '6. System & Financial Settings'
 };
 
 function initNav() {
@@ -143,7 +142,6 @@ function switchTab(viewId) {
   if (viewId === 'overview') loadOverview();
   else if (viewId === 'orders') loadOrders();
   else if (viewId === 'products') loadProducts();
-  else if (viewId === 'inventory') loadInventory();
   else if (viewId === 'delice-profit') loadDeliceProfit();
   else if (viewId === 'hero-slides') loadHeroSlidesAdmin();
   else if (viewId === 'settings') loadSettings();
@@ -875,82 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   4. INVENTORY
-   ========================================================================== */
-async function loadInventory() {
-  try {
-    const res = await fetchWithAuth('/api/admin/inventory');
-    const data = await res.json();
-
-    document.getElementById('invTotalCost').textContent = `৳${data.totalInventoryValue || 0}`;
-    document.getElementById('invTotalRetail').textContent = `৳${data.totalRetailValue || 0}`;
-
-    // Connect with DÉLICE Capital Recovery Batch Progress
-    try {
-      const dpRes = await fetchWithAuth('/api/admin/delice-profit/dashboard');
-      if (dpRes.ok) {
-        const dpData = await dpRes.json();
-        const s = dpData.data?.summary;
-        if (s) {
-          const elB = document.getElementById('invDeliceBatchBottles');
-          const elR = document.getElementById('invDeliceBatchRepaid');
-          if (elB) elB.textContent = `${s.totalBottlesSold} / 100`;
-          if (elR) elR.textContent = `৳${s.totalPrincipalRepaid.toFixed(2)} / ৳73,260 Repaid (${s.repaymentProgress}%)`;
-        }
-      }
-    } catch (e) {}
-
-    const tbody = document.getElementById('inventoryTableBody');
-    if (!tbody || !data.products) return;
-
-    tbody.innerHTML = data.products.map(p => {
-      const isLowStock = p.stock <= 15;
-      return `
-        <tr>
-          <td><strong>${p.name}</strong></td>
-          <td>${p.volume || '30ml'}</td>
-          <td><strong style="font-size:1.1rem; color:${isLowStock ? '#B91C1C' : '#181619'}">${p.stock}</strong> units</td>
-          <td>৳${p.cogs || 320}</td>
-          <td>৳${p.stock * (p.cogs || 320)}</td>
-          <td>
-            <span class="badge-status ${isLowStock ? 'failed' : 'delivered'}">
-              ${isLowStock ? 'LOW STOCK (REORDER)' : 'HEALTHY'}
-            </span>
-          </td>
-          <td>
-            <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.25rem 0.5rem;" onclick="quickAdjustStock('${p.id}', ${p.stock})">Adjust</button>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  } catch (err) {
-    console.error('Error loading inventory:', err);
-  }
-}
-
-async function quickAdjustStock(productId, currentStock) {
-  const newStock = prompt(`Update stock quantity for ${productId}:`, currentStock);
-  if (newStock === null) return;
-  const parsed = parseInt(newStock, 10);
-  if (isNaN(parsed) || parsed < 0) {
-    alert('Invalid stock quantity.');
-    return;
-  }
-
-  try {
-    const res = await fetchWithAuth(`/api/products/${productId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ stock: parsed })
-    });
-    if (res.ok) loadInventory();
-  } catch (e) {
-    alert('Failed to adjust stock.');
-  }
-}
-
-/* ==========================================================================
-   7. SETTINGS
+   6. SETTINGS
    ========================================================================== */
 async function loadSettings() {
   try {
@@ -1055,7 +978,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   6. HERO SLIDES MANAGEMENT
+   5. HERO SLIDES MANAGEMENT
    ========================================================================== */
 async function loadHeroSlidesAdmin() {
   try {
@@ -1397,7 +1320,7 @@ window.openModal = openModal;
 window.closeModal = closeModal;
 
 /* ==========================================================================
-   5. DÉLICE PROFIT CALCULATION & CAPITAL RECOVERY ENGINE
+   4. DÉLICE PROFIT CALCULATION & CAPITAL RECOVERY ENGINE
    ========================================================================== */
 let currentDeliceProfitData = null;
 let currentDeliceAllocations = [];
