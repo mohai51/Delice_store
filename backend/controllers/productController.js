@@ -17,9 +17,9 @@ const DEFAULT_PRODUCTS = [
     image: '/assets/images/uploads/delice_Bottle-1_1794420148574.png',
     images: [
       '/assets/images/uploads/delice_Bottle-1_1794420148574.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
-      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
+      '/assets/images/bloom-box.svg',
+      '/assets/images/bloom.svg',
+      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png'
     ],
     stock: 120,
     isActive: true,
@@ -39,9 +39,9 @@ const DEFAULT_PRODUCTS = [
     image: '/assets/images/uploads/delice_Bottle-2_1794420107446.png',
     images: [
       '/assets/images/uploads/delice_Bottle-2_1794420107446.png',
-      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
+      '/assets/images/momentum-box.svg',
+      '/assets/images/momentum.svg',
+      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png'
     ],
     stock: 100,
     isActive: true,
@@ -61,9 +61,9 @@ const DEFAULT_PRODUCTS = [
     image: '/assets/images/uploads/delice_Bottle-3_1794420022409.png',
     images: [
       '/assets/images/uploads/delice_Bottle-3_1794420022409.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
-      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png'
+      '/assets/images/enigma-box.svg',
+      '/assets/images/enigma.svg',
+      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
     ],
     stock: 90,
     isActive: true,

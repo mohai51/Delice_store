@@ -19,9 +19,9 @@ const DEFAULT_PRODUCTS = [
     image: '/assets/images/uploads/delice_Bottle-1_1794420148574.png',
     images: [
       '/assets/images/uploads/delice_Bottle-1_1794420148574.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
-      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
+      '/assets/images/bloom-box.svg',
+      '/assets/images/bloom.svg',
+      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png'
     ],
     stock: 120,
     badge: 'Opening Offer'
@@ -39,9 +39,9 @@ const DEFAULT_PRODUCTS = [
     image: '/assets/images/uploads/delice_Bottle-2_1794420107446.png',
     images: [
       '/assets/images/uploads/delice_Bottle-2_1794420107446.png',
-      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
+      '/assets/images/momentum-box.svg',
+      '/assets/images/momentum.svg',
+      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png'
     ],
     stock: 100,
     badge: 'Opening Offer'
@@ -59,9 +59,9 @@ const DEFAULT_PRODUCTS = [
     image: '/assets/images/uploads/delice_Bottle-3_1794420022409.png',
     images: [
       '/assets/images/uploads/delice_Bottle-3_1794420022409.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
-      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png'
+      '/assets/images/enigma-box.svg',
+      '/assets/images/enigma.svg',
+      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
     ],
     stock: 90,
     badge: 'Opening Offer'
@@ -290,14 +290,14 @@ function renderProductGrid(products) {
             aria-label="Previous Image" 
             title="Previous Angle"
             onclick="slideCardImage('${prod.id}', -1, event)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
           </button>
 
           <!-- Main Image: Clicking advances to next angle -->
-          <div style="cursor:pointer; width:100%; height:100%; display:flex; align-items:center; justify-content:center;" onclick="slideCardImage('${prod.id}', 1, event)" title="Click to view next angle">
-            <img src="${activeImg}" id="card-img-${prod.id}" alt="${prod.name} 30ml Bottle" loading="lazy">
+          <div class="product-media-click-area" onclick="slideCardImage('${prod.id}', 1, event)" title="Click to view next image">
+            <img src="${activeImg}" id="card-img-${prod.id}" class="product-main-img" alt="${prod.name} 30ml Bottle" loading="lazy">
           </div>
 
           <!-- Right Arrow Button -->
@@ -305,7 +305,7 @@ function renderProductGrid(products) {
             aria-label="Next Image" 
             title="Next Angle"
             onclick="slideCardImage('${prod.id}', 1, event)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </button>
@@ -315,43 +315,43 @@ function renderProductGrid(products) {
             ${imgs.slice(0, 4).map((img, i) => `
               <button type="button" class="prod-card-thumb ${i === currentIdx ? 'active' : ''}" 
                 data-index="${i}"
-                title="View Angle ${i + 1}"
+                title="View photo ${i + 1}"
                 onmouseenter="setCardImageIndex('${prod.id}', ${i}, event)"
                 onclick="setCardImageIndex('${prod.id}', ${i}, event)">
-                <img src="${img}" alt="${prod.name} angle ${i + 1}">
+                <img src="${img}" alt="${prod.name} thumbnail ${i + 1}">
               </button>
             `).join('')}
           </div>
         </div>
 
-        <div class="product-body" style="padding:1.15rem 1.25rem 1.35rem;">
-          <!-- 1. Name & 30ml ONLY (NO EAU DE PARFUM) -->
-          <div class="product-header-row" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.4rem;">
-            <h3 class="product-title" onclick="viewProductDetails('${prod.id}')" style="cursor:pointer; margin:0; font-size:1.22rem; font-weight:700; color:#181619; letter-spacing:0.04em;">${prod.name}</h3>
-            <span style="font-size:0.78rem; font-weight:600; color:#4A102A; background:#FAF6F0; padding:0.2rem 0.55rem; border-radius:4px; border:1px solid #EBE3D5; letter-spacing:0.04em;">30ml</span>
+        <div class="product-body">
+          <!-- 1. Name & 30ml Badge -->
+          <div class="product-header-row" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.25rem;">
+            <h3 class="product-title" onclick="viewProductDetails('${prod.id}')" style="cursor:pointer; margin:0; font-size:1.15rem; font-weight:700; color:#181619; letter-spacing:0.02em;">${prod.name}</h3>
+            <span style="font-size:0.75rem; font-weight:600; color:#4A102A; background:#FAF6F0; padding:0.15rem 0.45rem; border-radius:4px; border:1px solid #EBE3D5;">30ml</span>
           </div>
 
           <!-- 2. Price right after Name (naamer por a daam) -->
-          <div class="product-pricing" style="margin-bottom:0.65rem;">
+          <div class="product-pricing">
             <span class="price-current">৳${price}</span>
             <span class="price-original">৳${orig}</span>
-            ${discountPercent > 0 ? `<span class="price-savings">SAVE ৳${savings} (${discountPercent}%)</span>` : ''}
+            ${discountPercent > 0 ? `<span class="price-savings">${discountPercent}% OFF</span>` : ''}
           </div>
 
-          <!-- 3. Description -->
-          <p class="product-description" style="margin-bottom:0.65rem; font-size:0.875rem; line-height:1.5; color:#59555B;">${prod.description}</p>
+          <!-- 3. Short 2-line Description -->
+          <p class="product-description">${prod.description}</p>
           
-          <!-- 4. Occasions / Tags ("কবে কোথায় কীভাবে ব্যবহার করা যাবে") -->
-          <div class="product-tags" style="margin-bottom:0.95rem;">
-            ${(prod.occasions || []).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
+          <!-- 4. Occasions / Tags (compact 3 pills) -->
+          <div class="product-tags">
+            ${(prod.occasions || []).slice(0, 3).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
           </div>
 
-          <!-- 5. Action Buttons (Clean, Premium, No Icons / No Emojis) -->
-          <div class="product-actions" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.65rem;">
-            <button type="button" class="btn btn-primary" onclick="addProductToBag('${prod.id}')" style="padding:0.85rem 0.6rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
+          <!-- 5. Action Buttons (Clean, Premium, Compact) -->
+          <div class="product-actions" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem; margin-top:auto;">
+            <button type="button" class="btn btn-primary" onclick="addProductToBag('${prod.id}')" style="padding:0.65rem 0.4rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700;">
               Add to Cart
             </button>
-            <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-gold" style="padding:0.85rem 0.6rem; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
+            <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-gold" style="padding:0.65rem 0.4rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700; text-align:center;">
               Buy Now
             </a>
           </div>
@@ -359,6 +359,50 @@ function renderProductGrid(products) {
       </article>
     `;
   }).join('');
+
+  attachCardSliderListeners();
+}
+
+function attachCardSliderListeners() {
+  document.querySelectorAll('.product-card').forEach(card => {
+    const prodId = card.id ? card.id.replace('card-', '') : null;
+    if (!prodId) return;
+
+    const prevBtn = card.querySelector('.prod-slider-prev');
+    if (prevBtn) {
+      prevBtn.onclick = (e) => {
+        if (e) { e.stopPropagation(); e.preventDefault(); }
+        slideCardImage(prodId, -1, e);
+      };
+    }
+
+    const nextBtn = card.querySelector('.prod-slider-next');
+    if (nextBtn) {
+      nextBtn.onclick = (e) => {
+        if (e) { e.stopPropagation(); e.preventDefault(); }
+        slideCardImage(prodId, 1, e);
+      };
+    }
+
+    const clickArea = card.querySelector('.product-media-click-area');
+    if (clickArea) {
+      clickArea.onclick = (e) => {
+        if (e) { e.stopPropagation(); }
+        slideCardImage(prodId, 1, e);
+      };
+    }
+
+    const thumbs = card.querySelectorAll('.prod-card-thumb');
+    thumbs.forEach((thumb, idx) => {
+      thumb.onclick = (e) => {
+        if (e) { e.stopPropagation(); e.preventDefault(); }
+        setCardImageIndex(prodId, idx, e);
+      };
+      thumb.onmouseenter = (e) => {
+        setCardImageIndex(prodId, idx, e);
+      };
+    });
+  });
 }
 
 window.cardImageIndices = window.cardImageIndices || {};
@@ -388,8 +432,14 @@ function setCardImageIndex(prodId, index, event) {
 
   const cardImg = document.getElementById(`card-img-${prodId}`);
   if (cardImg) {
+    if (cardImg.style) cardImg.style.opacity = '0.35';
     cardImg.src = imgs[validIndex];
     if (cardImg.dataset) cardImg.dataset.index = validIndex;
+    if (cardImg.style) {
+      setTimeout(() => {
+        cardImg.style.opacity = '1';
+      }, 120);
+    }
   }
 
   const thumbsBar = document.getElementById(`thumbs-bar-${prodId}`);
