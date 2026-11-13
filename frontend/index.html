@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=4.8.0">
+  <link rel="stylesheet" href="/css/style.css?v=4.9.0">
 </head>
 <body>
 
@@ -228,38 +228,128 @@
       </div>
     </section>
 
-    <!-- BRAND STORY & PHILOSOPHY -->
+    <!-- BRAND STORY & FOUNDERS' JOURNEY -->
     <section class="section" id="story">
       <div class="container">
         <div class="brand-story-grid">
-          <div class="brand-story-media">
-            <img src="/assets/images/brand-story.svg" alt="DÉLICE Philosophy Editorial Visual">
+          <!-- Left Column: Authentic Sourcing & Founders Dual-Photo Showcase -->
+          <div class="brand-story-media-wrap">
+            <div class="story-media-frame" id="storyMediaFrame">
+              <span class="story-media-badge" id="storyPhotoBadge">Raw Material &amp; Sourcing Lab</span>
+              <img src="/assets/images/d1.jpg" id="storyMainPhoto" alt="DÉLICE Founders inside Avex International Perfumery Sourcing Lab">
+              
+              <div class="story-media-arrows">
+                <button type="button" class="story-arrow-btn" onclick="switchStoryPhoto(window.storyCurrentPhotoIndex - 1)" aria-label="Previous Photo" title="Previous Photo">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <button type="button" class="story-arrow-btn" onclick="switchStoryPhoto(window.storyCurrentPhotoIndex + 1)" aria-label="Next Photo" title="Next Photo">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Two Interactive Photo Switchers -->
+            <div class="story-thumbs-row">
+              <button type="button" class="story-thumb-btn active" onclick="switchStoryPhoto(0)" id="storyThumb0">
+                <div class="story-thumb-preview">
+                  <img src="/assets/images/d1.jpg" alt="Lab & Fragrance Oil Sourcing">
+                </div>
+                <div class="story-thumb-meta">
+                  <h5>Sourcing Lab</h5>
+                  <span>Avex Fragrance Hub</span>
+                </div>
+              </button>
+
+              <button type="button" class="story-thumb-btn" onclick="switchStoryPhoto(1)" id="storyThumb1">
+                <div class="story-thumb-preview">
+                  <img src="/assets/images/d2.jpg" alt="The 4 Founders of DÉLICE">
+                </div>
+                <div class="story-thumb-meta">
+                  <h5>The Founding Circle</h5>
+                  <span>4 Close Friends</span>
+                </div>
+              </button>
+            </div>
+
+            <div class="story-sourcing-note">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A46D" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span><strong>Pure &amp; Direct Sourcing:</strong> Photographed inside Avex International perfumery facilities. We partner directly with certified international suppliers to source pure, unadulterated perfume oils—zero cheap alcohol dilutions.</span>
+            </div>
           </div>
+
+          <!-- Right Column: The Real Story Narrative -->
           <div class="brand-story-content">
-            <span class="tagline-sub">WHY DÉLICE EXISTS</span>
-            <h2>"Fragrance for your mood, your moments and your own way of showing up."</h2>
+            <span class="tagline-sub">HOW DÉLICE WAS BORN &bull; 4 FRIENDS &bull; 1 RELENTLESS QUEST</span>
+            <h2>"Four Friends, Countless Sleepless Nights, and an Uncompromising Dream."</h2>
             
-            <p>The moments we remember are not always the biggest ones. Sometimes it is the pause before a first introduction. An afternoon out after class. Finding the courage to say how you feel. Or taking the first step towards a dream.</p>
+            <p>DÉLICE was not born in a boardroom. It began around late-night coffee tables among four university friends—<strong>Sayod Sulayman Sukria</strong>, <strong>Mohaiminul Islam</strong>, <strong>Abdullah Basar Tarif</strong>, and <strong>Zayed Iqbal Munna</strong>. We all shared an undeniable passion for luxury perfumery, but we were constantly disappointed by the local reality: authentic imported designer perfumes were priced far beyond reach, while cheap market alternatives smelled harsh, burned the nose, and evaporated in 30 minutes.</p>
+
+            <p>We asked ourselves a simple question: <em>Why can’t Bangladesh have its own authentic, world-class luxury perfume house?</em></p>
 
             <blockquote class="brand-quote">
-              "To us, luxury is the feeling of choosing something thoughtfully for yourself. A fragrance that belongs with your style, your mood and your story."
+              "We refused to take shortcuts. In an industry flooded with diluted imitations, our biggest battle was finding 100% authentic raw materials and true high-concentration perfume oils."
             </blockquote>
 
-            <p>We are creating for a generation that feels deeply, dreams boldly and chooses its own path. Energetic one day. Romantic the next. Quiet or outspoken, there is room for every side of you.</p>
+            <p>Turning that vision into reality demanded relentless hard work. We spent months traveling, knocking on certified supplier doors, and testing raw materials in international perfumery labs like Avex International. We threw away dozen upon dozen of test formulations, experimented with maceration curves, and recalibrated oil concentrations specifically for Bangladesh’s tropical heat, humidity, and demanding daily schedules. Every single drop had to perform with dignity.</p>
 
+            <!-- Compact Founder Cards (4 Friends) -->
+            <div style="margin-top:1.5rem;">
+              <span style="font-size:0.75rem; color:#4A102A; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; display:block; margin-bottom:0.65rem;">THE FOUNDING CIRCLE</span>
+              <div class="founder-cards-grid">
+                <div class="founder-card-compact">
+                  <div class="founder-avatar-chip">SSS</div>
+                  <h4 class="founder-name">Sayod Sulayman Sukria</h4>
+                  <div class="founder-role">Co-Founder</div>
+                  <p class="founder-focus">Sourcing &amp; Raw Material Vision</p>
+                </div>
+
+                <div class="founder-card-compact">
+                  <div class="founder-avatar-chip">MI</div>
+                  <h4 class="founder-name">Mohaiminul Islam</h4>
+                  <div class="founder-role">Co-Founder</div>
+                  <p class="founder-focus">Brand Architecture &amp; Strategy</p>
+                </div>
+
+                <div class="founder-card-compact">
+                  <div class="founder-avatar-chip">ABT</div>
+                  <h4 class="founder-name">Abdullah Basar Tarif</h4>
+                  <div class="founder-role">Co-Founder</div>
+                  <p class="founder-focus">Formulation &amp; Olfactory Testing</p>
+                </div>
+
+                <div class="founder-card-compact">
+                  <div class="founder-avatar-chip">ZIM</div>
+                  <h4 class="founder-name">Zayed Iqbal Munna</h4>
+                  <div class="founder-role">Co-Founder</div>
+                  <p class="founder-focus">Operations &amp; Client Quality</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Compact Brand Pillars -->
             <div class="brand-pillars">
               <div class="pillar-card">
                 <h4>Individuality</h4>
                 <p>Room for different moods, aesthetics, and expressions without rigid expectations.</p>
               </div>
               <div class="pillar-card">
+                <h4>Authentic Raw Sourcing</h4>
+                <p>Pure, lab-verified fragrance oils sourced from certified international hubs—zero shortcuts.</p>
+              </div>
+              <div class="pillar-card">
                 <h4>Honest Craft</h4>
-                <p>Clear scent guidance, dependable atomizers, and no fabricated performance claims.</p>
+                <p>Accurate scent notes, calibrated micro-fine atomizers, and no fabricated longevity claims.</p>
               </div>
             </div>
 
-            <div style="margin-top:2.5rem;">
-              <a href="#collection" class="btn btn-primary">Explore The Scents</a>
+            <div style="margin-top:2rem;">
+              <a href="#collection" class="btn btn-primary" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Explore The Scents</a>
             </div>
           </div>
         </div>
@@ -380,7 +470,7 @@
       </div>
 
       <div class="footer-bottom">
-        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved. Brand Owner: Mohaiminul Islam.</div>
+        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved. Founded by Mohaiminul Islam, Sayod Sulayman Sukria, Abdullah Basar Tarif &amp; Zayed Iqbal Munna.</div>
         <div>Dhaka, Bangladesh &bull; Designed &amp; Crafted for Youthful Luxury</div>
       </div>
     </div>
@@ -544,7 +634,7 @@
   </nav>
 
   <!-- Scripts -->
-  <script src="/js/cart.js?v=4.8.0"></script>
-  <script src="/js/app.js?v=4.8.0"></script>
+  <script src="/js/cart.js?v=4.9.0"></script>
+  <script src="/js/app.js?v=4.9.0"></script>
 </body>
 </html>

@@ -1085,3 +1085,62 @@ function closeModal(modalId) {
 }
 window.openModal = openModal;
 window.closeModal = closeModal;
+
+/* ==========================================================================
+   STORY SECTION PHOTO SWITCHER (d1 and d2 authentic founders & lab images)
+   ========================================================================== */
+window.storyPhotos = [
+  {
+    src: '/assets/images/d1.jpg',
+    badge: 'Raw Material & Sourcing Lab',
+    caption: 'Sayod Sulayman Sukria, Mohaiminul Islam, Abdullah Basar Tarif & Zayed Iqbal Munna at Avex International.'
+  },
+  {
+    src: '/assets/images/d2.jpg',
+    badge: 'The Founding Circle • 4 Friends',
+    caption: 'Four friends united by one relentless mission: authentic luxury fragrances crafted for Bangladesh.'
+  }
+];
+window.storyCurrentPhotoIndex = 0;
+
+function switchStoryPhoto(index) {
+  const photos = window.storyPhotos;
+  if (!photos || !photos.length) return;
+  const idx = ((index % photos.length) + photos.length) % photos.length;
+  window.storyCurrentPhotoIndex = idx;
+
+  const mainImg = document.getElementById('storyMainPhoto');
+  const badgeEl = document.getElementById('storyPhotoBadge');
+  const thumbs = [document.getElementById('storyThumb0'), document.getElementById('storyThumb1')];
+
+  if (mainImg) {
+    mainImg.style.opacity = '0.3';
+    setTimeout(() => {
+      mainImg.src = photos[idx].src;
+      mainImg.style.opacity = '1';
+    }, 110);
+  }
+  if (badgeEl) badgeEl.textContent = photos[idx].badge;
+
+  thumbs.forEach((t, i) => {
+    if (t) t.classList.toggle('active', i === idx);
+  });
+}
+window.switchStoryPhoto = switchStoryPhoto;
+
+// Touch swipe listener on story frame
+document.addEventListener('DOMContentLoaded', () => {
+  const frame = document.getElementById('storyMediaFrame');
+  if (!frame) return;
+  let startX = 0;
+  frame.addEventListener('touchstart', (e) => {
+    startX = e.changedTouches[0].clientX;
+  }, { passive: true });
+  frame.addEventListener('touchend', (e) => {
+    const diff = e.changedTouches[0].clientX - startX;
+    if (Math.abs(diff) > 35) {
+      switchStoryPhoto(window.storyCurrentPhotoIndex + (diff < 0 ? 1 : -1));
+    }
+  }, { passive: true });
+});
+
