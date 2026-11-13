@@ -1092,12 +1092,12 @@ window.closeModal = closeModal;
 window.storyPhotos = [
   {
     src: '/assets/images/d1.jpg',
-    badge: 'Raw Material & Sourcing Lab',
-    caption: 'Sayod Sulayman Sukria, Mohaiminul Islam, Abdullah Basar Tarif & Zayed Iqbal Munna at Avex International.'
+    badge: 'Crafting The Essence',
+    caption: 'Sayod Sulayman Sukria, Mohaiminul Islam, Abdullah Basar Tarif & Zayed Iqbal Munna during formulation trials.'
   },
   {
     src: '/assets/images/d2.jpg',
-    badge: 'The Founding Circle • 4 Friends',
+    badge: 'The Founders • 4 Friends',
     caption: 'Four friends united by one relentless mission: authentic luxury fragrances crafted for Bangladesh.'
   }
 ];
