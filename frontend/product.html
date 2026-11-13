@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Product Details — DÉLICE Fragrances</title>
   <link rel="icon" type="image/svg+xml" href="/assets/images/monogram.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=4.9.1">
+  <link rel="stylesheet" href="/css/style.css?v=5.0.0">
   <style>
     .gallery-thumbs {
       display: flex;
       gap: 1rem;
       margin-top: 1rem;
       justify-content: center;
+      flex-wrap: wrap;
     }
     .thumb-btn {
       width: 72px;
@@ -28,6 +29,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      touch-action: manipulation;
     }
     .thumb-btn:hover, .thumb-btn.active {
       border-color: #4A102A;
@@ -37,6 +39,25 @@
       max-height: 100%;
       max-width: 100%;
       object-fit: contain;
+    }
+    @media (max-width: 768px) {
+      .gallery-thumbs {
+        gap: 0.5rem;
+      }
+      .thumb-btn {
+        width: 52px;
+        height: 52px;
+        padding: 2px;
+      }
+    }
+    @media (max-width: 480px) {
+      .gallery-thumbs {
+        gap: 0.35rem;
+      }
+      .thumb-btn {
+        width: 44px;
+        height: 44px;
+      }
     }
   </style>
 </head>
@@ -69,6 +90,14 @@
               <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
             <span class="cart-count">0</span>
+          </button>
+
+          <button type="button" class="mobile-menu-toggle" aria-label="Toggle Navigation Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
           </button>
         </div>
       </nav>
@@ -168,8 +197,8 @@
     </a>
   </nav>
 
-  <script src="/js/cart.js?v=4.9.1"></script>
-  <script src="/js/app.js?v=4.9.1"></script>
+  <script src="/js/cart.js?v=5.0.0"></script>
+  <script src="/js/app.js?v=5.0.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -362,11 +391,11 @@
             </div>
 
             <!-- 6. Action Buttons -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
-              <button type="button" class="btn btn-primary" onclick="DeliceCart.addItem(window.currentActiveProduct, 1)" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700; padding:0.9rem;">
+            <div class="product-page-actions">
+              <button type="button" class="btn btn-primary" onclick="DeliceCart.addItem(window.currentActiveProduct, 1)">
                 Add to Cart
               </button>
-              <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.12em; font-weight:700; text-align:center; padding:0.9rem;">
+              <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold">
                 Buy Now
               </a>
             </div>

@@ -1027,7 +1027,8 @@ function initMobileNav() {
   const navMenu = document.querySelector('.nav-menu');
 
   if (toggleBtn && navMenu) {
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       navMenu.classList.toggle('open');
     });
 
@@ -1035,6 +1036,20 @@ function initMobileNav() {
       link.addEventListener('click', () => {
         navMenu.classList.remove('open');
       });
+    });
+
+    // Close mobile menu when tapping anywhere outside
+    document.addEventListener('click', (e) => {
+      if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+        navMenu.classList.remove('open');
+      }
+    });
+
+    // Close mobile menu on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && navMenu.classList.contains('open')) {
+        navMenu.classList.remove('open');
+      }
     });
   }
 }
