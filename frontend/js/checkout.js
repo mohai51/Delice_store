@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let checkoutItems = [];
   let selectedDeliveryArea = 'insideDhaka';
   let selectedProvider = 'bkash';
+  let selectedPaymentMethod = 'full_online';
 
   // 1. Fetch system delivery settings & payment number
   try {
@@ -92,7 +93,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderOrderSummary();
   }
 
-  // 4. Provider Selection (Native Radio Change & Label Class Sync)
+  // 4. Payment Method Choice (Online vs COD Advance)
+  const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+  paymentMethodRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      selectedPaymentMethod = e.target.value;
+      const cardOnline = document.getElementById('payTypeCardOnline');
+      const cardCOD = document.getElementById('payTypeCardCOD');
+      if (cardOnline) cardOnline.classList.toggle('active', selectedPaymentMethod === 'full_online');
+      if (cardCOD) cardCOD.classList.toggle('active', selectedPaymentMethod === 'cod_advance');
+      renderOrderSummary();
+    });
+  });
+
+  // 5. Provider Selection (Native Radio Change & Label Class Sync)
   const providerRadios = document.querySelectorAll('input[name="paymentProvider"]');
   providerRadios.forEach(radio => {
     radio.addEventListener('change', (e) => {
@@ -220,8 +234,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       savingsPill.textContent = `-৳${savings > 0 ? savings : 51}`;
     }
 
-    if (payBtn) {
-      payBtn.textContent = `Confirm Order • ৳${total}`;
+    // Dynamic Payable Amount & COD Notice
+    const bannerLabel = document.getElementById('bannerAmountLabel');
+    const bannerValue = document.getElementById('bannerAmountValue');
+    const codNoticeLine = document.getElementById('codNoticeLine');
+    const codCashDueAmount = document.getElementById('codCashDueAmount');
+
+    if (selectedPaymentMethod === 'full_online') {
+      if (bannerLabel) bannerLabel.textContent = 'Payable Now (100% Online):';
+      if (bannerValue) bannerValue.textContent = `৳${total}`;
+      if (codNoticeLine) codNoticeLine.style.display = 'none';
+      if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${total} Online</span>`;
+    } else {
+      // Cash on Delivery: Advance delivery fee paid now, product cost paid on delivery
+      if (bannerLabel) bannerLabel.textContent = 'Payable Now (Advance Delivery):';
+      if (bannerValue) bannerValue.textContent = `৳${deliveryFee}`;
+      if (codNoticeLine) codNoticeLine.style.display = 'flex';
+      if (codCashDueAmount) codCashDueAmount.textContent = `৳${subtotal}`;
+      if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${deliveryFee} Advance</span>`;
     }
   }
 
@@ -288,12 +318,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const submitBtn = document.getElementById('paySubmitBtn');
       const originalBtnText = submitBtn.innerHTML;
       submitBtn.disabled = true;
+      submitBtn.classList.add('is-loading');
       submitBtn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-icon">
-          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
-          <path d="M12 2a10 10 0 0 1 10 10"></path>
-        </svg>
-        Confirming Order...
+        <span class="btn-spinner"></span>
+        <span>Securing Your Order...</span>
       `;
 
       try {
@@ -312,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             name: item.name,
             quantity: item.quantity
           })),
-          paymentMethod: 'full_online',
+          paymentMethod: selectedPaymentMethod,
           paymentProvider: selectedProvider,
           senderNumber: cleanedSender,
           transactionId: transactionId.toUpperCase().trim()
@@ -338,6 +366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Checkout error:', err);
         alert(`Order error: ${err.message || 'Please check your details and try again.'}`);
         submitBtn.disabled = false;
+        submitBtn.classList.remove('is-loading');
         submitBtn.innerHTML = originalBtnText;
       }
     });
