@@ -327,32 +327,10 @@ body, p, li, span, input, select, textarea, label {
 }
 
 /* ==========================================================================
-   ANNOUNCEMENT BAR
+   ANNOUNCEMENT BAR (Hidden as per design)
    ========================================================================== */
 .announcement-bar {
-  background-color: var(--color-burgundy);
-  color: var(--color-ivory);
-  padding: 0.55rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-align: center;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(197, 164, 109, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-}
-
-.announcement-bar .badge-pill {
-  background-color: var(--color-coral);
-  color: #FFFFFF;
-  padding: 0.15rem 0.55rem;
-  border-radius: var(--radius-full);
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -816,28 +794,33 @@ body, p, li, span, input, select, textarea, label {
 .trust-strip {
   background-color: var(--color-ivory-soft);
   border-bottom: 1px solid var(--color-ivory-border);
-  padding: 1.5rem 0;
+  padding: 0.75rem 0;
 }
 
 .trust-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
   text-align: center;
+  align-items: center;
 }
 
 .trust-item {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.85rem;
-  color: var(--color-ink);
-  font-size: 0.875rem;
-  font-weight: 500;
+  gap: 0.5rem;
+  color: #181619;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .trust-item svg {
   color: var(--color-gold-dark);
+  stroke: var(--color-gold-dark);
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -2422,21 +2405,12 @@ body, p, li, span, input, select, textarea, label {
   }
 
   body {
-    padding-bottom: 64px; /* Space for mobile bottom bar */
+    padding-bottom: 56px; /* Space for 52px mobile bottom bar */
   }
 
   /* 1. ANNOUNCEMENT BAR */
   .announcement-bar {
-    font-size: 0.72rem;
-    padding: 0.4rem 0.65rem;
-    line-height: 1.35;
-    flex-direction: column;
-    gap: 0.2rem;
-    text-align: center;
-  }
-  .announcement-bar .badge-pill {
-    font-size: 0.65rem;
-    padding: 0.1rem 0.45rem;
+    display: none !important;
   }
 
   /* 2. HEADER & NAVBAR */
@@ -2573,35 +2547,41 @@ body, p, li, span, input, select, textarea, label {
     width: 18px;
   }
 
-  /* 4b. COMPACT TRUST STRIP ON MOBILE (Saves Space, Puts Products First) */
+  /* 4b. COMPACT TRUST STRIP ON MOBILE (Icon-Based Single Line) */
   .trust-strip {
-    padding: 0.45rem 0;
-    background: #FAF6F0;
-    border-bottom: 1px solid #EBE3D5;
+    padding: 0.45rem 0 !important;
+    background: #FAF6F0 !important;
+    border-bottom: 1px solid #EBE3D5 !important;
   }
   .trust-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.25rem 0.5rem;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.15rem !important;
+    align-items: center !important;
   }
   .trust-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    font-size: 0.68rem;
-    font-weight: 600;
-    color: #4A102A;
-    line-height: 1.25;
-    padding: 0.15rem 0;
-    text-align: left;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.15rem !important;
+    padding: 0.15rem 0.05rem !important;
+    text-align: center !important;
   }
   .trust-item svg {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-    color: #C5A46D;
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+    color: #C5A46D !important;
+    stroke: #C5A46D !important;
+  }
+  .trust-item span {
+    font-size: 0.62rem !important;
+    white-space: nowrap !important;
+    font-weight: 700 !important;
+    color: #4A102A !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.01em !important;
   }
 
   /* 5. SHOP PRODUCT GRID ON MOBILE (Instant Product Reach) */
@@ -3101,24 +3081,23 @@ body, p, li, span, input, select, textarea, label {
     text-align: center;
   }
 
-  /* 12. APP-LIKE FIXED MOBILE BOTTOM BAR */
+  /* 12. APP-LIKE FIXED MOBILE BOTTOM BAR (Centered at screen bottom) */
   .mobile-bottom-bar {
     display: flex;
     position: fixed;
     bottom: 0;
     left: 0;
+    right: 0;
     width: 100%;
-    height: 58px;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-top: 1px solid rgba(224, 212, 195, 0.9);
+    height: 52px;
+    background: #FFFFFF;
+    border-top: 1px solid rgba(224, 212, 195, 0.85);
     z-index: 1000;
     align-items: center;
     justify-content: space-around;
-    padding: 0 0.5rem;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    box-shadow: 0 -4px 16px rgba(24, 22, 25, 0.08);
+    padding: 0 0.25rem;
+    padding-bottom: 0 !important;
+    box-shadow: 0 -2px 10px rgba(24, 22, 25, 0.08);
   }
 
   .mobile-bar-item {
@@ -3126,12 +3105,12 @@ body, p, li, span, input, select, textarea, label {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.15rem;
+    gap: 2px;
     color: #6B7280;
     text-decoration: none;
-    font-size: 0.68rem;
+    font-size: 0.64rem;
     font-weight: 600;
-    padding: 0.3rem 0.5rem;
+    padding: 3px 6px;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -3141,7 +3120,9 @@ body, p, li, span, input, select, textarea, label {
   }
 
   .mobile-bar-item svg {
-    stroke-width: 2.2;
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
   }
 
   .mobile-bar-item:hover,
@@ -3156,7 +3137,7 @@ body, p, li, span, input, select, textarea, label {
 
   /* 13. TOAST POSITIONING ON MOBILE (Above Bottom Bar) */
   #deliceToast {
-    bottom: 70px !important;
+    bottom: 64px !important;
     left: 1rem !important;
     right: 1rem !important;
     text-align: center !important;
