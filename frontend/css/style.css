@@ -1124,33 +1124,38 @@ body, p, li, span, input, select, textarea, label {
 
 .product-badges {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  z-index: 2;
+  top: 0.6rem;
+  left: 0.6rem;
+  right: 0.6rem;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  z-index: 20;
+  pointer-events: none;
 }
 
 .badge-offer {
-  background-color: var(--color-burgundy);
-  color: var(--color-ivory);
+  background-color: #FF665C;
+  color: #FFFFFF;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 0.3rem 0.65rem;
+  letter-spacing: 0.05em;
+  padding: 0.22rem 0.55rem;
   border-radius: var(--radius-sm);
+  box-shadow: 0 2px 6px rgba(255, 102, 92, 0.35);
+  white-space: nowrap;
 }
 
 .badge-volume {
   background-color: rgba(24, 22, 25, 0.85);
-  color: var(--color-ivory);
+  color: #FFFFFF;
   font-size: 0.7rem;
   font-weight: 600;
-  padding: 0.25rem 0.55rem;
+  padding: 0.22rem 0.55rem;
   border-radius: var(--radius-sm);
-  align-self: flex-start;
+  white-space: nowrap;
 }
 
 .product-body {
@@ -1173,6 +1178,17 @@ body, p, li, span, input, select, textarea, label {
   font-size: 1.15rem;
   color: var(--color-burgundy);
   margin-bottom: 0.25rem;
+}
+
+.product-title-link {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  transition: color 0.2s ease;
+}
+
+.product-title-link:hover {
+  color: var(--color-gold);
 }
 
 .product-description {
@@ -2648,19 +2664,37 @@ body, p, li, span, input, select, textarea, label {
     object-fit: contain;
   }
   .product-badges {
-    top: 0.35rem;
-    left: 0.35rem;
-    right: 0.35rem;
-    display: flex;
-    justify-content: space-between;
-    gap: 0.2rem;
+    top: 0.35rem !important;
+    left: 0.35rem !important;
+    right: 0.35rem !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: auto !important;
+    pointer-events: none !important;
+    z-index: 20 !important;
   }
-  .product-badges .badge-offer,
+  .product-badges .badge-offer {
+    font-size: 0.58rem !important;
+    padding: 0.12rem 0.35rem !important;
+    border-radius: 4px !important;
+    font-weight: 700 !important;
+    background-color: #FF665C !important;
+    color: #FFFFFF !important;
+    white-space: nowrap !important;
+    box-shadow: none !important;
+    align-self: auto !important;
+  }
   .product-badges .badge-volume {
-    font-size: 0.58rem;
-    padding: 0.12rem 0.35rem;
-    border-radius: 4px;
-    font-weight: 700;
+    font-size: 0.58rem !important;
+    padding: 0.12rem 0.35rem !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    background-color: rgba(24, 22, 25, 0.85) !important;
+    color: #FFFFFF !important;
+    white-space: nowrap !important;
+    align-self: auto !important;
   }
   .prod-slider-arrow {
     width: 24px;

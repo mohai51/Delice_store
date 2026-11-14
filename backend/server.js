@@ -94,6 +94,10 @@ app.get('/story', (req, res) => {
   res.sendFile(path.join(frontendPath, 'story.html'));
 });
 
+app.get('/product', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'product.html'));
+});
+
 // Centralized Error Handler
 app.use(errorHandler);
 

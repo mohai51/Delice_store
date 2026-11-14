@@ -411,8 +411,8 @@ function renderProductGrid(products) {
     return `
       <article class="product-card clickable-card" id="card-${prod.id}" onclick="navigateToProduct('${prod.id}', event)" tabindex="0" role="link" aria-label="View ${prod.name} details">
         <div class="product-media" data-prod-id="${prod.id}">
-          <div class="product-badges" style="z-index:20;">
-            ${discountPercent > 0 ? `<span class="badge-offer" style="background:#FF665C;">${discountPercent}% OFF</span>` : `<span class="badge-offer">${prod.badge || 'Offer'}</span>`}
+          <div class="product-badges">
+            <span class="badge-offer">${discountPercent > 0 ? `${discountPercent}% OFF` : (prod.badge || 'Offer')}</span>
             <span class="badge-volume">${prod.volume || '30ml'}</span>
           </div>
 
@@ -426,10 +426,10 @@ function renderProductGrid(products) {
             </svg>
           </button>
 
-          <!-- Main Image -->
-          <div class="product-media-click-area" title="Click to view ${prod.name} details">
+          <!-- Main Image Link (Native <a> for 100% reliable click/tap navigation) -->
+          <a href="/product.html?id=${prod.id}" class="product-media-click-area" title="Click to view ${prod.name} details" aria-label="${prod.name} 30ml Bottle">
             <img src="${activeImg}" id="card-img-${prod.id}" class="product-main-img" alt="${prod.name} 30ml Bottle" loading="lazy">
-          </div>
+          </a>
 
           <!-- Right Arrow Button -->
           <button type="button" class="prod-slider-arrow prod-slider-next" 
@@ -456,10 +456,11 @@ function renderProductGrid(products) {
         </div>
 
         <div class="product-body">
-          <!-- 1. Name & 30ml Badge -->
+          <!-- 1. Name as Clickable Link (full width, no truncation) -->
           <div class="product-header-row">
-            <h3 class="product-title">${prod.name}</h3>
-            <span class="badge-volume-pill">${prod.volume || '30ml'}</span>
+            <h3 class="product-title">
+              <a href="/product.html?id=${prod.id}" class="product-title-link" title="View ${prod.name} details">${prod.name}</a>
+            </h3>
           </div>
 
           <!-- 2. Price right after Name -->
@@ -491,8 +492,8 @@ function navigateToProduct(prodId, event) {
   if (window.lastCardSwipeTime && (Date.now() - window.lastCardSwipeTime < 350)) {
     return;
   }
-  // Ignore clicks that originated from child buttons/links/slider controls
-  if (event && event.target && event.target.closest('button, a, .prod-slider-arrow, .prod-card-thumb')) {
+  // Ignore clicks that originated from child buttons/slider controls
+  if (event && event.target && event.target.closest('button, .btn-buy-now, .btn-add-cart, .prod-slider-arrow, .prod-card-thumb')) {
     return;
   }
   window.location.href = `/product.html?id=${encodeURIComponent(prodId)}`;
@@ -504,10 +505,38 @@ function attachCardSliderListeners() {
     const prodId = card.id ? card.id.replace('card-', '') : null;
     if (!prodId) return;
 
+    // Card click listener
+    card.onclick = (e) => {
+      navigateToProduct(prodId, e);
+    };
+
+    // Mobile tap detection for instant, reliable response on touch devices
+    let touchStartTime = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    card.addEventListener('touchstart', (e) => {
+      touchStartTime = Date.now();
+      touchStartX = e.changedTouches[0].clientX;
+      touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    card.addEventListener('touchend', (e) => {
+      const tapDuration = Date.now() - touchStartTime;
+      const moveX = Math.abs(e.changedTouches[0].clientX - touchStartX);
+      const moveY = Math.abs(e.changedTouches[0].clientY - touchStartY);
+
+      if (tapDuration < 350 && moveX < 14 && moveY < 14) {
+        if (!e.target.closest('button, .btn-buy-now, .btn-add-cart, .prod-slider-arrow, .prod-card-thumb')) {
+          window.location.href = `/product.html?id=${encodeURIComponent(prodId)}`;
+        }
+      }
+    }, { passive: true });
+
     // Keyboard accessibility for whole clickable card
     card.onkeydown = (e) => {
       if (e.key === 'Enter') {
-        if (e.target === card) {
+        if (e.target === card || e.target.classList.contains('product-title-link')) {
           e.preventDefault();
           navigateToProduct(prodId, e);
         }
