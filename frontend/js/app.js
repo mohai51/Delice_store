@@ -409,7 +409,7 @@ function renderProductGrid(products) {
     const activeImg = imgs[currentIdx] || imgs[0] || prod.image;
 
     return `
-      <article class="product-card" id="card-${prod.id}">
+      <article class="product-card clickable-card" id="card-${prod.id}" onclick="navigateToProduct('${prod.id}', event)" tabindex="0" role="link" aria-label="View ${prod.name} details">
         <div class="product-media" data-prod-id="${prod.id}">
           <div class="product-badges" style="z-index:20;">
             ${discountPercent > 0 ? `<span class="badge-offer" style="background:#FF665C;">${discountPercent}% OFF</span>` : `<span class="badge-offer">${prod.badge || 'Offer'}</span>`}
@@ -426,8 +426,8 @@ function renderProductGrid(products) {
             </svg>
           </button>
 
-          <!-- Main Image: Clicking advances to next angle -->
-          <div class="product-media-click-area" onclick="slideCardImage('${prod.id}', 1, event)" title="Click to view next image">
+          <!-- Main Image -->
+          <div class="product-media-click-area" title="Click to view ${prod.name} details">
             <img src="${activeImg}" id="card-img-${prod.id}" class="product-main-img" alt="${prod.name} 30ml Bottle" loading="lazy">
           </div>
 
@@ -457,41 +457,26 @@ function renderProductGrid(products) {
 
         <div class="product-body">
           <!-- 1. Name & 30ml Badge -->
-          <div class="product-header-row" style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.25rem;">
-            <h3 class="product-title" style="margin:0; font-size:1.15rem; font-weight:700; color:#181619; letter-spacing:0.02em;">
-              <a href="/product.html?id=${prod.id}" style="color:inherit; text-decoration:none;">${prod.name}</a>
-            </h3>
-            <span style="font-size:0.75rem; font-weight:600; color:#4A102A; background:#FAF6F0; padding:0.15rem 0.45rem; border-radius:4px; border:1px solid #EBE3D5;">30ml</span>
+          <div class="product-header-row">
+            <h3 class="product-title">${prod.name}</h3>
+            <span class="badge-volume-pill">${prod.volume || '30ml'}</span>
           </div>
 
-          <!-- 2. Price right after Name (naamer por a daam) -->
+          <!-- 2. Price right after Name -->
           <div class="product-pricing">
             <span class="price-current">৳${price}</span>
             <span class="price-original">৳${orig}</span>
             ${discountPercent > 0 ? `<span class="price-savings">${discountPercent}% OFF</span>` : ''}
           </div>
 
-          <!-- 3. Short 2-line Description -->
-          <p class="product-description">${prod.description}</p>
-          
-          <!-- 4. Occasions / Tags (compact 3 pills) -->
-          <div class="product-tags">
-            ${(prod.occasions || []).slice(0, 3).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
-          </div>
-
-          <!-- 5. Action Buttons (Clean, Premium, Compact) -->
-          <div class="product-actions" style="display:flex; flex-direction:column; gap:0.4rem; margin-top:auto;">
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.4rem;">
-              <button type="button" class="btn btn-primary" onclick="addProductToBag('${prod.id}')" style="padding:0.65rem 0.35rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700;">
-                Add to Cart
-              </button>
-              <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-gold" style="padding:0.65rem 0.35rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; font-weight:700; text-align:center;">
-                Buy Now
-              </a>
-            </div>
-            <a href="/product.html?id=${prod.id}" class="btn-card-details">
-              Fragrance Details &amp; Notes &rarr;
+          <!-- 3. Direct Action Buttons (Buy Now & Add to Cart) -->
+          <div class="product-card-actions">
+            <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-buy-now" onclick="event.stopPropagation()" title="Buy ${prod.name} Now">
+              Buy Now
             </a>
+            <button type="button" class="btn btn-add-cart" onclick="event.stopPropagation(); addProductToBag('${prod.id}')" title="Add ${prod.name} to Cart">
+              Add to Cart
+            </button>
           </div>
         </div>
       </article>
@@ -501,10 +486,33 @@ function renderProductGrid(products) {
   attachCardSliderListeners();
 }
 
+function navigateToProduct(prodId, event) {
+  // If recent touch swipe on gallery, ignore click
+  if (window.lastCardSwipeTime && (Date.now() - window.lastCardSwipeTime < 350)) {
+    return;
+  }
+  // Ignore clicks that originated from child buttons/links/slider controls
+  if (event && event.target && event.target.closest('button, a, .prod-slider-arrow, .prod-card-thumb')) {
+    return;
+  }
+  window.location.href = `/product.html?id=${encodeURIComponent(prodId)}`;
+}
+window.navigateToProduct = navigateToProduct;
+
 function attachCardSliderListeners() {
   document.querySelectorAll('.product-card').forEach(card => {
     const prodId = card.id ? card.id.replace('card-', '') : null;
     if (!prodId) return;
+
+    // Keyboard accessibility for whole clickable card
+    card.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        if (e.target === card) {
+          e.preventDefault();
+          navigateToProduct(prodId, e);
+        }
+      }
+    };
 
     const prevBtn = card.querySelector('.prod-slider-prev');
     if (prevBtn) {
@@ -522,14 +530,6 @@ function attachCardSliderListeners() {
       };
     }
 
-    const clickArea = card.querySelector('.product-media-click-area');
-    if (clickArea) {
-      clickArea.onclick = (e) => {
-        if (e) { e.stopPropagation(); }
-        slideCardImage(prodId, 1, e);
-      };
-    }
-
     // Touch swipe support for product card image gallery on mobile
     const mediaEl = card.querySelector('.product-media');
     if (mediaEl) {
@@ -543,6 +543,7 @@ function attachCardSliderListeners() {
         const diffX = e.changedTouches[0].clientX - tStartX;
         const diffY = e.changedTouches[0].clientY - tStartY;
         if (Math.abs(diffX) > 36 && Math.abs(diffX) > Math.abs(diffY)) {
+          window.lastCardSwipeTime = Date.now();
           slideCardImage(prodId, diffX < 0 ? 1 : -1, e);
         }
       }, { passive: true });
