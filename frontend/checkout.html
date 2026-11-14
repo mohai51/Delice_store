@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=6.0.0">
+  <link rel="stylesheet" href="/css/style.css?v=6.1.0">
   <style>
     .spin-icon { animation: spin 1s linear infinite; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -34,280 +34,170 @@
     </div>
   </header>
 
-  <main class="section checkout-main-section">
-    <div class="container container-checkout">
-      <div class="checkout-page-title">
-        <span class="tagline-sub">INSTANT ORDER &bull; FAST DISPATCH</span>
-        <h2>Complete Your DÉLICE Order</h2>
-        <p>সঠিক নাম ও ঠিকানা দিন। আপনার জেলা অনুযায়ী ডেলিভারি চার্জ স্বয়ংক্রিয়ভাবে হিসাব করা হবে।</p>
+  <main class="section" style="padding-top:1.5rem; padding-bottom:3rem;">
+    <div class="container" style="max-width:580px; padding:0 0.85rem;">
+      <div class="checkout-page-header-mini">
+        <span class="tagline-sub" style="font-size:0.75rem;">DIRECT DISPATCH</span>
+        <h2>Checkout</h2>
+        <p>Complete your delivery and payment details below.</p>
       </div>
 
       <form id="checkoutForm" novalidate>
-        <!-- 1. Recipient Details -->
-        <div class="checkout-step-card">
-          <div class="step-card-header">
-            <span class="step-number">1</span>
-            <div>
-              <h3>Recipient Details / প্রাপকের তথ্য</h3>
-              <p>আপনার পুরো নাম এবং সচল মোবাইল নাম্বার দিন</p>
+        <div class="checkout-compact-card">
+          <!-- 1. Delivery Details -->
+          <div class="checkout-section-title">1. Delivery Details</div>
+          
+          <div class="form-row-compact">
+            <div class="form-group-compact">
+              <label class="form-label" for="fullName">Full Name *</label>
+              <input type="text" id="fullName" class="form-control" placeholder="Full Name" required autocomplete="name">
+            </div>
+            <div class="form-group-compact">
+              <label class="form-label" for="phone">Mobile Number *</label>
+              <input type="tel" id="phone" class="form-control" placeholder="01XXXXXXXXX" pattern="^01[3-9]\d{8}$" inputmode="numeric" required autocomplete="tel">
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="fullName">
-              Full Name / আপনার পুরো নাম <span class="required">*</span>
-            </label>
-            <input type="text" id="fullName" class="form-control" placeholder="আপনার পুরো নাম লিখুন (e.g. Tanvir Ahmed)" required autocomplete="name">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="phone">
-              Mobile Number / মোবাইল নাম্বার <span class="required">*</span>
-            </label>
-            <input type="tel" id="phone" class="form-control" placeholder="01XXXXXXXXX" pattern="^01[3-9]\d{8}$" inputmode="numeric" required autocomplete="tel">
-            <span class="form-hint">১১ ডিজিটের সচল মোবাইল নাম্বার দিন (e.g. 01712345678)</span>
-          </div>
-        </div>
-
-        <!-- 2. District & Detailed Address -->
-        <div class="checkout-step-card">
-          <div class="step-card-header">
-            <span class="step-number">2</span>
-            <div>
-              <h3>District &amp; Address / জেলা ও ডেলিভারি ঠিকানা</h3>
-              <p>জেলা নির্বাচন করুন এবং সম্পূর্ণ ঠিকানা লিখুন</p>
+          <div class="form-row-compact">
+            <div class="form-group-compact">
+              <label class="form-label" for="districtSelect">District *</label>
+              <select id="districtSelect" class="form-control form-select-styled" required>
+                <option value="Dhaka" selected>Dhaka</option>
+                <option value="Gazipur">Gazipur</option>
+                <option value="Narayanganj">Narayanganj</option>
+                <option value="Chattogram">Chattogram</option>
+                <option value="Sylhet">Sylhet</option>
+                <option value="Rajshahi">Rajshahi</option>
+                <option value="Khulna">Khulna</option>
+                <option value="Barishal">Barishal</option>
+                <option value="Rangpur">Rangpur</option>
+                <option value="Mymensingh">Mymensingh</option>
+                <option value="Comilla">Comilla</option>
+                <option value="Bogra">Bogra</option>
+                <option value="Cox's Bazar">Cox's Bazar</option>
+                <option value="Feni">Feni</option>
+                <option value="Noakhali">Noakhali</option>
+                <option value="Brahmanbaria">Brahmanbaria</option>
+                <option value="Chandpur">Chandpur</option>
+                <option value="Lakshmipur">Lakshmipur</option>
+                <option value="Narsingdi">Narsingdi</option>
+                <option value="Manikganj">Manikganj</option>
+                <option value="Munshiganj">Munshiganj</option>
+                <option value="Tangail">Tangail</option>
+                <option value="Faridpur">Faridpur</option>
+                <option value="Gopalganj">Gopalganj</option>
+                <option value="Madaripur">Madaripur</option>
+                <option value="Rajbari">Rajbari</option>
+                <option value="Shariatpur">Shariatpur</option>
+                <option value="Kishoreganj">Kishoreganj</option>
+                <option value="Jamalpur">Jamalpur</option>
+                <option value="Netrokona">Netrokona</option>
+                <option value="Sherpur">Sherpur</option>
+                <option value="Moulvibazar">Moulvibazar</option>
+                <option value="Habiganj">Habiganj</option>
+                <option value="Sunamganj">Sunamganj</option>
+                <option value="Pabna">Pabna</option>
+                <option value="Sirajganj">Sirajganj</option>
+                <option value="Naogaon">Naogaon</option>
+                <option value="Natore">Natore</option>
+                <option value="Chapainawabganj">Chapainawabganj</option>
+                <option value="Joypurhat">Joypurhat</option>
+                <option value="Dinajpur">Dinajpur</option>
+                <option value="Gaibandha">Gaibandha</option>
+                <option value="Kurigram">Kurigram</option>
+                <option value="Lalmonirhat">Lalmonirhat</option>
+                <option value="Nilphamari">Nilphamari</option>
+                <option value="Panchagarh">Panchagarh</option>
+                <option value="Thakurgaon">Thakurgaon</option>
+                <option value="Jessore">Jessore</option>
+                <option value="Jhenaidah">Jhenaidah</option>
+                <option value="Magura">Magura</option>
+                <option value="Narail">Narail</option>
+                <option value="Bagerhat">Bagerhat</option>
+                <option value="Chuadanga">Chuadanga</option>
+                <option value="Kushtia">Kushtia</option>
+                <option value="Meherpur">Meherpur</option>
+                <option value="Satkhira">Satkhira</option>
+                <option value="Barguna">Barguna</option>
+                <option value="Bhola">Bhola</option>
+                <option value="Jhalokati">Jhalokati</option>
+                <option value="Patuakhali">Patuakhali</option>
+                <option value="Pirojpur">Pirojpur</option>
+              </select>
+            </div>
+            <div class="form-group-compact">
+              <label class="form-label" for="deliveryAddress">Delivery Address *</label>
+              <input type="text" id="deliveryAddress" class="form-control" placeholder="House, road, area..." required>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="districtSelect">
-              Select District / আপনার জেলা <span class="required">*</span>
-            </label>
-            <select id="districtSelect" class="form-control form-select-styled" required>
-              <option value="Dhaka" selected>Inside Dhaka City (ঢাকা সিটি — ডেলিভারি চার্জ ৳৬০)</option>
-              <option value="Gazipur">Gazipur (গাজীপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Narayanganj">Narayanganj (নারায়ণগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Chattogram">Chattogram (চট্টগ্রাম — ডেলিভারি ৳১২০)</option>
-              <option value="Sylhet">Sylhet (সিলেট — ডেলিভারি ৳১২০)</option>
-              <option value="Rajshahi">Rajshahi (রাজশাহী — ডেলিভারি ৳১২০)</option>
-              <option value="Khulna">Khulna (খুলনা — ডেলিভারি ৳১২০)</option>
-              <option value="Barishal">Barishal (বরিশাল — ডেলিভারি ৳১২০)</option>
-              <option value="Rangpur">Rangpur (রংপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Mymensingh">Mymensingh (ময়মনসিংহ — ডেলিভারি ৳১২০)</option>
-              <option value="Comilla">Comilla (কুমিল্লা — ডেলিভারি ৳১২০)</option>
-              <option value="Bogra">Bogra (বগুড়া — ডেলিভারি ৳১২০)</option>
-              <option value="Cox's Bazar">Cox's Bazar (কক্সবাজার — ডেলিভারি ৳১২০)</option>
-              <option value="Feni">Feni (ফেনী — ডেলিভারি ৳১২০)</option>
-              <option value="Noakhali">Noakhali (নোয়াখালী — ডেলিভারি ৳১২০)</option>
-              <option value="Brahmanbaria">Brahmanbaria (ব্রাহ্মণবাড়িয়া — ডেলিভারি ৳১২০)</option>
-              <option value="Chandpur">Chandpur (চাঁদপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Lakshmipur">Lakshmipur (লক্ষ্মীপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Narsingdi">Narsingdi (নরসিংদী — ডেলিভারি ৳১২০)</option>
-              <option value="Manikganj">Manikganj (মানিকগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Munshiganj">Munshiganj (মুন্সিগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Tangail">Tangail (টাঙ্গাইল — ডেলিভারি ৳১২০)</option>
-              <option value="Faridpur">Faridpur (ফরিদপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Gopalganj">Gopalganj (গোপালগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Madaripur">Madaripur (মাদারীপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Rajbari">Rajbari (রাজবাড়ী — ডেলিভারি ৳১২০)</option>
-              <option value="Shariatpur">Shariatpur (শরীয়তপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Kishoreganj">Kishoreganj (কিশোরগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Jamalpur">Jamalpur (জামালপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Netrokona">Netrokona (নেত্রকোনা — ডেলিভারি ৳১২০)</option>
-              <option value="Sherpur">Sherpur (শেরপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Moulvibazar">Moulvibazar (মৌলভীবাজার — ডেলিভারি ৳১২০)</option>
-              <option value="Habiganj">Habiganj (হবিগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Sunamganj">Sunamganj (সুনামগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Pabna">Pabna (পাবনা — ডেলিভারি ৳১২০)</option>
-              <option value="Sirajganj">Sirajganj (সিরাজগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Naogaon">Naogaon (নওগাঁ — ডেলিভারি ৳১২০)</option>
-              <option value="Natore">Natore (নাটোর — ডেলিভারি ৳১২০)</option>
-              <option value="Chapainawabganj">Chapainawabganj (চাঁপাইনবাবগঞ্জ — ডেলিভারি ৳১২০)</option>
-              <option value="Joypurhat">Joypurhat (জয়পুরহাট — ডেলিভারি ৳১২০)</option>
-              <option value="Dinajpur">Dinajpur (দিনাজপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Gaibandha">Gaibandha (গাইবান্ধা — ডেলিভারি ৳১২০)</option>
-              <option value="Kurigram">Kurigram (কুড়িগ্রাম — ডেলিভারি ৳১২০)</option>
-              <option value="Lalmonirhat">Lalmonirhat (লালমনিরহাট — ডেলিভারি ৳১২০)</option>
-              <option value="Nilphamari">Nilphamari (নীলফামারী — ডেলিভারি ৳১২০)</option>
-              <option value="Panchagarh">Panchagarh (পঞ্চগড় — ডেলিভারি ৳১২০)</option>
-              <option value="Thakurgaon">Thakurgaon (ঠাকুরগাঁও — ডেলিভারি ৳১২০)</option>
-              <option value="Jessore">Jessore (যশোর — ডেলিভারি ৳১২০)</option>
-              <option value="Jhenaidah">Jhenaidah (ঝিনাইদহ — ডেলিভারি ৳১২০)</option>
-              <option value="Magura">Magura (মাগুরা — ডেলিভারি ৳১২০)</option>
-              <option value="Narail">Narail (নড়াইল — ডেলিভারি ৳১২০)</option>
-              <option value="Bagerhat">Bagerhat (বাগেরহাট — ডেলিভারি ৳১২০)</option>
-              <option value="Chuadanga">Chuadanga (চুয়াডাঙ্গা — ডেলিভারি ৳১২০)</option>
-              <option value="Kushtia">Kushtia (কুষ্টিয়া — ডেলিভারি ৳১২০)</option>
-              <option value="Meherpur">Meherpur (মেহেরপুর — ডেলিভারি ৳১২০)</option>
-              <option value="Satkhira">Satkhira (সাতক্ষীরা — ডেলিভারি ৳১২০)</option>
-              <option value="Barguna">Barguna (বরগুনা — ডেলিভারি ৳১২০)</option>
-              <option value="Bhola">Bhola (ভোলা — ডেলিভারি ৳১২০)</option>
-              <option value="Jhalokati">Jhalokati (ঝালকাঠি — ডেলিভারি ৳১২০)</option>
-              <option value="Patuakhali">Patuakhali (পটুয়াখালী — ডেলিভারি ৳১২০)</option>
-              <option value="Pirojpur">Pirojpur (পিরোজপুর — ডেলিভারি ৳১২০)</option>
-            </select>
+          <!-- 2. Order Summary -->
+          <div class="checkout-section-title" style="margin-top:0.75rem;">2. Order Summary</div>
+          
+          <div id="checkoutSummaryItems" class="summary-items-box-compact">
+            <!-- Rendered by checkout.js -->
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="deliveryAddress">
-              Detailed Delivery Address / পূর্ণাঙ্গ ঠিকানা <span class="required">*</span>
-            </label>
-            <textarea id="deliveryAddress" class="form-control" rows="2" placeholder="বাসা/রোড নং, এলাকা, থানা... (e.g. House 14, Road 5, Block C, Bashundhara R/A)" required></textarea>
-            <span class="form-hint">কুরিয়ার রাইডারের সহজে পৌঁছানোর জন্য বিস্তারিত ঠিকানা দিন।</span>
-          </div>
-        </div>
-
-        <!-- 3. Order Summary -->
-        <div class="checkout-step-card order-summary-step-card">
-          <div class="step-card-header">
-            <span class="step-number">3</span>
-            <div>
-              <h3>Order Summary / অর্ডারের বিবরণ</h3>
-              <p>আপনার অর্ডারকৃত আইটেম ও মোট টাকার হিসাব</p>
-            </div>
-          </div>
-
-          <!-- Product items list -->
-          <div id="checkoutSummaryItems" class="summary-items-box">
-            <!-- Dynamically populated by checkout.js -->
-          </div>
-
-          <!-- SAVINGS HIGHLIGHT BADGE (Requested by user: highlight thakbe j 51 taka save hoiche) -->
-          <div id="savingsHighlightBox" class="savings-highlight-badge">
-            <span class="savings-icon">🎉</span>
-            <div class="savings-content">
-              <strong>অভিনন্দন! আপনি এই অর্ডারে <span id="savingsAmountText">৳৫১</span> সাশ্রয় করছেন</strong>
-              <small>স্পেশাল লঞ্চিং অফার: রেগুলার ৳৮৫০ ➔ অফার মূল্য মাত্র ৳৭৯৯</small>
-            </div>
-          </div>
-
-          <div class="summary-calculations">
-            <div class="calc-line">
-              <span>প্রোডাক্ট মোট মূল্য (Subtotal):</span>
+          <div class="summary-box-compact">
+            <div class="summary-row-mini">
+              <span>Subtotal</span>
               <strong id="summarySubtotal">৳799</strong>
             </div>
-            <div class="calc-line">
-              <span>ডেলিভারি চার্জ (<span id="summaryDeliveryAreaName">Inside Dhaka City</span>):</span>
+            <div class="summary-row-mini">
+              <span>Delivery (<span id="summaryDeliveryAreaName">Dhaka</span>)</span>
               <strong id="summaryDelivery">৳60</strong>
             </div>
-            <div class="calc-total-line">
-              <span>সর্বমোট পরিশোধযোগ্য (Total Amount):</span>
-              <span id="summaryTotal" class="total-price-tag">৳859</span>
+            <div class="summary-row-mini savings-row">
+              <span>Savings (Launch Offer)</span>
+              <span class="savings-pill">-৳51</span>
             </div>
-          </div>
-        </div>
-
-        <!-- 4. Payment (User noted: 5. Payment) -->
-        <div class="checkout-step-card payment-step-card">
-          <div class="step-card-header">
-            <span class="step-number">4</span>
-            <div>
-              <h3>Payment / বিকাশ ও নগদ পেমেন্ট</h3>
-              <p>নিচের যেকোনো একটি মাধ্যমে Send Money করুন</p>
+            <div class="summary-row-total">
+              <span>Total Amount</span>
+              <strong id="summaryTotal" class="total-highlight">৳859</strong>
             </div>
           </div>
 
-          <!-- Send Money Note & Wallet Number -->
-          <div class="send-money-alert-card">
-            <div class="send-money-header">
-              <span class="alert-tag">জরুরি নির্দেশনা</span>
-              <strong>Note: আপনাকে Send Money (সেন্ড মানি) করতে হবে</strong>
-            </div>
-            
-            <div class="send-money-number-row">
-              <div class="num-col">
-                <span class="num-label">আমাদের পার্সোনাল ওয়ালেট নাম্বার:</span>
-                <span class="num-digits" id="displayWalletNumber">01731101780</span>
+          <!-- 3. Payment -->
+          <div class="checkout-section-title" style="margin-top:0.75rem;">3. Payment (Send Money)</div>
+          
+          <div class="send-money-box-minimal">
+            <div class="send-money-info-line">
+              <span>Send Money to Personal Wallet:</span>
+              <div class="wallet-number-wrap">
+                <strong id="displayWalletNumber">01731101780</strong>
+                <button type="button" class="btn-copy-mini" onclick="window.copyPaymentNumber(this)">Copy</button>
               </div>
-              <button type="button" class="btn-copy-wallet" onclick="window.copyPaymentNumber(this)" aria-label="Copy Wallet Number">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                <span>কপি করুন</span>
-              </button>
-            </div>
-
-            <div class="send-money-amount-row">
-              <span>পরিশোধযোগ্য টাকার পরিমাণ:</span>
-              <strong id="displayPayableAmount">৳859</strong>
             </div>
           </div>
 
-          <!-- Side-by-side bKash & Nagad Provider Buttons (compact, no wasted space) -->
-          <div class="payment-provider-label">পেমেন্ট মেথড সিলেক্ট করুন:</div>
-          <div class="payment-provider-grid">
-            <!-- bKash Option -->
-            <button type="button" class="provider-pill-btn bkash-pill-btn active" id="btnChooseBkash" onclick="window.selectProvider('bkash')">
-              <div class="provider-icon-wrap">
-                <!-- Official bKash geometric polygon bird -->
-                <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-                  <path d="M17.5 2.5L2.8 15.6l8.4 2.2 6.3-15.3z" fill="#E2136E"/>
-                  <path d="M17.5 2.5L29.2 12l-7.3 3.6-4.4-13.1z" fill="#C70959"/>
-                  <path d="M11.2 17.8L7.5 29.5l11-8.5-7.3-3.2z" fill="#E2136E"/>
-                  <path d="M18.5 21L26.5 27l-4.6-11.4L18.5 21z" fill="#D12053"/>
-                  <path d="M11.2 17.8l7.3 3.2 3.4-5.4-10.7 2.2z" fill="#F45A95"/>
-                </svg>
-              </div>
-              <div class="provider-text-wrap">
-                <span class="provider-name">bKash</span>
-                <span class="provider-sub">সেন্ড মানি</span>
-              </div>
-              <div class="provider-check-mark">&#10003;</div>
-            </button>
-
-            <!-- Nagad Option -->
-            <button type="button" class="provider-pill-btn nagad-pill-btn" id="btnChooseNagad" onclick="window.selectProvider('nagad')">
-              <div class="provider-icon-wrap">
-                <!-- Official Nagad swirl vector -->
-                <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-                  <path d="M16 2.5C9.5 6 5 12.5 5 19.5 5 25.5 9.8 30 16 30s11-4.5 11-10.5c0-4.8-2.5-9-6.5-12.5 1.5 2.5 2 5.5 1 8.5-1.2 3.5-4.2 5.5-7.5 5.5-4.5 0-7.5-3.5-6.5-8 1-4.2 4.5-8 8.5-10.5z" fill="url(#nagadGrad)"/>
-                  <defs>
-                    <linearGradient id="nagadGrad" x1="5" y1="2" x2="27" y2="30" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#F7941D"/>
-                      <stop offset="1" stop-color="#ED1C24"/>
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="provider-text-wrap">
-                <span class="provider-name">Nagad</span>
-                <span class="provider-sub">সেন্ড মানি</span>
-              </div>
-              <div class="provider-check-mark">&#10003;</div>
-            </button>
-          </div>
-
-          <!-- Sender Mobile Number & TrxID -->
-          <div class="form-group" style="margin-top:1.25rem;">
-            <label class="form-label" for="senderNumber">
-              Sender Mobile Number / যে নাম্বার থেকে টাকা পাঠিয়েছেন <span class="required">*</span>
+          <!-- bKash & Nagad side-by-side selection with user's uploaded logos -->
+          <div class="payment-methods-grid">
+            <label class="payment-method-card active" id="labelBkash">
+              <input type="radio" name="paymentProvider" value="bkash" checked class="provider-radio">
+              <img src="/assets/images/bkash-logo.png" alt="bKash" class="provider-logo-img">
+              <span class="provider-title">bKash</span>
             </label>
-            <input type="tel" id="senderNumber" class="form-control" placeholder="01XXXXXXXXX" pattern="^01[3-9]\d{8}$" inputmode="numeric" required>
-            <span class="form-hint">আপনার বিকাশ বা নগদ একাউন্টের ১১ ডিজিটের নাম্বার দিন</span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="transactionId">
-              Transaction ID (TrxID) / ট্রানজেকশন আইডি <span class="required">*</span>
+            <label class="payment-method-card" id="labelNagad">
+              <input type="radio" name="paymentProvider" value="nagad" class="provider-radio">
+              <img src="/assets/images/nagad-logo.png" alt="Nagad" class="provider-logo-img">
+              <span class="provider-title">Nagad</span>
             </label>
-            <input type="text" id="transactionId" class="form-control input-trxid" placeholder="TrxID লিখুন (e.g. BLX9876XYZ)" required style="text-transform:uppercase; font-family:monospace; font-weight:700;">
-            <span class="form-hint">Send Money সম্পন্ন হওয়ার পর ফিরতি SMS বা অ্যাপে প্রাপ্ত TrxID-টি লিখুন</span>
           </div>
 
-          <!-- Submit Order Button -->
-          <div style="margin-top:1.5rem;">
-            <button type="submit" class="btn btn-primary btn-block btn-confirm-order" id="paySubmitBtn">
-              অর্ডার কনফার্ম করুন • ৳৮৫৯
-            </button>
+          <div class="form-row-compact">
+            <div class="form-group-compact">
+              <label class="form-label" for="senderNumber">Sender Number *</label>
+              <input type="tel" id="senderNumber" class="form-control" placeholder="01XXXXXXXXX" pattern="^01[3-9]\d{8}$" inputmode="numeric" required>
+            </div>
+            <div class="form-group-compact">
+              <label class="form-label" for="transactionId">Transaction ID (TrxID) *</label>
+              <input type="text" id="transactionId" class="form-control" placeholder="TrxID" required style="text-transform:uppercase; font-family:monospace; font-weight:700;">
+            </div>
           </div>
 
-          <div class="checkout-security-guarantee">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-            <span>১০০% নিরাপদ ও ভেরিফাইড পেমেন্ট &bull; দ্রুত ডেলিভারি নিশ্চয়তা</span>
-          </div>
+          <button type="submit" class="btn-pay-now" id="paySubmitBtn">
+            Confirm Order • ৳859
+          </button>
         </div>
       </form>
     </div>
@@ -322,8 +212,8 @@
     </div>
   </footer>
 
-  <script src="/js/cart.js?v=6.0.0"></script>
-  <script src="/js/app.js?v=6.0.0"></script>
-  <script src="/js/checkout.js?v=6.0.0"></script>
+  <script src="/js/cart.js?v=6.1.0"></script>
+  <script src="/js/app.js?v=6.1.0"></script>
+  <script src="/js/checkout.js?v=6.1.0"></script>
 </body>
 </html>
