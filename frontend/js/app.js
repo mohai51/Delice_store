@@ -957,7 +957,8 @@ const MOOD_ATMOSPHERE_CONFIG = {
     alt: 'DÉLICE BLOOM — Parisian Haute Couture Floral Romance',
     tagline: 'HAUTE PARFUMERIE &bull; SOFT, SWEET &amp; ROMANTIC',
     accords: 'Tender Peony &bull; Grasse Rose &bull; Calabrian Bergamot &bull; White Musk',
-    story: 'An exquisite ode to youthful romance and timeless Parisian grace. Tender Centifolia rose petals and velvety peonies bloom effortlessly over a sparkling kiss of fresh bergamot, wrapped in a soft, sensual veil of white musk. Sweet, delightfully delicate, and breathtakingly feminine.'
+    story: 'An exquisite ode to youthful romance and timeless Parisian grace. Tender Centifolia rose petals and velvety peonies bloom effortlessly over a sparkling kiss of fresh bergamot, wrapped in a soft, sensual veil of white musk. Sweet, delightfully delicate, and breathtakingly feminine.',
+    shortStory: 'Tender Grasse rose and velvety peonies over sparkling bergamot and a sensual veil of white musk.'
   },
   'energetic': {
     badge: 'Executive Distinction',
@@ -966,7 +967,8 @@ const MOOD_ATMOSPHERE_CONFIG = {
     alt: 'DÉLICE MOMENTUM — Executive Distinction & Charismatic Motion',
     tagline: 'BRITISH LUXURY HERITAGE &bull; BOLD &amp; CONFIDENT',
     accords: 'Italian Bergamot &bull; Neroli &bull; Cracked Black Pepper &bull; Smoked Cedarwood',
-    story: 'Crafted for the modern gentleman who moves with effortless executive poise and magnetic presence. Crisp Italian bergamot and neroli meet the spicy warmth of cracked black pepper and cardamom, grounded in an authoritative foundation of smoked cedarwood and earthy vetiver. Bold, fresh, and remarkably resilient.'
+    story: 'Crafted for the modern gentleman who moves with effortless executive poise and magnetic presence. Crisp Italian bergamot and neroli meet the spicy warmth of cracked black pepper and cardamom, grounded in an authoritative foundation of smoked cedarwood and earthy vetiver. Bold, fresh, and remarkably resilient.',
+    shortStory: 'Crisp Italian bergamot and neroli meet cracked black pepper and commanding smoked cedarwood.'
   },
   'evening': {
     badge: 'Midnight Royalty',
@@ -975,7 +977,8 @@ const MOOD_ATMOSPHERE_CONFIG = {
     alt: 'DÉLICE ENIGMA — Midnight Velvet Royalty & Seductive Oud',
     tagline: 'ROYAL ORIENTAL OPULENCE &bull; SOPHISTICATED &amp; INTIMATE',
     accords: 'Noble Midnight Oud &bull; Royal Saffron &bull; Dark Plum &bull; Golden Amber',
-    story: 'A hypnotic journey into midnight opulence and regal sensuality. Noble midnight oud wood is ignited with sparkling saffron, fiery pink peppercorns, and juicy dark plum, melting seamlessly into deep velvet amber and warm smoky woods. Seductive, mysterious, and unforgettable.'
+    story: 'A hypnotic journey into midnight opulence and regal sensuality. Noble midnight oud wood is ignited with sparkling saffron, fiery pink peppercorns, and juicy dark plum, melting seamlessly into deep velvet amber and warm smoky woods. Seductive, mysterious, and unforgettable.',
+    shortStory: 'Noble midnight oud ignited with royal saffron, rich dark plum, and deep velvet amber.'
   }
 };
 
@@ -995,30 +998,34 @@ function renderMoodFinderProduct() {
 
   let matched = globalProducts.find(p => p.mood === mood) || globalProducts[0];
   const moodCfg = MOOD_ATMOSPHERE_CONFIG[mood] || MOOD_ATMOSPHERE_CONFIG['romantic'];
+  const orig = Number(matched.originalPrice) || 850;
+  const price = Number(matched.price) || 799;
 
   matchResult.innerHTML = `
     <div class="mood-match-card">
-      <div class="mood-match-media" onclick="viewProductDetails('${matched.id}')" style="cursor:pointer;" title="Click to view ${matched.name} details">
+      <a href="/product.html?id=${matched.id}" class="mood-match-media" title="Click to view ${matched.name} details" aria-label="${matched.name} Atmosphere">
         <span class="mood-match-badge">${moodCfg.badge}</span>
         <img src="${moodCfg.image}" id="moodMatchMainImg" alt="${moodCfg.alt}" onerror="this.onerror=null; this.src='${moodCfg.fallback}';">
-      </div>
+      </a>
       <div class="mood-match-info">
-        <span class="tagline-sub" style="font-size:0.75rem; color:#C5A46D; font-weight:700; letter-spacing:0.12em;">${moodCfg.tagline}</span>
-        <h3 style="font-size:1.65rem; margin:0.25rem 0 0.35rem; color:#181619; letter-spacing:0.02em;">${matched.name}</h3>
-        <div style="font-size:0.82rem; font-weight:600; color:#4A102A; margin-bottom:0.75rem;">
-          ${moodCfg.accords}
-        </div>
-        <p style="color:#59555B; margin-bottom:1.15rem; font-size:0.92rem; line-height:1.65;">
-          ${moodCfg.story}
-        </p>
-        <div class="product-tags" style="margin-bottom:1.25rem;">
-          ${(matched.occasions || []).map(tag => `<span class="tag-pill">${tag}</span>`).join('')}
+        <div class="mood-match-header">
+          <span class="tagline-sub mood-match-tagline">${moodCfg.tagline}</span>
+          <h3 class="mood-match-title">
+            <a href="/product.html?id=${matched.id}" class="product-title-link" title="View ${matched.name} details">${matched.name}</a>
+          </h3>
+          <div class="mood-match-accords">${moodCfg.accords}</div>
+          <p class="mood-match-story">${moodCfg.shortStory || moodCfg.story}</p>
         </div>
         <div class="mood-match-actions">
-          <span class="price-display" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#4A102A;">৳${matched.price}</span>
-          <button type="button" class="btn btn-primary" onclick="addProductToBag('${matched.id}')" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Add to Cart</button>
-          <a href="/checkout.html?buyNow=${matched.id}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700; text-align:center;">Buy Now</a>
-          <a href="/product.html?id=${matched.id}" class="btn btn-secondary" style="text-transform:uppercase; letter-spacing:0.08em; font-weight:600; text-align:center;">Details</a>
+          <div class="mood-match-price-row">
+            <span class="price-current">৳${price}</span>
+            <span class="price-original">৳${orig}</span>
+            <span class="price-discount">6% OFF</span>
+          </div>
+          <div class="mood-match-btns">
+            <a href="/checkout.html?buyNow=${matched.id}" class="btn btn-gold mood-match-btn-buy">Buy Now</a>
+            <button type="button" class="btn btn-primary mood-match-btn-cart" onclick="addProductToBag('${matched.id}')">Add to Cart</button>
+          </div>
         </div>
       </div>
     </div>

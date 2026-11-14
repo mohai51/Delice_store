@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=5.7.0">
+  <link rel="stylesheet" href="/css/style.css?v=5.8.0">
 </head>
 <body>
 
@@ -159,43 +159,42 @@
         <div class="mood-selector-wrapper">
           <div class="mood-pills">
             <button type="button" class="mood-pill-btn active" data-mood="romantic" onclick="window.selectMood('romantic', this)">
-              Floral Romance (Soft &amp; Sweet)
+              Floral Romance
             </button>
             <button type="button" class="mood-pill-btn" data-mood="energetic" onclick="window.selectMood('energetic', this)">
-              Executive Motion (Bold &amp; Fresh)
+              Executive Bold
             </button>
             <button type="button" class="mood-pill-btn" data-mood="evening" onclick="window.selectMood('evening', this)">
-              Midnight Royalty (Intimate &amp; Seductive)
+              Midnight Royalty
             </button>
           </div>
 
           <div id="moodMatchResult">
-            <!-- Rendered by app.js -->
+            <!-- Rendered by app.js / Initial Markup -->
             <div class="mood-match-card">
-              <div class="mood-match-media" onclick="viewProductDetails('delice-bloom')" style="cursor:pointer;" title="Click to view DÉLICE BLOOM details">
+              <a href="/product.html?id=delice-bloom" class="mood-match-media" title="Click to view DÉLICE BLOOM details" aria-label="DÉLICE BLOOM Atmosphere">
                 <span class="mood-match-badge">Parisian Floral Romance</span>
                 <img src="/assets/images/scent-guide-bloom-model.jpg" id="moodMatchMainImg" alt="DÉLICE BLOOM — Parisian Haute Couture Floral Romance" onerror="this.onerror=null; this.src='/assets/images/scent-guide-bloom.jpg';">
-              </div>
+              </a>
               <div class="mood-match-info">
-                <span class="tagline-sub" style="font-size:0.75rem; color:#C5A46D; font-weight:700; letter-spacing:0.12em;">HAUTE PARFUMERIE &bull; SOFT, SWEET &amp; ROMANTIC</span>
-                <h3 style="font-size:1.65rem; margin:0.25rem 0 0.35rem; color:#181619; letter-spacing:0.02em;">DÉLICE BLOOM</h3>
-                <div style="font-size:0.82rem; font-weight:600; color:#4A102A; margin-bottom:0.75rem;">
-                  Tender Peony &bull; Grasse Rose &bull; Calabrian Bergamot &bull; White Musk
-                </div>
-                <p style="color:#59555B; margin-bottom:1.15rem; font-size:0.92rem; line-height:1.65;">
-                  An exquisite ode to youthful romance and timeless Parisian grace. Tender Centifolia rose petals and velvety peonies blend effortlessly over a sparkling kiss of fresh bergamot, wrapped in a soft, sensual veil of white musk. Sweet, delightfully delicate, and breathtakingly feminine.
-                </p>
-                <div class="product-tags" style="margin-bottom:1.25rem;">
-                  <span class="tag-pill">Campus &amp; Everyday</span>
-                  <span class="tag-pill">Romantic Dates</span>
-                  <span class="tag-pill">Spring Outings</span>
-                  <span class="tag-pill">Daytime Events</span>
+                <div class="mood-match-header">
+                  <span class="tagline-sub mood-match-tagline">HAUTE PARFUMERIE &bull; SOFT, SWEET &amp; ROMANTIC</span>
+                  <h3 class="mood-match-title">
+                    <a href="/product.html?id=delice-bloom" class="product-title-link" title="View DÉLICE BLOOM details">DÉLICE BLOOM</a>
+                  </h3>
+                  <div class="mood-match-accords">Tender Peony &bull; Grasse Rose &bull; Calabrian Bergamot &bull; White Musk</div>
+                  <p class="mood-match-story">Tender Grasse rose and velvety peonies over sparkling bergamot and a sensual veil of white musk.</p>
                 </div>
                 <div class="mood-match-actions">
-                  <span class="price-display" style="font-family:var(--font-heading); font-size:1.5rem; font-weight:700; color:#4A102A;">৳799</span>
-                  <button type="button" class="btn btn-primary" onclick="addProductToBag('delice-bloom')" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Add to Cart</button>
-                  <a href="/checkout.html?buyNow=delice-bloom" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700; text-align:center;">Buy Now</a>
-                  <a href="/product.html?id=delice-bloom" class="btn btn-secondary" style="text-transform:uppercase; letter-spacing:0.08em; font-weight:600; text-align:center;">Details</a>
+                  <div class="mood-match-price-row">
+                    <span class="price-current">৳799</span>
+                    <span class="price-original">৳850</span>
+                    <span class="price-discount">6% OFF</span>
+                  </div>
+                  <div class="mood-match-btns">
+                    <a href="/checkout.html?buyNow=delice-bloom" class="btn btn-gold mood-match-btn-buy">Buy Now</a>
+                    <button type="button" class="btn btn-primary mood-match-btn-cart" onclick="addProductToBag('delice-bloom')">Add to Cart</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -511,6 +510,6 @@
 
   <!-- Scripts -->
   <script src="/js/cart.js?v=5.4.0"></script>
-  <script src="/js/app.js?v=5.6.0"></script>
+  <script src="/js/app.js?v=5.8.0"></script>
 </body>
 </html>
