@@ -2539,61 +2539,174 @@ body, p, li, span, input, select, textarea, label {
     line-height: 1.4;
   }
   .product-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    max-width: 400px;
-    margin: 0 auto;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
   }
   .product-card {
-    border-radius: 12px;
-    box-shadow: 0 4px 14px rgba(24, 22, 25, 0.05);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(24, 22, 25, 0.05);
+    border: 1px solid #EBE3D5;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
   }
   .product-media {
-    height: 220px;
-    max-height: 220px;
-    margin: 0.4rem 0.4rem 0;
-    border-radius: 10px;
-    padding: 0.6rem 0.4rem 2rem;
+    height: 160px;
+    max-height: 160px;
+    margin: 0.3rem 0.3rem 0;
+    border-radius: 8px;
+    padding: 0.4rem 0.3rem 1.6rem;
+    position: relative;
+    background: #FAF6F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .product-media img {
-    max-height: 165px;
+    max-height: 120px;
+    width: auto;
+    object-fit: contain;
+  }
+  .product-badges {
+    top: 0.35rem;
+    left: 0.35rem;
+    right: 0.35rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.2rem;
+  }
+  .product-badges .badge-offer,
+  .product-badges .badge-volume {
+    font-size: 0.58rem;
+    padding: 0.12rem 0.35rem;
+    border-radius: 4px;
+    font-weight: 700;
   }
   .prod-slider-arrow {
-    width: 36px;
-    height: 36px;
-    opacity: 0.95;
+    width: 24px;
+    height: 24px;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.9);
     touch-action: manipulation;
   }
+  .prod-slider-arrow svg {
+    width: 12px;
+    height: 12px;
+  }
   .prod-slider-prev {
-    left: 0.35rem;
+    left: 0.2rem;
   }
   .prod-slider-next {
-    right: 0.35rem;
+    right: 0.2rem;
   }
   .product-thumbs-bar {
-    bottom: 0.45rem;
-    gap: 0.4rem;
-    padding: 0.2rem 0.45rem;
+    bottom: 0.25rem;
+    gap: 0.25rem;
+    padding: 0.15rem 0.3rem;
   }
   .prod-card-thumb {
-    width: 30px;
-    height: 30px;
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
     touch-action: manipulation;
   }
   .product-body {
-    padding: 0.85rem 0.95rem 1.05rem;
+    padding: 0.5rem 0.45rem 0.65rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .product-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.25rem;
+    margin-bottom: 0.2rem;
   }
   .product-title {
-    font-size: 1.15rem;
+    font-size: 0.88rem !important;
+    font-weight: 700;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .product-header-row span {
+    font-size: 0.62rem !important;
+    padding: 0.08rem 0.3rem !important;
+    flex-shrink: 0;
+  }
+  .product-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin-bottom: 0.35rem;
+    flex-wrap: wrap;
+  }
+  .product-pricing .price-current {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #4A102A;
+  }
+  .product-pricing .price-original {
+    font-size: 0.78rem;
+    color: #87828A;
+  }
+  .product-pricing .price-savings {
+    font-size: 0.6rem;
+    padding: 0.08rem 0.3rem;
+  }
+  .product-description {
+    font-size: 0.7rem;
+    line-height: 1.35;
+    margin-bottom: 0.35rem;
+    color: #59555B;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .product-tags {
+    display: none;
   }
   .product-actions {
-    gap: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: auto;
+  }
+  .product-actions > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
   }
   .product-actions .btn {
-    min-height: 44px;
-    padding: 0.7rem 0.35rem;
-    font-size: 0.76rem;
+    min-height: 34px !important;
+    padding: 0.45rem 0.2rem !important;
+    font-size: 0.66rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    border-radius: 4px;
     touch-action: manipulation;
+    white-space: nowrap;
+  }
+  .btn-card-details {
+    font-size: 0.62rem !important;
+    padding: 0.3rem 0.2rem !important;
+    text-align: center;
+    border-radius: 4px;
+    margin-top: 0.1rem;
+    display: block;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* 6. INTERACTIVE SCENT FINDER ON MOBILE */
@@ -2971,20 +3084,23 @@ body, p, li, span, input, select, textarea, label {
     max-height: 220px;
   }
   .product-grid {
-    max-width: 100%;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.4rem !important;
+    max-width: 100% !important;
   }
   .product-media {
-    height: 210px;
-    max-height: 210px;
+    height: 150px;
+    max-height: 150px;
+    padding: 0.35rem 0.25rem 1.5rem;
   }
   .product-media img {
-    max-height: 155px;
+    max-height: 110px;
   }
   .product-body {
-    padding: 0.75rem 0.85rem 0.95rem;
+    padding: 0.45rem 0.4rem 0.6rem;
   }
   .product-title {
-    font-size: 1.05rem !important;
+    font-size: 0.82rem !important;
   }
   .founder-cards-grid {
     gap: 0.4rem;
@@ -3027,8 +3143,8 @@ body, p, li, span, input, select, textarea, label {
     font-size: 0.72rem;
   }
   .prod-card-thumb {
-    width: 26px;
-    height: 26px;
+    width: 16px;
+    height: 16px;
   }
   .story-thumb-preview {
     width: 32px;
