@@ -1160,6 +1160,7 @@ function switchStoryPhoto(index) {
     mainImg.style.opacity = '0.3';
     setTimeout(() => {
       mainImg.src = photos[idx].src;
+      mainImg.style.objectPosition = idx === 1 ? 'center top' : 'center center';
       mainImg.style.opacity = '1';
     }, 110);
   }
