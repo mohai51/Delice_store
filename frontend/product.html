@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=5.8.0">
+  <link rel="stylesheet" href="/css/style.css?v=5.9.0">
   <style>
     .gallery-thumbs {
       display: flex;
@@ -116,9 +116,77 @@
   <!-- SITE FOOTER -->
   <footer class="site-footer">
     <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="/assets/images/logo-light.svg" alt="DÉLICE Logo" height="42">
+          <p>An attainable luxury fragrance brand for young people in Bangladesh who want scent to express their personality. Make It Yours.</p>
+          
+          <div class="footer-contact-details">
+            <div class="footer-contact-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <a href="mailto:contact.delice@gmail.com">contact.delice@gmail.com</a>
+            </div>
+            <div class="footer-contact-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>Bashundhara R/A, Dhaka, Bangladesh.</span>
+            </div>
+          </div>
+
+          <div class="footer-social-links">
+            <a href="https://www.facebook.com/share/14zhxWuQ2jV/" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="DÉLICE Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+            <a href="https://www.instagram.com/delice.parfumerie?xtok=MTJ0Njh4MmJkb2xjcQ==" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="DÉLICE Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fragrances</h4>
+          <ul class="footer-links">
+            <li><a href="/product.html?id=delice-bloom">DÉLICE Bloom (30ml)</a></li>
+            <li><a href="/product.html?id=delice-momentum">DÉLICE Momentum (30ml)</a></li>
+            <li><a href="/product.html?id=delice-enigma">DÉLICE Enigma (30ml)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <ul class="footer-links">
+            <li><a href="/story.html">Our Brand Story</a></li>
+            <li><a href="/#discovery">Scent Guide &amp; Moods</a></li>
+            <li><a href="/checkout.html">Checkout</a></li>
+            <li><a href="/admin">Admin Portal</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Customer Care &amp; Policies</h4>
+          <ul class="footer-links">
+            <li><a href="javascript:void(0)" data-modal-open="deliveryPolicyModal">Delivery Policy</a></li>
+            <li><a href="javascript:void(0)" data-modal-open="refundPolicyModal">Refund Policy</a></li>
+            <li><a href="javascript:void(0)" data-modal-open="privacyPolicyModal">Privacy Policy</a></li>
+            <li><a href="javascript:void(0)" data-modal-open="termsModal">Terms &amp; Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+
       <div class="footer-bottom">
-        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved. Founded by Mohaiminul Islam, Sayod Sulayman Sukria, Abdullah Basar Tarif &amp; Zayed Iqbal Munna.</div>
-        <div>Dhaka, Bangladesh &bull; Make It Yours.</div>
+        <div>&copy; 2026 DÉLICE Fragrances. All rights reserved.</div>
+        <div>Design and crafted by <a href="https://regnons.vercel.app/" target="_blank" rel="noopener noreferrer" class="regnons-credit-link">Regnons Bangladesh</a></div>
       </div>
     </div>
   </footer>
