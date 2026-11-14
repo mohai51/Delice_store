@@ -248,7 +248,12 @@ async function loadHeroSlides() {
   sliderContainer.innerHTML = `
     ${slidesData.map((s, idx) => {
       const targetProdId = s.productId || 'delice-bloom';
-      const bannerImg = s.image || `/assets/images/hero-slide-${(idx % 3) + 1}.svg`;
+      const defaultBanners = [
+        '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png',
+        '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
+        '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
+      ];
+      const bannerImg = (s.image && !s.image.endsWith('.svg')) ? s.image : (defaultBanners[idx % defaultBanners.length] || s.image);
       const linkUrl = targetProdId ? `/checkout.html?buyNow=${targetProdId}` : '#collection';
 
       return `
