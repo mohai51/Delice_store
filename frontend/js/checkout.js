@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let bkashNagadNumber = '01731101780';
   let checkoutItems = [];
   let selectedDeliveryArea = 'insideDhaka';
+  let selectedCampusHub = null;
   let selectedProvider = 'bkash';
   let selectedPaymentMethod = 'full_online';
 
@@ -123,6 +124,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (labelNagad) labelNagad.classList.toggle('active', provider === 'nagad');
   }
 
+  // 6. Campus Delivery Hubs (Free Delivery ৳0 for UIU, NSU, IUB, AIUB, BRACU, EWU)
+  const hubButtons = document.querySelectorAll('.campus-hub-btn');
+  const activeHubBanner = document.getElementById('campusHubActiveBanner');
+  const selectedHubDisplay = document.getElementById('selectedHubDisplay');
+  const btnRemoveHub = document.getElementById('btnRemoveHub');
+
+  hubButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const hub = btn.dataset.hub;
+      if (selectedCampusHub === hub) {
+        deselectCampusHub();
+      } else {
+        selectCampusHub(hub);
+      }
+    });
+  });
+
+  if (btnRemoveHub) {
+    btnRemoveHub.addEventListener('click', () => {
+      deselectCampusHub();
+    });
+  }
+
+  function selectCampusHub(hubCode) {
+    selectedCampusHub = hubCode;
+    hubButtons.forEach(b => {
+      b.classList.toggle('active', b.dataset.hub === hubCode);
+    });
+    if (activeHubBanner) activeHubBanner.style.display = 'flex';
+    if (selectedHubDisplay) selectedHubDisplay.textContent = hubCode;
+    renderOrderSummary();
+  }
+
+  function deselectCampusHub() {
+    selectedCampusHub = null;
+    hubButtons.forEach(b => b.classList.remove('active'));
+    if (activeHubBanner) activeHubBanner.style.display = 'none';
+    renderOrderSummary();
+  }
+
   // 5. One-Click Copy Wallet Number
   window.copyPaymentNumber = function(btn) {
     const textToCopy = bkashNagadNumber;
@@ -221,12 +262,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
     }).join('');
 
-    const deliveryFee = deliveryRates[selectedDeliveryArea] || (selectedDeliveryArea === 'insideDhaka' ? 60 : 120);
+    const isFreeHub = Boolean(selectedCampusHub);
+    const baseDeliveryFee = deliveryRates[selectedDeliveryArea] || (selectedDeliveryArea === 'insideDhaka' ? 60 : 120);
+    const deliveryFee = isFreeHub ? 0 : baseDeliveryFee;
     const total = subtotal + deliveryFee;
 
     if (subtotalEl) subtotalEl.textContent = `৳${subtotal}`;
-    if (deliveryEl) deliveryEl.textContent = `৳${deliveryFee}`;
+    if (deliveryEl) {
+      if (isFreeHub) {
+        deliveryEl.innerHTML = `<span style="color:#15803D; font-weight:800;">৳0 (FREE)</span>`;
+      } else {
+        deliveryEl.textContent = `৳${deliveryFee}`;
+      }
+    }
     if (totalEl) totalEl.textContent = `৳${total}`;
+
+    // Update Area Name in summary
+    const areaNameEl = document.getElementById('summaryDeliveryAreaName');
+    if (areaNameEl) {
+      if (isFreeHub) {
+        areaNameEl.textContent = `Campus Hub (${selectedCampusHub})`;
+      } else {
+        const isDhaka = (document.getElementById('districtSelect')?.value || '').trim().toLowerCase() === 'dhaka';
+        areaNameEl.textContent = isDhaka ? 'Dhaka' : (document.getElementById('districtSelect')?.value || 'Dhaka');
+      }
+    }
 
     // Update savings text if element exists
     const savingsPill = document.querySelector('.savings-pill');
@@ -239,19 +299,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bannerValue = document.getElementById('bannerAmountValue');
     const codNoticeLine = document.getElementById('codNoticeLine');
     const codCashDueAmount = document.getElementById('codCashDueAmount');
+    const senderInput = document.getElementById('senderNumber');
+    const trxInput = document.getElementById('transactionId');
+    const labelSender = document.getElementById('labelSenderNumber');
+    const labelTrx = document.getElementById('labelTransactionId');
 
     if (selectedPaymentMethod === 'full_online') {
-      if (bannerLabel) bannerLabel.textContent = 'Payable Now (100% Online):';
+      if (bannerLabel) bannerLabel.textContent = isFreeHub ? 'Payable Now (100% Online • Free Hub):' : 'Payable Now (100% Online):';
       if (bannerValue) bannerValue.textContent = `৳${total}`;
       if (codNoticeLine) codNoticeLine.style.display = 'none';
       if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${total} Online</span>`;
+
+      if (senderInput) senderInput.required = true;
+      if (trxInput) trxInput.required = true;
+      if (labelSender) labelSender.textContent = 'Sender Number *';
+      if (labelTrx) labelTrx.textContent = 'Transaction ID (TrxID) *';
     } else {
-      // Cash on Delivery: Advance delivery fee paid now, product cost paid on delivery
-      if (bannerLabel) bannerLabel.textContent = 'Payable Now (Advance Delivery):';
-      if (bannerValue) bannerValue.textContent = `৳${deliveryFee}`;
-      if (codNoticeLine) codNoticeLine.style.display = 'flex';
-      if (codCashDueAmount) codCashDueAmount.textContent = `৳${subtotal}`;
-      if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${deliveryFee} Advance</span>`;
+      // Cash on Delivery
+      if (isFreeHub) {
+        // Free Campus Delivery Hub: Advance delivery fee is 0!
+        if (bannerLabel) bannerLabel.textContent = 'Payable Now (Campus Hub Pickup):';
+        if (bannerValue) bannerValue.textContent = '৳0 (FREE)';
+        if (codNoticeLine) codNoticeLine.style.display = 'flex';
+        if (codCashDueAmount) codCashDueAmount.textContent = `৳${subtotal} (Pay on Campus Handover)`;
+        if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${subtotal} at ${selectedCampusHub}</span>`;
+
+        if (senderInput) senderInput.required = false;
+        if (trxInput) trxInput.required = false;
+        if (labelSender) labelSender.textContent = 'Sender Number (Optional for Free Hub)';
+        if (labelTrx) labelTrx.textContent = 'Transaction ID (Optional for Free Hub)';
+      } else {
+        // Regular home delivery COD: ৳60 or ৳120 advance fee
+        if (bannerLabel) bannerLabel.textContent = 'Payable Now (Advance Delivery):';
+        if (bannerValue) bannerValue.textContent = `৳${deliveryFee}`;
+        if (codNoticeLine) codNoticeLine.style.display = 'flex';
+        if (codCashDueAmount) codCashDueAmount.textContent = `৳${subtotal}`;
+        if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${deliveryFee} Advance</span>`;
+
+        if (senderInput) senderInput.required = true;
+        if (trxInput) trxInput.required = true;
+        if (labelSender) labelSender.textContent = 'Sender Number *';
+        if (labelTrx) labelTrx.textContent = 'Transaction ID (TrxID) *';
+      }
     }
   }
 
@@ -302,17 +391,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const cleanedSender = senderNumber.replace(/[\s-]/g, '');
-      if (!bdPhoneRegex.test(cleanedSender)) {
-        alert('Please enter the 11-digit sender mobile number.');
-        document.getElementById('senderNumber').focus();
-        return;
-      }
+      const isFreeHubCOD = (Boolean(selectedCampusHub) && selectedPaymentMethod === 'cod_advance');
 
-      if (!transactionId || transactionId.length < 4) {
-        alert('Please enter the Transaction ID (TrxID).');
-        document.getElementById('transactionId').focus();
-        return;
+      let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '') : '';
+      let trxIdClean = transactionId ? transactionId.toUpperCase().trim() : '';
+
+      if (isFreeHubCOD) {
+        if (!cleanedSender) cleanedSender = cleanedPhone;
+        if (!trxIdClean) trxIdClean = `HUB-COD-${Date.now().toString().slice(-6)}`;
+      } else {
+        if (!bdPhoneRegex.test(cleanedSender)) {
+          alert('Please enter the 11-digit sender mobile number.');
+          document.getElementById('senderNumber').focus();
+          return;
+        }
+
+        if (!trxIdClean || trxIdClean.length < 4) {
+          alert('Please enter the Transaction ID (TrxID).');
+          document.getElementById('transactionId').focus();
+          return;
+        }
       }
 
       const submitBtn = document.getElementById('paySubmitBtn');
@@ -334,7 +432,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             address,
             orderNotes: ''
           },
-          deliveryArea: selectedDeliveryArea,
+          deliveryArea: selectedCampusHub ? 'campusHub' : selectedDeliveryArea,
+          deliveryHub: selectedCampusHub || '',
           items: checkoutItems.map(item => ({
             id: item.id,
             name: item.name,
@@ -343,7 +442,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           paymentMethod: selectedPaymentMethod,
           paymentProvider: selectedProvider,
           senderNumber: cleanedSender,
-          transactionId: transactionId.toUpperCase().trim()
+          transactionId: trxIdClean
         };
 
         const response = await fetch('/api/orders', {

@@ -21,7 +21,7 @@ const CATALOG_PRICES = {
  */
 exports.createOrder = async (req, res, next) => {
   try {
-    const { customer, deliveryArea, items, paymentMethod, paymentProvider, senderNumber, transactionId } = req.body;
+    const { customer, deliveryArea, deliveryHub, items, paymentMethod, paymentProvider, senderNumber, transactionId } = req.body;
 
     // 1. Validate Customer Info
     if (!customer || !customer.fullName || !customer.phone || !customer.district || !customer.address) {
@@ -39,25 +39,36 @@ exports.createOrder = async (req, res, next) => {
       });
     }
 
-    // 2. Validate Payment Details (bKash & Nagad Send Money)
+    // 2. Validate Payment Details & Campus Delivery Hub
+    const VALID_CAMPUS_HUBS = ['UIU', 'NSU', 'IUB', 'AIUB', 'BRACU', 'EWU'];
+    const chosenHub = (deliveryHub && typeof deliveryHub === 'string') ? deliveryHub.trim().toUpperCase() : '';
+    const isCampusHub = VALID_CAMPUS_HUBS.includes(chosenHub);
+
     const validMethods = ['full_online', 'cod_advance'];
     const pMethod = validMethods.includes(paymentMethod) ? paymentMethod : 'full_online';
     const pProvider = (paymentProvider === 'nagad') ? 'nagad' : 'bkash';
 
-    const cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
-    if (!cleanedSender || !/^01[3-9]\d{8}$/.test(cleanedSender)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Please enter the valid 11-digit bKash or Nagad sender mobile number from which payment was made.'
-      });
-    }
+    let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
+    let trxId = transactionId ? transactionId.trim().toUpperCase() : '';
 
-    const trxId = transactionId ? transactionId.trim().toUpperCase() : '';
-    if (!trxId || trxId.length < 4) {
-      return res.status(400).json({
-        success: false,
-        error: 'Please provide a valid bKash or Nagad Transaction ID (TrxID).'
-      });
+    // If campus hub + cash on delivery, advance is ৳0 so payment inputs are optional
+    if (isCampusHub && pMethod === 'cod_advance') {
+      if (!cleanedSender) cleanedSender = cleanedPhone;
+      if (!trxId) trxId = `HUB-COD-${Date.now().toString().slice(-6)}`;
+    } else {
+      if (!cleanedSender || !/^01[3-9]\d{8}$/.test(cleanedSender)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Please enter the valid 11-digit bKash or Nagad sender mobile number from which payment was made.'
+        });
+      }
+
+      if (!trxId || trxId.length < 4) {
+        return res.status(400).json({
+          success: false,
+          error: 'Please provide a valid bKash or Nagad Transaction ID (TrxID).'
+        });
+      }
     }
 
     // Check for duplicate TrxID
@@ -71,6 +82,14 @@ exports.createOrder = async (req, res, next) => {
           });
         }
       } catch (e) {}
+    } else if (memoryStore && memoryStore.orders) {
+      const existingOrder = memoryStore.orders.find(o => o.transactionId === trxId);
+      if (existingOrder) {
+        return res.status(400).json({
+          success: false,
+          error: `Transaction ID "${trxId}" has already been submitted for Order #${existingOrder.orderNumber}.`
+        });
+      }
     }
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -141,7 +160,7 @@ exports.createOrder = async (req, res, next) => {
       });
     }
 
-    // 4. Delivery Calculation (Inside Dhaka ৳60 vs Outside Dhaka ৳120)
+    // 4. Delivery Calculation (Campus Hub ৳0 FREE vs Inside Dhaka ৳60 vs Outside Dhaka ৳120)
     let deliveryInside = 60;
     let deliveryOutside = 120;
 
@@ -154,11 +173,19 @@ exports.createOrder = async (req, res, next) => {
       } catch (e) {}
     }
 
-    // District logic: 'Dhaka' defaults to insideDhaka, any other district defaults to outsideDhaka
-    const isDhakaDistrict = customer.district.trim().toLowerCase() === 'dhaka';
-    const isInsideDhaka = (deliveryArea === 'insideDhaka' || (isDhakaDistrict && deliveryArea !== 'outsideDhaka'));
-    const deliveryCharge = isInsideDhaka ? deliveryInside : deliveryOutside;
-    const finalDeliveryArea = isInsideDhaka ? 'insideDhaka' : 'outsideDhaka';
+    let deliveryCharge = 0;
+    let finalDeliveryArea = 'insideDhaka';
+
+    if (isCampusHub) {
+      deliveryCharge = 0;
+      finalDeliveryArea = 'campusHub';
+    } else {
+      // District logic: 'Dhaka' defaults to insideDhaka, any other district defaults to outsideDhaka
+      const isDhakaDistrict = customer.district.trim().toLowerCase() === 'dhaka';
+      const isInsideDhaka = (deliveryArea === 'insideDhaka' || (isDhakaDistrict && deliveryArea !== 'outsideDhaka'));
+      deliveryCharge = isInsideDhaka ? deliveryInside : deliveryOutside;
+      finalDeliveryArea = isInsideDhaka ? 'insideDhaka' : 'outsideDhaka';
+    }
 
     const totalPayable = productSubtotal + deliveryCharge;
 
@@ -171,7 +198,7 @@ exports.createOrder = async (req, res, next) => {
       advancePaid = totalPayable;
       cashDueOnDelivery = 0;
     } else if (pMethod === 'cod_advance') {
-      // Cash on Delivery with Delivery Charge paid in advance
+      // Cash on Delivery with Delivery Charge paid in advance (৳0 if campus hub)
       advancePaid = deliveryCharge;
       cashDueOnDelivery = productSubtotal;
     } else {
@@ -198,6 +225,7 @@ exports.createOrder = async (req, res, next) => {
       productSubtotal,
       deliveryArea: finalDeliveryArea,
       deliveryCharge,
+      deliveryHub: isCampusHub ? chosenHub : '',
       totalPayable,
       totalPaid: advancePaid,
       paymentMethod: pMethod,
@@ -206,7 +234,7 @@ exports.createOrder = async (req, res, next) => {
       advancePaid,
       cashDueOnDelivery,
       totalProductCost: totalCOGS,
-      actualCourierCost: isInsideDhaka ? deliveryInside : deliveryOutside,
+      actualCourierCost: isCampusHub ? 0 : (finalDeliveryArea === 'insideDhaka' ? deliveryInside : deliveryOutside),
       gatewayFee: 0,
       netProfit: pMethod === 'full_online' 
         ? (totalPayable - totalCOGS - deliveryCharge)
@@ -258,6 +286,8 @@ exports.createOrder = async (req, res, next) => {
         orderNumber: order.orderNumber,
         transactionId: order.transactionId,
         totalPayable: order.totalPayable,
+        deliveryCharge: order.deliveryCharge,
+        deliveryHub: order.deliveryHub || '',
         advancePaid: order.advancePaid,
         cashDueOnDelivery: order.cashDueOnDelivery,
         paymentMethod: order.paymentMethod,

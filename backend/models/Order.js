@@ -66,13 +66,19 @@ const orderSchema = new mongoose.Schema({
   },
   deliveryArea: {
     type: String,
-    enum: ['insideDhaka', 'outsideDhaka'],
+    enum: ['insideDhaka', 'outsideDhaka', 'campusHub'],
     required: true
   },
   deliveryCharge: {
     type: Number,
     required: true,
     comment: 'Snapshot delivery charge collected'
+  },
+  deliveryHub: {
+    type: String,
+    default: '',
+    trim: true,
+    comment: 'Campus delivery hub code (e.g. UIU, NSU, IUB, AIUB, BRACU, EWU) with 100% Free Delivery'
   },
   totalPayable: {
     type: Number,

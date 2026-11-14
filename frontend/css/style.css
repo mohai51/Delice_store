@@ -2750,6 +2750,151 @@ body, p, li, span, input, select, textarea, label {
   100% { transform: rotate(360deg); }
 }
 
+/* ==========================================================================
+   CAMPUS DELIVERY HUBS (FREE DELIVERY ৳0)
+   ========================================================================== */
+.campus-hubs-box {
+  background: #FFFDF9;
+  border: 1.5px dashed #C5A46D;
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  margin: 0.75rem 0 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.campus-hubs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.campus-hubs-title {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-burgundy);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.hub-header-icon {
+  font-size: 1rem;
+}
+
+.hub-free-pill {
+  background: #DCFCE7;
+  color: #15803D;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  white-space: nowrap;
+}
+
+.campus-hubs-subtitle {
+  font-size: 0.74rem;
+  color: #6B7280;
+  margin-bottom: 0.55rem;
+  line-height: 1.3;
+}
+
+.campus-hubs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+}
+
+.campus-hub-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.25rem;
+  min-height: 48px;
+  background: #FFFFFF;
+  border: 1.5px solid #E0D4C3;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-family: var(--font-body);
+}
+
+.campus-hub-btn:hover {
+  border-color: #C5A46D;
+  background: #FFFDF8;
+  transform: translateY(-1px);
+}
+
+.campus-hub-btn.active {
+  background: linear-gradient(135deg, #4A102A 0%, #300619 100%) !important;
+  border-color: #4A102A !important;
+  box-shadow: 0 4px 10px rgba(74, 16, 42, 0.22);
+  transform: translateY(-1px);
+}
+
+.hub-btn-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #2D1115;
+  line-height: 1.1;
+}
+
+.campus-hub-btn.active .hub-btn-name {
+  color: #FFFFFF !important;
+}
+
+.hub-btn-badge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #15803D;
+  margin-top: 0.15rem;
+  letter-spacing: 0.02em;
+}
+
+.campus-hub-btn.active .hub-btn-badge {
+  color: #FBBF24 !important;
+}
+
+.campus-hub-active-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.55rem;
+  padding: 0.4rem 0.6rem;
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  border-radius: 6px;
+}
+
+.hub-banner-text {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #15803D;
+}
+
+.btn-remove-hub {
+  background: transparent;
+  border: 1px solid #86EFAC;
+  color: #15803D;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-remove-hub:hover {
+  background: #DCFCE7;
+}
+
 
 /* ==========================================================================
    PRODUCT DETAILS PAGE

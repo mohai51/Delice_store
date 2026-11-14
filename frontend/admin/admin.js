@@ -274,7 +274,7 @@ async function loadOrders() {
             <a href="tel:${o.customer.phone}" style="color:#4A102A; font-weight:700; text-decoration:none;">${o.customer.phone}</a>
             <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${o.customer.phone}', this)">Copy</button><br>
             <span style="font-size:0.78rem; font-weight:600; color:#7A5B35; background:#FAF6F0; border:1px solid #E0D4C3; padding:1px 5px; border-radius:3px; display:inline-block; margin-top:0.2rem;">
-              ${o.customer.district} (${o.deliveryArea === 'insideDhaka' ? 'Inside Dhaka ৳60' : 'Outside Dhaka ৳120'})
+              ${o.deliveryHub ? `<strong style="color:#15803D;">🏫 Hub: ${o.deliveryHub} (FREE ৳0)</strong>` : `${o.customer.district} (${o.deliveryArea === 'insideDhaka' ? 'Inside Dhaka ৳60' : 'Outside Dhaka ৳120'})`}
             </span><br>
             <small style="color:#6B7280; font-size:0.75rem; display:block; max-width:200px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; margin-top:0.2rem;" title="${o.customer.address}">
               📍 ${o.customer.address}
@@ -352,7 +352,7 @@ function exportCourierCSV() {
     `"${(o.customer?.fullName || '').replace(/"/g, '""')}"`,
     `"${o.customer?.phone || ''}"`,
     `"${o.customer?.district || ''}"`,
-    `"${o.deliveryArea || ''}"`,
+    `"${o.deliveryHub ? `Campus Hub (${o.deliveryHub})` : (o.deliveryArea || '')}"`,
     `"${(o.customer?.address || '').replace(/"/g, '""')}"`,
     `"${(o.items || []).map(i => `${i.productName} (x${i.quantity})`).join('; ')}"`,
     o.productSubtotal || 0,
@@ -427,7 +427,7 @@ District: ${order.customer.district}
 Delivery Address: ${order.customer.address}
 Products: ${itemsText}
 Cash to Collect (COD): ৳${cashDue}
-Delivery Zone: ${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka (৳60)' : 'Outside Dhaka (৳120)'}
+Delivery Zone: ${order.deliveryHub ? `Campus Hub: ${order.deliveryHub} (FREE Delivery ৳0)` : (order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka (৳60)' : 'Outside Dhaka (৳120)')}
 Payment Status: ${(order.paymentStatus || 'AWAITING_VERIFICATION').toUpperCase()}
 Payment Method: ${isCOD ? 'Cash on Delivery (Advance Fee Paid)' : '100% Online Payment'}
 Provider / TrxID: ${(order.paymentProvider || 'bkash').toUpperCase()} - ${order.transactionId}`;
@@ -482,8 +482,12 @@ function viewOrderModal(orderId) {
           </div>
         </div>
         <div class="box-row">
-          <span>District:</span>
-          <strong>${order.customer.district} <span style="font-size:0.75rem; color:#7A5B35;">(${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka City • ৳60' : 'Outside Dhaka • ৳120'})</span></strong>
+          <span>District &amp; Delivery Zone:</span>
+          <strong>
+            ${order.deliveryHub 
+              ? `<span style="color:#15803D; font-weight:800;">🏫 Campus Hub: ${order.deliveryHub} (FREE Delivery • ৳0)</span>` 
+              : `${order.customer.district} <span style="font-size:0.75rem; color:#7A5B35;">(${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka City • ৳60' : 'Outside Dhaka • ৳120'})</span>`}
+          </strong>
         </div>
         <div style="margin-top:0.4rem;">
           <span style="font-size:0.78rem; color:#6B7280; display:block;">Detailed Delivery Address:</span>
