@@ -80,7 +80,8 @@
       }
 
       try {
-        const fetchUrl = tranId ? `/api/orders/by-transaction/${encodeURIComponent(tranId)}` : `/api/orders/${encodeURIComponent(orderId)}`;
+        const identifier = tranId || orderId;
+        const fetchUrl = `/api/orders/by-transaction/${encodeURIComponent(identifier)}`;
         const res = await fetch(fetchUrl);
         if (res.ok) {
           const order = await res.json();
@@ -89,6 +90,7 @@
           renderFallback(tranId, orderId);
         }
       } catch (e) {
+        console.error('Error fetching order receipt:', e);
         renderFallback(tranId, orderId);
       }
 
@@ -344,8 +346,6 @@
               `}
             </div>
           </div>
-        `;
-      }
         `;
       }
 
