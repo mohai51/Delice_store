@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=5.2.0">
+  <link rel="stylesheet" href="/css/style.css?v=5.3.0">
 </head>
 <body>
 
@@ -58,90 +58,27 @@
   </header>
 
   <main>
-    <!-- HERO SLIDESHOW (100% Responsive Luxury Editorial Slideshow) -->
+    <!-- HERO SLIDESHOW (100% Full-View Visual Banners) -->
     <section class="hero-slider-container" id="heroSliderContainer" aria-label="Fragrance Highlights">
       <!-- Slide 1: Bloom / Make It Yours -->
       <div class="hero-slide active" data-slide="0">
-        <div class="hero-slide-backdrop hero-bg-1"></div>
-        <div class="container hero-slide-container">
-          <div class="hero-slide-content">
-            <span class="hero-badge-pill">Authentic Eau De Parfum &bull; 30ml</span>
-            <h1 class="hero-title">Make It <span class="hero-highlight">Yours.</span></h1>
-            <p class="hero-subtitle">Romantic in feeling. Bold in self-expression. Alive with youthful energy. An attainable luxury fragrance created for the moments you choose for yourself.</p>
-            <div class="hero-price-row">
-              <span class="hero-offer-price">৳799</span>
-              <span class="hero-orig-price">৳850</span>
-              <span class="hero-savings-chip">Save ৳51 &bull; Special Launch Price</span>
-            </div>
-            <div class="hero-actions clean-actions">
-              <a href="/checkout.html?buyNow=delice-bloom" class="btn btn-hero-buy">Buy Now &bull; ৳799</a>
-              <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-bloom')">Add to Cart</button>
-              <a href="#collection" class="btn btn-hero-explore">Explore Scents</a>
-            </div>
-          </div>
-          <div class="hero-slide-visual">
-            <div class="hero-bottle-wrap">
-              <img src="/assets/images/bloom.svg" alt="DÉLICE Bloom 30ml" class="hero-bottle-img">
-              <span class="hero-bottle-badge">Bloom &bull; 30ml</span>
-            </div>
-          </div>
-        </div>
+        <a href="/checkout.html?buyNow=delice-bloom" class="hero-banner-link" aria-label="Shop DÉLICE Bloom • ৳799">
+          <img src="/assets/images/hero-slide-1.svg" alt="DÉLICE Bloom — Make It Yours • 30ml Eau De Parfum • ৳799" class="hero-banner-img">
+        </a>
       </div>
 
       <!-- Slide 2: Momentum / Signature Profiles -->
       <div class="hero-slide" data-slide="1">
-        <div class="hero-slide-backdrop hero-bg-2"></div>
-        <div class="container hero-slide-container">
-          <div class="hero-slide-content">
-            <span class="hero-badge-pill">Crisp &bull; Sophisticated &bull; Magnetic</span>
-            <h1 class="hero-title">A Fragrance for <span class="hero-highlight">Every Side of You.</span></h1>
-            <p class="hero-subtitle">From university lectures and outdoor active days to intimate evenings and formal gatherings—explore fragrances attuned to your rhythm.</p>
-            <div class="hero-price-row">
-              <span class="hero-offer-price">৳799</span>
-              <span class="hero-orig-price">৳850</span>
-              <span class="hero-savings-chip">Save ৳51 &bull; Limited Edition</span>
-            </div>
-            <div class="hero-actions clean-actions">
-              <a href="/checkout.html?buyNow=delice-momentum" class="btn btn-hero-buy">Buy Now &bull; ৳799</a>
-              <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-momentum')">Add to Cart</button>
-              <a href="#collection" class="btn btn-hero-explore">Explore Scents</a>
-            </div>
-          </div>
-          <div class="hero-slide-visual">
-            <div class="hero-bottle-wrap">
-              <img src="/assets/images/momentum.svg" alt="DÉLICE Momentum 30ml" class="hero-bottle-img">
-              <span class="hero-bottle-badge">Momentum &bull; 30ml</span>
-            </div>
-          </div>
-        </div>
+        <a href="#collection" class="hero-banner-link" aria-label="Explore The DÉLICE Collection">
+          <img src="/assets/images/hero-slide-2.svg" alt="DÉLICE Fragrances — A Fragrance for Every Side of You" class="hero-banner-img">
+        </a>
       </div>
 
       <!-- Slide 3: Enigma / Special Opening Offer -->
       <div class="hero-slide" data-slide="2">
-        <div class="hero-slide-backdrop hero-bg-3"></div>
-        <div class="container hero-slide-container">
-          <div class="hero-slide-content">
-            <span class="hero-badge-pill">Dark &bull; Woody &bull; Mysterious</span>
-            <h1 class="hero-title">Your Mood. <span class="hero-highlight">Your Moments.</span></h1>
-            <p class="hero-subtitle">Enjoy our introductory opening offer: ৳799 across all 30ml editions. Pure, dependable fragrance with considered packaging and fast nationwide delivery.</p>
-            <div class="hero-price-row">
-              <span class="hero-offer-price">৳799</span>
-              <span class="hero-orig-price">৳850</span>
-              <span class="hero-savings-chip">Save ৳51 &bull; Introductory Price</span>
-            </div>
-            <div class="hero-actions clean-actions">
-              <a href="/checkout.html?buyNow=delice-enigma" class="btn btn-hero-buy">Buy Now &bull; ৳799</a>
-              <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-enigma')">Add to Cart</button>
-              <a href="#collection" class="btn btn-hero-explore">Explore Scents</a>
-            </div>
-          </div>
-          <div class="hero-slide-visual">
-            <div class="hero-bottle-wrap">
-              <img src="/assets/images/enigma.svg" alt="DÉLICE Enigma 30ml" class="hero-bottle-img">
-              <span class="hero-bottle-badge">Enigma &bull; 30ml</span>
-            </div>
-          </div>
-        </div>
+        <a href="/checkout.html?buyNow=delice-enigma" class="hero-banner-link" aria-label="Shop DÉLICE Enigma • ৳799">
+          <img src="/assets/images/hero-slide-3.svg" alt="DÉLICE Enigma — Your Mood, Your Moments • ৳799" class="hero-banner-img">
+        </a>
       </div>
 
       <!-- Slideshow Navigation Controls -->
@@ -205,9 +142,9 @@
     <section class="section" id="collection">
       <div class="container">
         <div class="section-header">
-          <span class="tagline-sub">THE SIGNATURE TRIO</span>
+          <span class="tagline-sub">30ML EAU DE PARFUM &bull; ৳799 LAUNCH PRICE</span>
           <h2>The DÉLICE Collection</h2>
-          <p>Created with attention to detail, balanced formulation, and honest scent representation. Every bottle is an invitation to express your own personality.</p>
+          <p>Authentic, high-concentration luxury fragrances crafted for Bangladesh.</p>
         </div>
 
         <div class="product-grid" id="productGrid">
@@ -579,7 +516,7 @@
   </nav>
 
   <!-- Scripts -->
-  <script src="/js/cart.js?v=5.2.0"></script>
-  <script src="/js/app.js?v=5.2.0"></script>
+  <script src="/js/cart.js?v=5.3.0"></script>
+  <script src="/js/app.js?v=5.3.0"></script>
 </body>
 </html>

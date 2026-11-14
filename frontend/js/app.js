@@ -248,51 +248,14 @@ async function loadHeroSlides() {
   sliderContainer.innerHTML = `
     ${slidesData.map((s, idx) => {
       const targetProdId = s.productId || 'delice-bloom';
-      const offerPrice = s.offerPrice || 799;
-      const originalPrice = s.originalPrice || 850;
-      const savings = originalPrice - offerPrice;
-      const highlight = s.titleHighlight ? `<span class="hero-highlight">${s.titleHighlight}</span>` : '';
-      let bottleImg = '/assets/images/bloom.svg';
-      if (s.image && s.image.includes('.svg') && !s.image.includes('hero-slide')) {
-        bottleImg = s.image;
-      } else if (targetProdId === 'delice-momentum') {
-        bottleImg = '/assets/images/momentum.svg';
-      } else if (targetProdId === 'delice-enigma') {
-        bottleImg = '/assets/images/enigma.svg';
-      }
+      const bannerImg = s.image || `/assets/images/hero-slide-${(idx % 3) + 1}.svg`;
+      const linkUrl = targetProdId ? `/checkout.html?buyNow=${targetProdId}` : '#collection';
 
       return `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}" data-slide="${idx}">
-          <div class="hero-slide-backdrop hero-bg-${(idx % 3) + 1}"></div>
-          <div class="container hero-slide-container">
-            <div class="hero-slide-content">
-              <span class="hero-badge-pill">${s.badge || 'Authentic Eau De Parfum • 30ml'}</span>
-              <h1 class="hero-title">${s.title || 'Make It'} ${highlight}</h1>
-              <p class="hero-subtitle">${s.subtitle || 'Romantic in feeling. Bold in self-expression. Alive with youthful energy.'}</p>
-              <div class="hero-price-row">
-                <span class="hero-offer-price">৳${offerPrice}</span>
-                <span class="hero-orig-price">৳${originalPrice}</span>
-                ${savings > 0 ? `<span class="hero-savings-chip">Save ৳${savings} &bull; Special Launch Price</span>` : ''}
-              </div>
-              <div class="hero-actions clean-actions">
-                <a href="/checkout.html?buyNow=${targetProdId}" class="btn btn-hero-buy">
-                  Buy Now &bull; ৳${offerPrice}
-                </a>
-                <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('${targetProdId}')">
-                  Add to Cart
-                </button>
-                <a href="#collection" class="btn btn-hero-explore">
-                  Explore Scents
-                </a>
-              </div>
-            </div>
-            <div class="hero-slide-visual">
-              <div class="hero-bottle-wrap">
-                <img src="${bottleImg}" alt="${s.title || 'DÉLICE Fragrance'}" class="hero-bottle-img">
-                <span class="hero-bottle-badge">${s.badge ? s.badge.split('•')[0].trim() : '30ml Edition'}</span>
-              </div>
-            </div>
-          </div>
+          <a href="${linkUrl}" class="hero-banner-link" aria-label="${s.title || 'DÉLICE Fragrance'}">
+            <img src="${bannerImg}" alt="${s.title || 'DÉLICE Fragrance'} • ৳${s.offerPrice || 799}" class="hero-banner-img">
+          </a>
         </div>
       `;
     }).join('')}

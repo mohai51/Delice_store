@@ -469,17 +469,18 @@ body, p, li, span, input, select, textarea, label {
 }
 
 /* ==========================================================================
-   HERO SLIDESHOW SECTION (100% Responsive Luxury Editorial Architecture)
+   HERO SLIDESHOW SECTION (100% Full-View Visual Banners)
    ========================================================================== */
 .hero-slider-container,
 .hero-slider-section {
   position: relative;
   width: 100%;
-  min-height: 560px;
+  max-width: 1400px;
+  margin: 0 auto;
+  aspect-ratio: 16 / 9;
+  max-height: 580px;
   background-color: #181619;
   overflow: hidden;
-  display: flex;
-  align-items: center;
 }
 
 .hero-slide {
@@ -490,16 +491,28 @@ body, p, li, span, input, select, textarea, label {
   height: 100%;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.7s ease, visibility 0.7s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+  z-index: 1;
 }
 
 .hero-slide.active {
   opacity: 1;
   visibility: visible;
   z-index: 2;
+}
+
+.hero-banner-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+.hero-banner-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .hero-slide-backdrop {
@@ -2413,161 +2426,137 @@ body, p, li, span, input, select, textarea, label {
     line-height: 1.5;
   }
 
-  /* 4. HERO SLIDER ON MOBILE (Zero Cropping, Clean Vertical Flow) */
+  /* 4. HERO BANNER SLIDER ON MOBILE (16:9 Full View - Zero Cropping, Zero Space Waste) */
   .hero-slider-container,
   .hero-slider-section {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 240px;
     min-height: auto;
-    padding: 1.25rem 0 3.25rem;
-    align-items: stretch;
+    padding: 0;
+    margin: 0 auto;
+    overflow: hidden;
+    background: #181619;
   }
   .hero-slide {
-    position: relative;
-    opacity: 1;
-    visibility: visible;
-    display: none;
-    height: auto;
-    min-height: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
   }
   .hero-slide.active {
-    display: flex;
+    display: block;
+    opacity: 1;
+    visibility: visible;
   }
-  .hero-slide-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 1.25rem 1rem 2.25rem;
-    gap: 0.85rem;
-  }
-  .hero-slide-content {
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .hero-slide-visual {
-    order: -1;
-    max-height: 180px;
-    margin-bottom: 0.35rem;
-  }
-  .hero-bottle-img {
-    max-height: 155px;
-    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
-  }
-  .hero-bottle-badge {
-    margin-top: 0.45rem;
-    font-size: 0.68rem;
-    padding: 0.15rem 0.6rem;
-  }
-  .hero-badge-pill {
-    font-size: 0.68rem;
-    padding: 0.22rem 0.65rem;
-    margin-bottom: 0.45rem;
-  }
-  .hero-title {
-    font-size: 1.85rem;
-    line-height: 1.2;
-    margin-bottom: 0.45rem;
-  }
-  .hero-subtitle {
-    font-size: 0.85rem;
-    line-height: 1.45;
-    margin-bottom: 0.65rem;
-    max-width: 95%;
-  }
-  .hero-price-row {
-    justify-content: center;
-    gap: 0.6rem;
-    margin-bottom: 0.85rem;
-  }
-  .hero-offer-price {
-    font-size: 1.4rem;
-  }
-  .hero-orig-price {
-    font-size: 0.95rem;
-  }
-  .hero-savings-chip {
-    font-size: 0.68rem;
-    padding: 0.1rem 0.45rem;
-  }
-  .hero-actions.clean-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.45rem;
+  .hero-banner-link {
+    display: block;
     width: 100%;
-    max-width: 340px;
-    margin: 0 auto;
+    height: 100%;
+    cursor: pointer;
   }
-  .btn-hero-buy, .btn-hero-bag {
-    padding: 0.7rem 0.35rem;
-    font-size: 0.75rem;
-    min-height: 44px;
+  .hero-banner-img {
     width: 100%;
-    box-sizing: border-box;
-  }
-  .btn-hero-explore {
-    grid-column: 1 / -1;
-    padding: 0.6rem 0.5rem;
-    font-size: 0.74rem;
-    min-height: 40px;
-    width: 100%;
-    box-sizing: border-box;
+    height: 100%;
+    display: block;
+    object-fit: cover;
   }
   .slider-control-btn {
     display: none;
   }
   .slider-dots {
-    bottom: 0.85rem;
-    gap: 0.4rem;
+    bottom: 0.35rem;
+    gap: 0.35rem;
   }
   .slider-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   .slider-dot.active {
-    width: 22px;
+    width: 18px;
   }
 
-  /* 4b. TRUST STRIP ON MOBILE */
+  /* 4b. COMPACT TRUST STRIP ON MOBILE (Saves Space, Puts Products First) */
   .trust-strip {
-    padding: 1rem 0;
+    padding: 0.45rem 0;
+    background: #FAF6F0;
+    border-bottom: 1px solid #EBE3D5;
   }
   .trust-grid {
+    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem 0.5rem;
+    gap: 0.25rem 0.5rem;
   }
   .trust-item {
-    font-size: 0.74rem;
-    flex-direction: column;
-    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
     gap: 0.35rem;
-    line-height: 1.3;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #4A102A;
+    line-height: 1.25;
+    padding: 0.15rem 0;
+    text-align: left;
   }
   .trust-item svg {
-    width: 20px;
-    height: 20px;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #C5A46D;
   }
 
-  /* 5. SHOP PRODUCT GRID ON MOBILE */
+  /* 5. SHOP PRODUCT GRID ON MOBILE (Instant Product Reach) */
+  #collection.section {
+    padding: 1rem 0 1.5rem 0;
+  }
+  #collection .section-header {
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+  #collection .section-header .tagline-sub {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.2rem;
+    display: block;
+  }
+  #collection .section-header h2 {
+    font-size: 1.35rem;
+    line-height: 1.25;
+    margin-bottom: 0.25rem;
+  }
+  #collection .section-header p {
+    font-size: 0.78rem;
+    color: #87828A;
+    margin: 0;
+    line-height: 1.4;
+  }
   .product-grid {
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: 1rem;
     max-width: 400px;
     margin: 0 auto;
   }
   .product-card {
-    border-radius: 14px;
+    border-radius: 12px;
     box-shadow: 0 4px 14px rgba(24, 22, 25, 0.05);
   }
   .product-media {
-    height: 250px;
-    max-height: 250px;
-    margin: 0.5rem 0.5rem 0;
-    border-radius: 12px;
-    padding: 0.75rem 0.5rem 2.2rem;
+    height: 220px;
+    max-height: 220px;
+    margin: 0.4rem 0.4rem 0;
+    border-radius: 10px;
+    padding: 0.6rem 0.4rem 2rem;
   }
   .product-media img {
-    max-height: 185px;
+    max-height: 165px;
   }
   .prod-slider-arrow {
     width: 36px;
@@ -2978,24 +2967,18 @@ body, p, li, span, input, select, textarea, label {
 @media (max-width: 480px) {
   .hero-slider-container,
   .hero-slider-section {
-    min-height: auto;
-    height: auto;
-  }
-  .hero-title {
-    font-size: 1.6rem;
-  }
-  .hero-actions.clean-actions {
-    max-width: 310px;
+    aspect-ratio: 16 / 9;
+    max-height: 220px;
   }
   .product-grid {
     max-width: 100%;
   }
   .product-media {
-    height: 235px;
-    max-height: 235px;
+    height: 210px;
+    max-height: 210px;
   }
   .product-media img {
-    max-height: 175px;
+    max-height: 155px;
   }
   .product-body {
     padding: 0.75rem 0.85rem 0.95rem;
