@@ -129,28 +129,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   const activeHubBanner = document.getElementById('campusHubActiveBanner');
   const selectedHubDisplay = document.getElementById('selectedHubDisplay');
   const btnRemoveHub = document.getElementById('btnRemoveHub');
+  const hiddenHubInput = document.getElementById('selectedCampusHubInput');
+
+  // Check if browser restored a value in hidden input
+  if (hiddenHubInput && hiddenHubInput.value) {
+    selectCampusHub(hiddenHubInput.value.trim().toUpperCase());
+  }
 
   hubButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const hub = btn.dataset.hub;
-      if (selectedCampusHub === hub) {
-        deselectCampusHub();
-      } else {
-        selectCampusHub(hub);
-      }
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const hub = (btn.getAttribute('data-hub') || btn.dataset.hub || '').trim().toUpperCase();
+      if (!hub) return;
+      selectCampusHub(hub);
     });
   });
 
   if (btnRemoveHub) {
-    btnRemoveHub.addEventListener('click', () => {
+    btnRemoveHub.addEventListener('click', (e) => {
+      e.preventDefault();
       deselectCampusHub();
     });
   }
 
   function selectCampusHub(hubCode) {
     selectedCampusHub = hubCode;
+    const inputEl = document.getElementById('selectedCampusHubInput');
+    if (inputEl) inputEl.value = hubCode;
+
     hubButtons.forEach(b => {
-      b.classList.toggle('active', b.dataset.hub === hubCode);
+      const bHub = (b.getAttribute('data-hub') || b.dataset.hub || '').trim().toUpperCase();
+      b.classList.toggle('active', bHub === hubCode);
     });
     if (activeHubBanner) activeHubBanner.style.display = 'flex';
     if (selectedHubDisplay) selectedHubDisplay.textContent = hubCode;
@@ -159,6 +168,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function deselectCampusHub() {
     selectedCampusHub = null;
+    const inputEl = document.getElementById('selectedCampusHubInput');
+    if (inputEl) inputEl.value = '';
+
     hubButtons.forEach(b => b.classList.remove('active'));
     if (activeHubBanner) activeHubBanner.style.display = 'none';
     renderOrderSummary();
@@ -394,14 +406,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const isFreeHubCOD = (Boolean(selectedCampusHub) && selectedPaymentMethod === 'cod_advance');
+      const domHub = (document.getElementById('selectedCampusHubInput')?.value || '').trim().toUpperCase();
+      const activeCampusHub = domHub || (selectedCampusHub ? selectedCampusHub.trim().toUpperCase() : '');
+      const isFreeHubCOD = (Boolean(activeCampusHub) && selectedPaymentMethod === 'cod_advance');
 
       let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '') : '';
       let trxIdClean = transactionId ? transactionId.toUpperCase().trim() : '';
 
       if (isFreeHubCOD) {
         if (!cleanedSender) cleanedSender = cleanedPhone;
-        if (!trxIdClean) trxIdClean = `HUB-COD-${Date.now().toString().slice(-6)}`;
+        if (!trxIdClean) trxIdClean = `CAMPUS-COD-${Date.now().toString().slice(-6)}`;
       } else {
         if (!bdPhoneRegex.test(cleanedSender)) {
           alert('Please enter the 11-digit sender mobile number.');
@@ -435,8 +449,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             address,
             orderNotes: ''
           },
-          deliveryArea: selectedCampusHub ? 'campusHub' : selectedDeliveryArea,
-          deliveryHub: selectedCampusHub || '',
+          deliveryArea: activeCampusHub ? 'campusHub' : selectedDeliveryArea,
+          deliveryHub: activeCampusHub || '',
           items: checkoutItems.map(item => ({
             id: item.id,
             name: item.name,

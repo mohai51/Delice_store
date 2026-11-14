@@ -41,13 +41,28 @@ exports.createOrder = async (req, res, next) => {
 
     // 2. Validate Payment Details & Campus Delivery Hub
     const VALID_CAMPUS_HUBS = ['UIU', 'NSU', 'IUB', 'AIUB', 'BRACU', 'EWU'];
-    const chosenHub = (deliveryHub && typeof deliveryHub === 'string') ? deliveryHub.trim().toUpperCase() : '';
-    const isCampusHub = VALID_CAMPUS_HUBS.includes(chosenHub);
+    let chosenHub = (deliveryHub && typeof deliveryHub === 'string') ? deliveryHub.trim().toUpperCase() : '';
+
+    const isExplicitCampusArea = (deliveryArea === 'campusHub');
+    const isHubTrx = Boolean(transactionId && (transactionId.toUpperCase().startsWith('HUB-COD-') || transactionId.toUpperCase().startsWith('CAMPUS-COD-')));
+    const isHandCashProvider = (paymentProvider === 'hand_cash');
+
+    // Auto-detect hub if client omitted deliveryHub field but indicated campus delivery
+    if (!chosenHub && (isExplicitCampusArea || isHubTrx || isHandCashProvider)) {
+      const combinedText = `${customer.address || ''} ${customer.district || ''} ${customer.orderNotes || ''}`.toUpperCase();
+      const matched = VALID_CAMPUS_HUBS.find(h => combinedText.includes(h));
+      chosenHub = matched || 'UIU';
+    }
+
+    const isCampusHub = Boolean(chosenHub && VALID_CAMPUS_HUBS.includes(chosenHub)) || isExplicitCampusArea || isHubTrx || isHandCashProvider;
+    if (isCampusHub && !chosenHub) {
+      chosenHub = 'UIU';
+    }
 
     const validMethods = ['full_online', 'cod_advance'];
     const pMethod = validMethods.includes(paymentMethod) ? paymentMethod : 'full_online';
-    const isFreeCampusCOD = (isCampusHub && pMethod === 'cod_advance');
-    const pProvider = (paymentProvider === 'nagad') ? 'nagad' : (paymentProvider === 'hand_cash' || isFreeCampusCOD ? 'hand_cash' : 'bkash');
+    const isFreeCampusCOD = (isCampusHub && (pMethod === 'cod_advance' || isHandCashProvider || isHubTrx));
+    const pProvider = isFreeCampusCOD ? 'hand_cash' : ((paymentProvider === 'nagad') ? 'nagad' : (paymentProvider === 'hand_cash' ? 'hand_cash' : 'bkash'));
 
     let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
     let trxId = transactionId ? transactionId.trim().toUpperCase() : '';
@@ -55,7 +70,7 @@ exports.createOrder = async (req, res, next) => {
     // If campus hub + cash on delivery, advance is ৳0 so payment inputs are optional
     if (isFreeCampusCOD) {
       if (!cleanedSender) cleanedSender = cleanedPhone;
-      if (!trxId) trxId = `HUB-COD-${Date.now().toString().slice(-6)}`;
+      if (!trxId) trxId = `CAMPUS-COD-${Date.now().toString().slice(-6)}`;
     } else {
       if (!cleanedSender || !/^01[3-9]\d{8}$/.test(cleanedSender)) {
         return res.status(400).json({

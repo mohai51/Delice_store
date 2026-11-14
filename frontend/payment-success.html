@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=6.6.0">
+  <link rel="stylesheet" href="/css/style.css?v=6.7.0">
 </head>
 <body>
 
@@ -93,21 +93,43 @@
       }
 
       function renderConfirmedOrder(order) {
-        const isCampusHub = Boolean(order.deliveryHub);
-        const isCOD = order.paymentMethod === 'cod_advance';
-        const provLower = (order.paymentProvider || 'bkash').toLowerCase();
-        const advancePaid = Number(order.advancePaid !== undefined ? order.advancePaid : (order.totalPaid || 0));
-        const cashDue = isCOD ? Number(order.cashDueOnDelivery || order.productSubtotal || 0) : 0;
-        const isHandCash = provLower === 'hand_cash' || (isCampusHub && isCOD && advancePaid === 0);
+        const VALID_CAMPUS_HUBS = ['UIU', 'NSU', 'IUB', 'AIUB', 'BRACU', 'EWU'];
+        const rawHub = (order.deliveryHub && typeof order.deliveryHub === 'string') ? order.deliveryHub.trim().toUpperCase() : '';
+        const isHubTrx = Boolean(order.transactionId && (order.transactionId.toUpperCase().startsWith('HUB-COD-') || order.transactionId.toUpperCase().startsWith('CAMPUS-COD-')));
+        const isCampusArea = (order.deliveryArea === 'campusHub');
+        const isHandCashProv = ((order.paymentProvider || '').toLowerCase() === 'hand_cash');
 
-        // Dynamic Subtitle message matching exact order mode
+        const isCampusHub = Boolean(rawHub && VALID_CAMPUS_HUBS.includes(rawHub)) || isCampusArea || isHubTrx || isHandCashProv;
+        let campusName = rawHub;
+        if (!campusName && isCampusHub) {
+          const combined = `${order.customer?.address || ''} ${order.customer?.district || ''} ${order.customer?.orderNotes || ''}`.toUpperCase();
+          const matched = VALID_CAMPUS_HUBS.find(h => combined.includes(h));
+          campusName = matched || 'UIU';
+        }
+
+        const isCOD = order.paymentMethod === 'cod_advance';
+        const isOnline = order.paymentMethod === 'full_online';
+        // For campus hub COD, it is strictly hand cash (no advance, no online trx)
+        const isHandCash = isCampusHub && (isCOD || isHandCashProv || isHubTrx);
+
+        const subtotal = Number(order.productSubtotal) || 799;
+        const deliveryFee = isCampusHub ? 0 : Number(order.deliveryCharge !== undefined ? order.deliveryCharge : (order.deliveryArea === 'insideDhaka' ? 60 : 120));
+        const totalValue = isCampusHub ? subtotal : (Number(order.totalPayable) || (subtotal + deliveryFee));
+
+        const advancePaid = isHandCash ? 0 : (isOnline ? totalValue : deliveryFee);
+        const cashDue = isOnline ? 0 : subtotal;
+
+        const provRaw = (order.paymentProvider || 'bkash').toLowerCase();
+        const provDisplay = provRaw === 'nagad' ? 'Nagad' : 'bKash';
+
+        // 1. Dynamic Subtitle message matching exact order mode
         if (subMessageEl) {
           if (isHandCash) {
-            subMessageEl.innerHTML = `Your order for campus delivery has been confirmed. Please pay <strong>৳${cashDue}</strong> in cash hand-to-hand upon parcel collection at <strong>${order.deliveryHub}</strong> campus.`;
+            subMessageEl.innerHTML = `Your order for <strong>${campusName} Campus Delivery</strong> is confirmed! Please pay <strong>৳${cashDue}</strong> in cash hand-to-hand upon parcel collection at <strong>${campusName}</strong> campus.`;
           } else if (isCOD) {
-            subMessageEl.innerHTML = `Your order and advance delivery fee have been received. Please keep <strong>৳${cashDue}</strong> cash ready for the courier rider upon delivery.`;
+            subMessageEl.innerHTML = `Your order and advance delivery fee (৳${advancePaid}) have been received. Please keep <strong>৳${cashDue}</strong> cash ready for the courier rider upon delivery.`;
           } else {
-            subMessageEl.innerHTML = `Your order and 100% online payment reference have been received. We are preparing your DÉLICE fragrance with considered care.`;
+            subMessageEl.innerHTML = `Your order and 100% online payment (৳${advancePaid}) have been received. We are preparing your DÉLICE fragrance with considered care.`;
           }
         }
 
@@ -159,7 +181,11 @@
               ${isCampusHub ? `
                 <div class="confirm-row">
                   <span>Campus Delivery Hub:</span>
-                  <span class="hub-pill-highlight">🏫 ${order.deliveryHub} Campus • Free Delivery ৳0</span>
+                  <span class="hub-pill-highlight">🏫 ${campusName} Campus • Free Delivery ৳0</span>
+                </div>
+                <div class="confirm-row">
+                  <span>Delivery Method:</span>
+                  <strong>${isHandCash ? 'Hand-to-Hand Campus Handover' : 'Campus Hub Pickup'}</strong>
                 </div>
               ` : `
                 <div class="confirm-row">
@@ -211,7 +237,7 @@
               </div>
               <div class="confirm-row">
                 <span>Product Subtotal:</span>
-                <span>৳${order.productSubtotal || 0}</span>
+                <span>৳${subtotal}</span>
               </div>
               ${totalSavings > 0 ? `
                 <div class="confirm-row savings-highlight-row">
@@ -221,11 +247,11 @@
               ` : ''}
               <div class="confirm-row">
                 <span>Delivery Charge:</span>
-                <span>${isCampusHub ? '<strong style="color:#15803D;">৳0 (FREE Delivery)</strong>' : `৳${order.deliveryCharge || 0}`}</span>
+                <span>${isCampusHub ? '<strong style="color:#15803D;">৳0 (FREE Delivery)</strong>' : `৳${deliveryFee}`}</span>
               </div>
               <div class="confirm-row confirm-total-row">
                 <span>Total Order Value:</span>
-                <strong>৳${order.totalPayable}</strong>
+                <strong>৳${totalValue}</strong>
               </div>
             </div>
 
@@ -237,14 +263,14 @@
               </div>
 
               ${isHandCash ? `
-                <!-- Campus Hand-to-Hand Cash -->
+                <!-- Campus Hub Hand-to-Hand Cash (NO TrxID, NO bKash, ৳0 Advance) -->
                 <div class="hand-cash-box">
                   <div class="hand-cash-badge">
-                    <span>🤝 Campus Hand-to-Hand Cash</span>
-                    <span class="zero-advance-pill">৳0 Advance</span>
+                    <span>🤝 Campus Hand-to-Hand Delivery</span>
+                    <span class="zero-advance-pill">৳0 Advance Required</span>
                   </div>
                   <p class="hand-cash-desc">
-                    No advance payment was required. Please pay <strong>৳${cashDue}</strong> in cash directly upon parcel collection at <strong>${order.deliveryHub}</strong> campus.
+                    No online payment or advance fee needed! Please pay <strong>৳${cashDue}</strong> in cash directly upon parcel collection at <strong>${campusName}</strong> campus.
                   </p>
                 </div>
                 <div class="confirm-row">
@@ -252,22 +278,26 @@
                   <strong>Cash on Delivery (Campus Handover)</strong>
                 </div>
                 <div class="confirm-row">
+                  <span>Payment Mode:</span>
+                  <span style="font-weight:700; color:#065F46;">🤝 Hand Cash at ${campusName} Campus</span>
+                </div>
+                <div class="confirm-row">
                   <span>Advance Paid Now:</span>
                   <strong style="color:#15803D;">৳0</strong>
                 </div>
                 <div class="confirm-row due-row">
                   <span style="font-weight:700; color:#991B1B;">Cash to Pay at Campus:</span>
-                  <strong style="color:#B91C1C; font-size:1.05rem;">৳${cashDue}</strong>
+                  <strong style="color:#B91C1C; font-size:1.08rem;">৳${cashDue}</strong>
                 </div>
               ` : isCOD ? `
-                <!-- Regular Home Delivery COD -->
+                <!-- Regular Home Delivery COD (With actual Advance Fee & actual TrxID) -->
                 <div class="confirm-row">
                   <span>Payment Method:</span>
                   <strong>Cash on Delivery (Advance Fee Paid)</strong>
                 </div>
                 <div class="confirm-row">
                   <span>Payment Provider:</span>
-                  <span style="font-weight:700; color:#4A102A; text-transform:uppercase;">${order.paymentProvider || 'bKash'} Send Money</span>
+                  <span style="font-weight:700; color:#4A102A; text-transform:uppercase;">${provDisplay} Send Money</span>
                 </div>
                 <div class="confirm-row">
                   <span>Sender Mobile Number:</span>
@@ -283,17 +313,17 @@
                 </div>
                 <div class="confirm-row due-row">
                   <span style="font-weight:700; color:#991B1B;">Cash Due to Courier Rider:</span>
-                  <strong style="color:#B91C1C; font-size:1.05rem;">৳${cashDue}</strong>
+                  <strong style="color:#B91C1C; font-size:1.08rem;">৳${cashDue}</strong>
                 </div>
               ` : `
-                <!-- 100% Online Payment -->
+                <!-- 100% Online Payment (With actual TrxID & ৳0 Due) -->
                 <div class="confirm-row">
                   <span>Payment Method:</span>
-                  <strong>100% Online Payment</strong>
+                  <strong>100% Online Payment ${isCampusHub ? `(Campus Hub Delivery)` : ''}</strong>
                 </div>
                 <div class="confirm-row">
                   <span>Payment Provider:</span>
-                  <span style="font-weight:700; color:#4A102A; text-transform:uppercase;">${order.paymentProvider || 'bKash'} Send Money</span>
+                  <span style="font-weight:700; color:#4A102A; text-transform:uppercase;">${provDisplay} Send Money</span>
                 </div>
                 <div class="confirm-row">
                   <span>Sender Mobile Number:</span>
@@ -305,7 +335,7 @@
                 </div>
                 <div class="confirm-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
                   <span>Total Paid Online:</span>
-                  <strong style="color:#15803D; font-size:1.05rem;">৳${order.totalPayable}</strong>
+                  <strong style="color:#15803D; font-size:1.08rem;">৳${advancePaid}</strong>
                 </div>
                 <div class="confirm-row">
                   <span>Cash Due on Delivery:</span>
@@ -314,6 +344,8 @@
               `}
             </div>
           </div>
+        `;
+      }
         `;
       }
 

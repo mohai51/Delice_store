@@ -2825,6 +2825,10 @@ body, p, li, span, input, select, textarea, label {
   font-family: var(--font-body);
 }
 
+.campus-hub-btn * {
+  pointer-events: none;
+}
+
 .campus-hub-btn:hover {
   border-color: #C5A46D;
   background: #FFFDF8;

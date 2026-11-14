@@ -421,6 +421,7 @@ window.copyCourierDispatchDetails = function(orderId, btn) {
   const order = currentOrders.find(o => o._id === orderId);
   if (!order) return;
   const isCOD = order.paymentMethod === 'cod_advance';
+  const isHandCash = ((order.paymentProvider || '').toLowerCase() === 'hand_cash') || (Boolean(order.deliveryHub) && isCOD) || (order.transactionId && (order.transactionId.startsWith('HUB-COD-') || order.transactionId.startsWith('CAMPUS-COD-')));
   const cashDue = isCOD ? (order.cashDueOnDelivery || order.productSubtotal || 0) : 0;
   const itemsText = (order.items || []).map(i => `${i.productName} (${i.volume || '30ml'} x${i.quantity})`).join(', ');
 
@@ -430,11 +431,11 @@ Phone: ${order.customer.phone}
 District: ${order.customer.district}
 Delivery Address: ${order.customer.address}
 Products: ${itemsText}
-Cash to Collect (COD): ৳${cashDue}
+Cash to Collect: ৳${cashDue}
 Delivery Zone: ${order.deliveryHub ? `Campus Hub: ${order.deliveryHub} (FREE Delivery ৳0)` : (order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka (৳60)' : 'Outside Dhaka (৳120)')}
 Payment Status: ${(order.paymentStatus || 'AWAITING_VERIFICATION').toUpperCase()}
-Payment Method: ${isCOD ? 'Cash on Delivery (Advance Fee Paid)' : '100% Online Payment'}
-Provider / TrxID: ${(order.paymentProvider || 'bkash').toUpperCase()} - ${order.transactionId}`;
+Payment Method: ${isHandCash ? `Campus Hand-to-Hand Delivery (${order.deliveryHub || 'Campus Hub'})` : (isCOD ? 'Cash on Delivery (Advance Fee Paid)' : '100% Online Payment')}
+Provider / Payment Mode: ${isHandCash ? `Hand Cash at ${order.deliveryHub || 'Campus'} (No advance fee)` : `${(order.paymentProvider || 'bkash').toUpperCase()} - ${order.transactionId}`}`;
 
   window.copyAdminText(text, btn);
 };
@@ -454,7 +455,7 @@ function viewOrderModal(orderId) {
   const provLower = (order.paymentProvider || 'bkash').toLowerCase();
   const advancePaid = order.advancePaid !== undefined ? order.advancePaid : (order.totalPaid || 0);
   const cashDue = isCOD ? (order.cashDueOnDelivery || order.productSubtotal || 0) : 0;
-  const isHandCash = provLower === 'hand_cash' || (Boolean(order.deliveryHub) && isCOD && advancePaid === 0);
+  const isHandCash = provLower === 'hand_cash' || (Boolean(order.deliveryHub) && isCOD && advancePaid === 0) || (order.transactionId && (order.transactionId.startsWith('HUB-COD-') || order.transactionId.startsWith('CAMPUS-COD-')));
   const bottles = (order.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
   const totalSavings = (order.items || []).reduce((sum, item) => {
     const diff = (item.originalPrice && item.originalPrice > item.price) ? (item.originalPrice - item.price) : 51;
@@ -536,8 +537,11 @@ function viewOrderModal(orderId) {
         <div class="box-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
           <span>Transaction ID (TrxID):</span>
           <div>
-            <code class="trxid-large">${order.transactionId}</code>
-            <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.transactionId}', this)">Copy</button>
+            ${isHandCash 
+              ? `<span style="font-size:0.85rem; color:#059669; font-weight:700;">Hand-to-Hand Delivery (No online TrxID)</span>`
+              : `<code class="trxid-large">${order.transactionId}</code>
+                 <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.transactionId}', this)">Copy</button>`
+            }
           </div>
         </div>
       </div>
