@@ -303,31 +303,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     const trxInput = document.getElementById('transactionId');
     const labelSender = document.getElementById('labelSenderNumber');
     const labelTrx = document.getElementById('labelTransactionId');
+    const sendMoneySection = document.getElementById('sendMoneyDetailsSection');
+    const campusCodHandoverBox = document.getElementById('campusCodHandoverBox');
+    const campusCodCashDue = document.getElementById('campusCodCashDue');
+    const campusCodHubName = document.getElementById('campusCodHubName');
 
-    if (selectedPaymentMethod === 'full_online') {
-      if (bannerLabel) bannerLabel.textContent = isFreeHub ? 'Payable Now (100% Online • Free Hub):' : 'Payable Now (100% Online):';
-      if (bannerValue) bannerValue.textContent = `৳${total}`;
-      if (codNoticeLine) codNoticeLine.style.display = 'none';
-      if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${total} Online</span>`;
+    const isFreeHubCOD = (Boolean(selectedCampusHub) && selectedPaymentMethod === 'cod_advance');
+
+    if (isFreeHubCOD) {
+      // HIDE Send Money Details completely when Campus Hub + Cash on Delivery is active!
+      if (sendMoneySection) sendMoneySection.style.display = 'none';
+      if (campusCodHandoverBox) campusCodHandoverBox.style.display = 'block';
+      if (campusCodCashDue) campusCodCashDue.textContent = subtotal;
+      if (campusCodHubName) campusCodHubName.textContent = selectedCampusHub;
+
+      if (senderInput) senderInput.required = false;
+      if (trxInput) trxInput.required = false;
+
+      if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${subtotal} Hand to Hand at ${selectedCampusHub}</span>`;
+    } else {
+      // SHOW Send Money Details (for Online Payment OR regular Home Delivery with advance fee)
+      if (sendMoneySection) sendMoneySection.style.display = 'block';
+      if (campusCodHandoverBox) campusCodHandoverBox.style.display = 'none';
 
       if (senderInput) senderInput.required = true;
       if (trxInput) trxInput.required = true;
       if (labelSender) labelSender.textContent = 'Sender Number *';
       if (labelTrx) labelTrx.textContent = 'Transaction ID (TrxID) *';
-    } else {
-      // Cash on Delivery
-      if (isFreeHub) {
-        // Free Campus Delivery Hub: Advance delivery fee is 0!
-        if (bannerLabel) bannerLabel.textContent = 'Payable Now (Campus Hub Pickup):';
-        if (bannerValue) bannerValue.textContent = '৳0 (FREE)';
-        if (codNoticeLine) codNoticeLine.style.display = 'flex';
-        if (codCashDueAmount) codCashDueAmount.textContent = `৳${subtotal} (Pay on Campus Handover)`;
-        if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${subtotal} at ${selectedCampusHub}</span>`;
 
-        if (senderInput) senderInput.required = false;
-        if (trxInput) trxInput.required = false;
-        if (labelSender) labelSender.textContent = 'Sender Number (Optional for Free Hub)';
-        if (labelTrx) labelTrx.textContent = 'Transaction ID (Optional for Free Hub)';
+      if (selectedPaymentMethod === 'full_online') {
+        if (bannerLabel) bannerLabel.textContent = isFreeHub ? 'Payable Now (100% Online • Free Hub):' : 'Payable Now (100% Online):';
+        if (bannerValue) bannerValue.textContent = `৳${total}`;
+        if (codNoticeLine) codNoticeLine.style.display = 'none';
+        if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${total} Online</span>`;
       } else {
         // Regular home delivery COD: ৳60 or ৳120 advance fee
         if (bannerLabel) bannerLabel.textContent = 'Payable Now (Advance Delivery):';
@@ -335,11 +343,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (codNoticeLine) codNoticeLine.style.display = 'flex';
         if (codCashDueAmount) codCashDueAmount.textContent = `৳${subtotal}`;
         if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${deliveryFee} Advance</span>`;
-
-        if (senderInput) senderInput.required = true;
-        if (trxInput) trxInput.required = true;
-        if (labelSender) labelSender.textContent = 'Sender Number *';
-        if (labelTrx) labelTrx.textContent = 'Transaction ID (TrxID) *';
       }
     }
   }
@@ -440,7 +443,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             quantity: item.quantity
           })),
           paymentMethod: selectedPaymentMethod,
-          paymentProvider: selectedProvider,
+          paymentProvider: isFreeHubCOD ? 'hand_cash' : selectedProvider,
           senderNumber: cleanedSender,
           transactionId: trxIdClean
         };

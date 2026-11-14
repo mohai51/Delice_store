@@ -46,13 +46,14 @@ exports.createOrder = async (req, res, next) => {
 
     const validMethods = ['full_online', 'cod_advance'];
     const pMethod = validMethods.includes(paymentMethod) ? paymentMethod : 'full_online';
-    const pProvider = (paymentProvider === 'nagad') ? 'nagad' : 'bkash';
+    const isFreeCampusCOD = (isCampusHub && pMethod === 'cod_advance');
+    const pProvider = (paymentProvider === 'nagad') ? 'nagad' : (paymentProvider === 'hand_cash' || isFreeCampusCOD ? 'hand_cash' : 'bkash');
 
     let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
     let trxId = transactionId ? transactionId.trim().toUpperCase() : '';
 
     // If campus hub + cash on delivery, advance is ৳0 so payment inputs are optional
-    if (isCampusHub && pMethod === 'cod_advance') {
+    if (isFreeCampusCOD) {
       if (!cleanedSender) cleanedSender = cleanedPhone;
       if (!trxId) trxId = `HUB-COD-${Date.now().toString().slice(-6)}`;
     } else {
@@ -243,8 +244,8 @@ exports.createOrder = async (req, res, next) => {
       orderStatus: 'processing',
       paymentDetails: {
         bankTranId: trxId,
-        cardType: `${pProvider.toUpperCase()} (${pMethod === 'full_online' ? '100% Online' : 'COD Advance Fee'})`,
-        cardBrand: pProvider.toUpperCase(),
+        cardType: isFreeCampusCOD ? `Campus Hand-to-Hand (${chosenHub})` : `${pProvider.toUpperCase()} (${pMethod === 'full_online' ? '100% Online' : 'COD Advance Fee'})`,
+        cardBrand: isFreeCampusCOD ? 'HAND_CASH' : pProvider.toUpperCase(),
         valId: `TRX-${cleanedSender.slice(-4)}-${trxId.slice(-4)}`,
         validatedAt: new Date()
       },

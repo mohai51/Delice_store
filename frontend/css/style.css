@@ -2895,6 +2895,47 @@ body, p, li, span, input, select, textarea, label {
   background: #DCFCE7;
 }
 
+/* Campus COD Hand-to-Hand Delivery Notice (When Campus Hub + COD active) */
+.campus-cod-handover-box {
+  background: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin: 0.75rem 0 0.85rem;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.08);
+  animation: fadeInDown 0.25s ease;
+}
+
+.campus-cod-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.campus-cod-badge-pill {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #15803D;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.campus-cod-text {
+  font-size: 0.82rem;
+  color: #166534;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.campus-cod-text strong {
+  color: #4A102A;
+  font-weight: 800;
+}
+
 
 /* ==========================================================================
    PRODUCT DETAILS PAGE

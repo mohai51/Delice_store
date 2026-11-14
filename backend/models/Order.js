@@ -97,7 +97,7 @@ const orderSchema = new mongoose.Schema({
   },
   paymentProvider: {
     type: String,
-    enum: ['bkash', 'nagad', 'other'],
+    enum: ['bkash', 'nagad', 'hand_cash', 'other'],
     default: 'bkash'
   },
   senderNumber: {

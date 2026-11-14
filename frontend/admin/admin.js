@@ -251,6 +251,7 @@ async function loadOrders() {
       const cashDue = isCOD ? (o.cashDueOnDelivery || o.productSubtotal || 0) : 0;
       const isPaid = o.paymentStatus === 'paid' || o.orderStatus === 'delivered';
       const bottles = (o.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const isHandCash = provLower === 'hand_cash' || (Boolean(o.deliveryHub) && isCOD && advancePaid === 0);
 
       const crDisplay = isPaid
         ? `<span style="color:#C5A46D; font-weight:700; font-size:0.8rem;">৳${(732.60 * bottles).toFixed(2)} Repaid</span><br><span style="color:#15803D; font-weight:700; font-size:0.75rem;">+৳${(66.40 * bottles).toFixed(2)} Profit</span>`
@@ -293,13 +294,16 @@ async function loadOrders() {
           </td>
           <td>
             <div style="margin-bottom:0.35rem;">
-              <span class="provider-pill ${provLower}">
-                <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
-                ${provider}
-              </span>
+              ${isHandCash
+                ? `<span class="provider-pill" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-weight:700;">🤝 Hand Cash</span>`
+                : `<span class="provider-pill ${provLower}">
+                    <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
+                    ${provider}
+                  </span>`
+              }
             </div>
             <span class="badge-method ${isCOD ? 'cod' : 'online'}">
-              ${isCOD ? 'COD (Adv Fee)' : '100% Online'}
+              ${isHandCash ? 'Campus Hand-to-Hand' : (isCOD ? 'COD (Adv Fee)' : '100% Online')}
             </span>
           </td>
           <td>
@@ -450,6 +454,7 @@ function viewOrderModal(orderId) {
   const provLower = (order.paymentProvider || 'bkash').toLowerCase();
   const advancePaid = order.advancePaid !== undefined ? order.advancePaid : (order.totalPaid || 0);
   const cashDue = isCOD ? (order.cashDueOnDelivery || order.productSubtotal || 0) : 0;
+  const isHandCash = provLower === 'hand_cash' || (Boolean(order.deliveryHub) && isCOD && advancePaid === 0);
   const bottles = (order.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
   const totalSavings = (order.items || []).reduce((sum, item) => {
     const diff = (item.originalPrice && item.originalPrice > item.price) ? (item.originalPrice - item.price) : 51;
@@ -498,24 +503,31 @@ function viewOrderModal(orderId) {
 
       <!-- Card 2: Payment Method & Verification -->
       <div class="order-card-box">
-        <h4 class="box-title">2. Payment Method &amp; Send Money Details</h4>
+        <h4 class="box-title">2. Payment Method &amp; Verification</h4>
         <div class="box-row">
           <span>Payment Choice:</span>
-          <span class="badge-method ${isCOD ? 'cod' : 'online'}">${isCOD ? 'Cash on Delivery (Advance Fee)' : '100% Online Payment'}</span>
-        </div>
-        <div class="box-row">
-          <span>Provider:</span>
-          <span class="provider-pill ${provLower}">
-            <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
-            ${provider} (Send Money)
+          <span class="badge-method ${isCOD ? 'cod' : 'online'}">
+            ${isHandCash ? 'Campus Hand-to-Hand Delivery' : (isCOD ? 'Cash on Delivery (Advance Fee)' : '100% Online Payment')}
           </span>
         </div>
         <div class="box-row">
-          <span>Wallet Sent To:</span>
-          <code style="font-size:0.9rem; font-weight:700; color:#4A102A;">01731101780 (Personal)</code>
+          <span>Provider / Mode:</span>
+          ${isHandCash 
+            ? `<span class="provider-pill" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-weight:700;">🤝 Hand Cash at ${order.deliveryHub || 'Campus'}</span>`
+            : `<span class="provider-pill ${provLower}">
+                 <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
+                 ${provider} (Send Money)
+               </span>`
+          }
         </div>
         <div class="box-row">
-          <span>Customer Sender Mobile:</span>
+          <span>Wallet Sent To:</span>
+          <code style="font-size:0.9rem; font-weight:700; color:#4A102A;">
+            ${isHandCash ? `None (Collect ৳${cashDue} Cash Hand-to-Hand)` : '01731101780 (Personal)'}
+          </code>
+        </div>
+        <div class="box-row">
+          <span>Customer Mobile / Contact:</span>
           <div>
             <strong style="color:#4A102A; font-size:0.95rem;">${order.senderNumber || order.customer.phone}</strong>
             <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.senderNumber || order.customer.phone}', this)">Copy</button>
