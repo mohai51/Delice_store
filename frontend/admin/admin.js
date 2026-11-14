@@ -226,10 +226,12 @@ async function loadOverview() {
    ========================================================================== */
 async function loadOrders() {
   const status = document.getElementById('orderStatusFilter')?.value || 'all';
+  const paymentStatus = document.getElementById('orderPaymentStatusFilter')?.value || 'all';
+  const paymentMethod = document.getElementById('orderPaymentMethodFilter')?.value || 'all';
   const search = document.getElementById('orderSearchInput')?.value || '';
 
   try {
-    const res = await fetchWithAuth(`/api/orders?status=${status}&search=${encodeURIComponent(search)}`);
+    const res = await fetchWithAuth(`/api/orders?status=${status}&paymentStatus=${paymentStatus}&paymentMethod=${paymentMethod}&search=${encodeURIComponent(search)}`);
     const data = await res.json();
     currentOrders = data.orders || [];
 
@@ -237,14 +239,14 @@ async function loadOrders() {
     if (!tbody) return;
 
     if (currentOrders.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:2rem; color:#87828A;">No matching orders found.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:2rem; color:#87828A;">No matching orders found.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = currentOrders.map(o => {
       const isCOD = o.paymentMethod === 'cod_advance';
       const provider = (o.paymentProvider || 'bkash').toUpperCase();
-      const methodLabel = isCOD ? 'COD (Adv Fee)' : '100% Online';
+      const provLower = (o.paymentProvider || 'bkash').toLowerCase();
       const advancePaid = o.advancePaid !== undefined ? o.advancePaid : (o.totalPaid || 0);
       const cashDue = isCOD ? (o.cashDueOnDelivery || o.productSubtotal || 0) : 0;
       const isPaid = o.paymentStatus === 'paid' || o.orderStatus === 'delivered';
@@ -254,32 +256,80 @@ async function loadOrders() {
         ? `<span style="color:#C5A46D; font-weight:700; font-size:0.8rem;">৳${(732.60 * bottles).toFixed(2)} Repaid</span><br><span style="color:#15803D; font-weight:700; font-size:0.75rem;">+৳${(66.40 * bottles).toFixed(2)} Profit</span>`
         : '<span style="color:#6B7280; font-size:0.75rem;">Pending</span>';
 
+      const totalSavings = (o.items || []).reduce((sum, item) => {
+        const diff = (item.originalPrice && item.originalPrice > item.price) ? (item.originalPrice - item.price) : 51;
+        return sum + (diff * (item.quantity || 1));
+      }, 0);
+
       return `
         <tr>
-          <td><strong>#${o.orderNumber}</strong></td>
           <td>
-            <code style="font-weight:700; color:#4A102A;">${o.transactionId}</code><br>
-            <small style="color:#6B7280;">Sender: ${o.senderNumber || o.customer?.phone}</small>
+            <span class="order-id-badge">#${o.orderNumber}</span><br>
+            <small style="color:#6B7280; font-size:0.72rem; display:block; margin-top:0.25rem;">
+              ${new Date(o.createdAt).toLocaleDateString('en-GB')}<br>${new Date(o.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            </small>
           </td>
           <td>
-            <strong>${o.customer.fullName}</strong><br>
-            <small style="color:#6B7280;">${o.customer.phone} &bull; ${o.customer.district}</small>
+            <strong style="color:#181619; font-size:0.92rem;">${o.customer.fullName}</strong><br>
+            <a href="tel:${o.customer.phone}" style="color:#4A102A; font-weight:700; text-decoration:none;">${o.customer.phone}</a>
+            <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${o.customer.phone}', this)">Copy</button><br>
+            <span style="font-size:0.78rem; font-weight:600; color:#7A5B35; background:#FAF6F0; border:1px solid #E0D4C3; padding:1px 5px; border-radius:3px; display:inline-block; margin-top:0.2rem;">
+              ${o.customer.district} (${o.deliveryArea === 'insideDhaka' ? 'Inside Dhaka ৳60' : 'Outside Dhaka ৳120'})
+            </span><br>
+            <small style="color:#6B7280; font-size:0.75rem; display:block; max-width:200px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; margin-top:0.2rem;" title="${o.customer.address}">
+              📍 ${o.customer.address}
+            </small>
           </td>
-          <td>${(o.items || []).map(i => `${i.productName} × ${i.quantity}`).join('<br>')}</td>
           <td>
-            <span class="badge-status ${isCOD ? 'shipped' : 'delivered'}" style="font-size:0.7rem; font-weight:700;">
-              ${provider} &bull; ${methodLabel}
+            ${(o.items || []).map(i => `
+              <div style="font-size:0.85rem; margin-bottom:0.25rem;">
+                <strong>${i.productName}</strong>
+                <span class="volume-badge">${i.volume || '30ml'}</span>
+                <span style="color:#4A102A; font-weight:700;">× ${i.quantity}</span>
+                <small style="color:#6B7280; margin-left:2px;">(৳${i.price})</small>
+              </div>
+            `).join('')}
+            ${totalSavings > 0 ? `<span class="savings-tag">Offer: -৳${totalSavings}</span>` : ''}
+          </td>
+          <td>
+            <div style="margin-bottom:0.35rem;">
+              <span class="provider-pill ${provLower}">
+                <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
+                ${provider}
+              </span>
+            </div>
+            <span class="badge-method ${isCOD ? 'cod' : 'online'}">
+              ${isCOD ? 'COD (Adv Fee)' : '100% Online'}
             </span>
           </td>
-          <td style="color:#15803D; font-weight:700;">৳${advancePaid}</td>
-          <td style="color:${cashDue > 0 ? '#B91C1C' : '#6B7280'}; font-weight:700;">৳${cashDue}</td>
-          <td style="color:${(o.netProfit || 0) >= 0 ? '#15803D' : '#B91C1C'}; font-weight:700;">৳${o.netProfit || 0}</td>
-          <td>${crDisplay}</td>
-          <td><span class="badge-status ${o.paymentStatus}">${(o.paymentStatus || 'pending').replace('_', ' ')}</span></td>
+          <td>
+            <div>
+              <code class="trxid-code" onclick="window.copyAdminText('${o.transactionId}', this)" title="Click to copy TrxID">${o.transactionId}</code>
+              <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${o.transactionId}', this)">Copy</button>
+            </div>
+            <small style="color:#4A102A; font-weight:600; display:block; margin-top:0.3rem;">
+              Sender: <strong>${o.senderNumber || o.customer?.phone}</strong>
+            </small>
+          </td>
+          <td>
+            <div style="font-size:0.78rem; color:#6B7280;">Total: <strong>৳${o.totalPayable}</strong></div>
+            <div style="color:#15803D; font-weight:800; font-size:0.92rem; margin-top:2px;">Paid: ৳${advancePaid}</div>
+            <div style="color:${cashDue > 0 ? '#B91C1C' : '#15803D'}; font-weight:800; font-size:0.92rem; margin-top:2px;">
+              Due: ৳${cashDue}
+              ${cashDue > 0 ? '<small style="color:#B91C1C; font-size:0.68rem; font-weight:600; display:block;">(Rider Collects)</small>' : '<small style="color:#15803D; font-size:0.68rem; display:block;">(Full Paid)</small>'}
+            </div>
+          </td>
+          <td>
+            <div style="font-size:0.85rem; font-weight:700; color:${(o.netProfit || 0) >= 0 ? '#15803D' : '#B91C1C'};">
+              Profit: ৳${o.netProfit || 0}
+            </div>
+            <div style="margin-top:0.25rem;">${crDisplay}</div>
+          </td>
+          <td><span class="badge-status ${o.paymentStatus}">${(o.paymentStatus || 'awaiting_verification').replace('_', ' ')}</span></td>
           <td><span class="badge-status ${o.orderStatus}">${(o.orderStatus || 'processing').replace('_', ' ')}</span></td>
           <td>
-            <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.3rem 0.6rem;" onclick="viewOrderModal('${o._id}')">
-              Manage
+            <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.7rem; white-space:nowrap;" onclick="viewOrderModal('${o._id}')">
+              Manage &rarr;
             </button>
           </td>
         </tr>
@@ -329,67 +379,238 @@ function exportCourierCSV() {
   URL.revokeObjectURL(url);
 }
 
+window.copyAdminText = function(text, btn) {
+  if (!text) return;
+  const origText = btn ? btn.innerHTML : null;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      if (btn) {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.innerHTML = origText; }, 1500);
+      }
+    }).catch(() => {
+      fallbackAdminCopy(text, btn, origText);
+    });
+  } else {
+    fallbackAdminCopy(text, btn, origText);
+  }
+};
+
+function fallbackAdminCopy(text, btn, origText) {
+  try {
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    if (btn) {
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.innerHTML = origText; }, 1500);
+    }
+  } catch (e) {
+    prompt('Copy:', text);
+  }
+}
+
+window.copyCourierDispatchDetails = function(orderId, btn) {
+  const order = currentOrders.find(o => o._id === orderId);
+  if (!order) return;
+  const isCOD = order.paymentMethod === 'cod_advance';
+  const cashDue = isCOD ? (order.cashDueOnDelivery || order.productSubtotal || 0) : 0;
+  const itemsText = (order.items || []).map(i => `${i.productName} (${i.volume || '30ml'} x${i.quantity})`).join(', ');
+
+  const text = `Order ID: #${order.orderNumber}
+Recipient: ${order.customer.fullName}
+Phone: ${order.customer.phone}
+District: ${order.customer.district}
+Delivery Address: ${order.customer.address}
+Products: ${itemsText}
+Cash to Collect (COD): ৳${cashDue}
+Delivery Zone: ${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka (৳60)' : 'Outside Dhaka (৳120)'}
+Payment Status: ${(order.paymentStatus || 'AWAITING_VERIFICATION').toUpperCase()}
+Payment Method: ${isCOD ? 'Cash on Delivery (Advance Fee Paid)' : '100% Online Payment'}
+Provider / TrxID: ${(order.paymentProvider || 'bkash').toUpperCase()} - ${order.transactionId}`;
+
+  window.copyAdminText(text, btn);
+};
+
 function viewOrderModal(orderId) {
   const order = currentOrders.find(o => o._id === orderId);
   if (!order) return;
 
   const content = document.getElementById('modalOrderContent');
-  document.getElementById('modalOrderTitle').textContent = `Order #${order.orderNumber}`;
+  document.getElementById('modalOrderTitle').innerHTML = `
+    <span style="font-size:1.15rem; font-weight:800; color:#4A102A;">Order Details &bull;</span>
+    <span class="order-id-badge" style="font-size:1.1rem; margin-left:6px;">#${order.orderNumber}</span>
+  `;
 
   const isCOD = order.paymentMethod === 'cod_advance';
   const provider = (order.paymentProvider || 'bkash').toUpperCase();
+  const provLower = (order.paymentProvider || 'bkash').toLowerCase();
   const advancePaid = order.advancePaid !== undefined ? order.advancePaid : (order.totalPaid || 0);
   const cashDue = isCOD ? (order.cashDueOnDelivery || order.productSubtotal || 0) : 0;
+  const bottles = (order.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const totalSavings = (order.items || []).reduce((sum, item) => {
+    const diff = (item.originalPrice && item.originalPrice > item.price) ? (item.originalPrice - item.price) : 51;
+    return sum + (diff * (item.quantity || 1));
+  }, 0);
 
   content.innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
-      <div>
-        <h4 style="font-size:0.85rem; text-transform:uppercase; color:#4A102A; margin-bottom:0.5rem;">Recipient &amp; Delivery</h4>
-        <p style="margin:0; font-size:0.9rem;"><strong>Name:</strong> ${order.customer.fullName}</p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>Phone:</strong> ${order.customer.phone}</p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>District:</strong> ${order.customer.district} (${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka City' : 'Outside Dhaka'})</p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>Address:</strong> ${order.customer.address}</p>
-        ${order.customer.orderNotes ? `<p style="margin:0.25rem 0; font-size:0.85rem; color:#6B7280;"><em>Note: ${order.customer.orderNotes}</em></p>` : ''}
+    <!-- Top Strip -->
+    <div class="order-strip" style="margin-bottom:1.25rem;">
+      <div><strong>Order ID:</strong> <span class="order-id-badge">#${order.orderNumber}</span></div>
+      <div><strong>Placed On:</strong> ${new Date(order.createdAt).toLocaleString('en-GB')}</div>
+      <div><strong>Payment:</strong> <span class="badge-status ${order.paymentStatus}">${(order.paymentStatus || 'awaiting_verification').replace('_', ' ')}</span></div>
+      <div><strong>Fulfillment:</strong> <span class="badge-status ${order.orderStatus}">${(order.orderStatus || 'processing').replace('_', ' ')}</span></div>
+    </div>
+
+    <!-- 2 Columns: Recipient & Payment Details -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.25rem;">
+      <!-- Card 1: Recipient Details -->
+      <div class="order-card-box">
+        <h4 class="box-title">1. Recipient &amp; Delivery Destination</h4>
+        <div class="box-row">
+          <span>Recipient Name:</span>
+          <strong style="color:#181619; font-size:0.95rem;">${order.customer.fullName}</strong>
+        </div>
+        <div class="box-row">
+          <span>Phone Number:</span>
+          <div>
+            <a href="tel:${order.customer.phone}" style="color:#4A102A; font-weight:700; text-decoration:none; font-size:0.95rem;">${order.customer.phone}</a>
+            <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.customer.phone}', this)">Copy</button>
+          </div>
+        </div>
+        <div class="box-row">
+          <span>District:</span>
+          <strong>${order.customer.district} <span style="font-size:0.75rem; color:#7A5B35;">(${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka City • ৳60' : 'Outside Dhaka • ৳120'})</span></strong>
+        </div>
+        <div style="margin-top:0.4rem;">
+          <span style="font-size:0.78rem; color:#6B7280; display:block;">Detailed Delivery Address:</span>
+          <div class="address-box">${order.customer.address}</div>
+        </div>
+        ${order.customer.orderNotes ? `<div style="margin-top:0.35rem; font-size:0.8rem; color:#6B7280; font-style:italic;">Note: ${order.customer.orderNotes}</div>` : ''}
       </div>
 
-      <div>
-        <h4 style="font-size:0.85rem; text-transform:uppercase; color:#4A102A; margin-bottom:0.5rem;">Payment Verification Details</h4>
-        <p style="margin:0; font-size:0.9rem;"><strong>Method:</strong> <span class="badge-status ${isCOD ? 'shipped' : 'delivered'}">${isCOD ? 'COD (Advance Delivery Fee)' : '100% Online Payment'}</span></p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>Provider:</strong> <strong>${provider} (Send Money)</strong></p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>Receiver:</strong> <code>01731101780</code> (Personal)</p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>Customer Sender Mobile:</strong> <strong style="color:#4A102A;">${order.senderNumber || order.customer.phone}</strong></p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>Transaction ID (TrxID):</strong> <code style="font-size:1.05rem; font-weight:800; color:#4A102A; background:#FFF; border:1px solid #E0D4C3; padding:2px 6px; border-radius:3px;">${order.transactionId}</code></p>
-        <p style="margin:0.25rem 0; font-size:0.9rem;"><strong>Payment Status:</strong> <span class="badge-status ${order.paymentStatus}">${(order.paymentStatus || 'pending').toUpperCase().replace('_', ' ')}</span></p>
-        <p style="margin:0.25rem 0; font-size:0.85rem; color:#6B7280;"><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString('en-GB')}</p>
+      <!-- Card 2: Payment Method & Verification -->
+      <div class="order-card-box">
+        <h4 class="box-title">2. Payment Method &amp; Send Money Details</h4>
+        <div class="box-row">
+          <span>Payment Choice:</span>
+          <span class="badge-method ${isCOD ? 'cod' : 'online'}">${isCOD ? 'Cash on Delivery (Advance Fee)' : '100% Online Payment'}</span>
+        </div>
+        <div class="box-row">
+          <span>Provider:</span>
+          <span class="provider-pill ${provLower}">
+            <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
+            ${provider} (Send Money)
+          </span>
+        </div>
+        <div class="box-row">
+          <span>Wallet Sent To:</span>
+          <code style="font-size:0.9rem; font-weight:700; color:#4A102A;">01731101780 (Personal)</code>
+        </div>
+        <div class="box-row">
+          <span>Customer Sender Mobile:</span>
+          <div>
+            <strong style="color:#4A102A; font-size:0.95rem;">${order.senderNumber || order.customer.phone}</strong>
+            <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.senderNumber || order.customer.phone}', this)">Copy</button>
+          </div>
+        </div>
+        <div class="box-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
+          <span>Transaction ID (TrxID):</span>
+          <div>
+            <code class="trxid-large">${order.transactionId}</code>
+            <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.transactionId}', this)">Copy</button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- ADVANCE VS CASH DUE HIGHLIGHT -->
-    <div style="background:#FAF6F0; border-radius:6px; padding:1.15rem; margin-bottom:1.5rem; border:1.5px solid #C5A46D;">
-      <h4 style="font-size:0.85rem; text-transform:uppercase; color:#4A102A; margin-bottom:0.75rem;">Payment Collection Breakdown</h4>
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
-        <span>Product Subtotal:</span><strong>৳${order.productSubtotal}</strong>
+    <!-- Card 3: Ordered Fragrance Editions (30ml) -->
+    <div class="order-card-box" style="margin-bottom:1.25rem;">
+      <h4 class="box-title">3. Ordered Fragrance Editions (30ml)</h4>
+      <table class="modal-items-table">
+        <thead>
+          <tr>
+            <th>Fragrance Edition</th>
+            <th>Volume</th>
+            <th>Unit Price</th>
+            <th>Qty</th>
+            <th>Savings (Offer)</th>
+            <th style="text-align:right;">Line Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(order.items || []).map(i => {
+            const price = Number(i.price) || 799;
+            const orig = Number(i.originalPrice) || 850;
+            const qty = Number(i.quantity) || 1;
+            const sav = (orig > price ? (orig - price) : 51) * qty;
+            return `
+              <tr>
+                <td><strong>${i.productName}</strong></td>
+                <td><span class="volume-badge">${i.volume || '30ml'} EDP</span></td>
+                <td>৳${price} <small style="text-decoration:line-through; color:#9CA3AF; margin-left:2px;">৳${orig}</small></td>
+                <td><strong>× ${qty}</strong></td>
+                <td><span class="savings-tag">-৳${sav}</span></td>
+                <td style="text-align:right; font-weight:700; font-size:0.92rem;">৳${price * qty}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Card 4: Financial Breakdown & Courier Collection Math -->
+    <div class="order-card-box highlight-box" style="margin-bottom:1.25rem;">
+      <h4 class="box-title">4. Financial Breakdown &amp; Courier Collection Math</h4>
+      <div class="math-grid">
+        <div class="math-row">
+          <span>Product Subtotal:</span>
+          <strong>৳${order.productSubtotal}</strong>
+        </div>
+        <div class="math-row">
+          <span>Delivery Charge (${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka ৳60' : 'Outside Dhaka ৳120'}):</span>
+          <strong>৳${order.deliveryCharge}</strong>
+        </div>
+        ${totalSavings > 0 ? `
+          <div class="math-row" style="color:#E54B4B;">
+            <span>Total Customer Savings (Launch Offer):</span>
+            <strong>-৳${totalSavings}</strong>
+          </div>
+        ` : ''}
+        <div class="math-row total-row">
+          <span>Total Order Value:</span>
+          <strong style="color:#4A102A; font-size:1.05rem;">৳${order.totalPayable}</strong>
+        </div>
+        <div class="math-row advance-row">
+          <span style="color:#15803D;">Advance Paid via ${provider}:</span>
+          <strong style="color:#15803D; font-size:1.15rem;">৳${advancePaid}</strong>
+        </div>
+        <div class="math-row rider-row">
+          <span style="color:${cashDue > 0 ? '#B91C1C' : '#15803D'};">Cash to Collect from Customer (Courier Rider):</span>
+          <strong style="color:${cashDue > 0 ? '#B91C1C' : '#15803D'}; font-size:1.25rem;">৳${cashDue}</strong>
+        </div>
       </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.85rem;">
-        <span>Delivery Fee (${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka ৳60' : 'Outside Dhaka ৳120'}):</span><strong>৳${order.deliveryCharge}</strong>
+
+      <div class="rider-alert ${cashDue > 0 ? 'alert-cod' : 'alert-paid'}">
+        ${cashDue > 0
+          ? `⚠️ <strong>Cash on Delivery:</strong> Delivery charge of <strong>৳${advancePaid}</strong> has been received in advance. Instruct Steadfast / Pathao rider to collect remaining <strong>৳${cashDue}</strong> in cash before parcel handover.`
+          : `✅ <strong>100% Paid in Advance:</strong> Full order amount of <strong>৳${advancePaid}</strong> has been received online. Instruct courier rider to collect <strong>৳0</strong> cash.`}
       </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.9rem; font-weight:700;">
-        <span>Total Order Value:</span><strong>৳${order.totalPayable}</strong>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #E0D4C3; font-size:0.9rem;">
-        <span style="font-weight:700; color:#15803D;">Advance Paid via ${provider}:</span>
-        <strong style="color:#15803D; font-size:1rem;">৳${advancePaid}</strong>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-top:0.25rem; font-size:0.9rem;">
-        <span style="font-weight:700; color:${cashDue > 0 ? '#B91C1C' : '#59555B'};">Cash Due from Courier Rider:</span>
-        <strong style="color:${cashDue > 0 ? '#B91C1C' : '#15803D'}; font-size:1.05rem;">৳${cashDue}</strong>
-      </div>
-      <div style="display:flex; justify-content:space-between; margin-top:0.5rem; padding-top:0.5rem; border-top:1px solid #E0D4C3; font-weight:700; font-size:0.95rem; color:#4A102A;">
-        <span>Realized Net Profit:</span><span style="color:${(order.netProfit || 0) >= 0 ? '#15803D' : '#B91C1C'};">৳${order.netProfit || 0}</span>
+
+      <div style="margin-top:0.75rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <button type="button" class="btn btn-secondary" style="font-size:0.78rem; padding:0.4rem 0.8rem;" onclick="window.copyCourierDispatchDetails('${order._id}', this)">
+          📋 Copy Dispatch Details (for Steadfast/Pathao)
+        </button>
+        <span style="font-size:0.85rem; font-weight:700; color:#4A102A;">
+          Realized Net Profit: <span style="color:${(order.netProfit || 0) >= 0 ? '#15803D' : '#B91C1C'};">৳${order.netProfit || 0}</span>
+        </span>
       </div>
     </div>
 
-    <!-- DÉLICE CAPITAL RECOVERY & PROFIT ENGINE SNAPSHOT (CONNECTED TO TAB 11) -->
+    <!-- DÉLICE CAPITAL RECOVERY & PROFIT ENGINE SNAPSHOT -->
     <div style="background:#FAF6F0; border-radius:6px; padding:1.15rem; margin-bottom:1.5rem; border:1.5px solid #4A102A; box-shadow:0 2px 6px rgba(74, 16, 42, 0.05);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
         <div>
@@ -402,7 +623,6 @@ function viewOrderModal(orderId) {
       </div>
 
       ${(() => {
-        const bottles = (order.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
         const repaid = (732.60 * bottles).toFixed(2);
         const profit = (66.40 * bottles).toFixed(2);
         const isPaid = order.paymentStatus === 'paid' || order.orderStatus === 'delivered';
@@ -449,6 +669,7 @@ function viewOrderModal(orderId) {
       })()}
     </div>
 
+    <!-- Status Updates Form -->
     <form id="orderManageForm" onsubmit="handleOrderStatusUpdate(event, '${order._id}')">
       <div class="form-row">
         <div class="form-group">
@@ -463,6 +684,7 @@ function viewOrderModal(orderId) {
         <div class="form-group">
           <label class="form-label">Fulfillment Status</label>
           <select id="modalOrderStatus" class="form-control">
+            <option value="awaiting_verification" ${order.orderStatus === 'awaiting_verification' ? 'selected' : ''}>Awaiting Verification</option>
             <option value="processing" ${order.orderStatus === 'processing' ? 'selected' : ''}>Processing</option>
             <option value="shipped" ${order.orderStatus === 'shipped' ? 'selected' : ''}>Shipped</option>
             <option value="delivered" ${order.orderStatus === 'delivered' ? 'selected' : ''}>Delivered (Cash Collected)</option>
@@ -475,7 +697,7 @@ function viewOrderModal(orderId) {
         <input type="number" id="modalCourierCost" class="form-control" value="${order.actualCourierCost || (order.deliveryArea === 'insideDhaka' ? 60 : 120)}">
         <small style="color:#6B7280; font-size:0.75rem;">Actual settlement amount paid to Steadfast / Pathao courier</small>
       </div>
-      <button type="submit" class="btn btn-primary btn-block">Update Status &amp; Recalculate Profit</button>
+      <button type="submit" class="btn btn-primary btn-block" style="padding:0.75rem; font-size:0.95rem; font-weight:700;">Update Status &amp; Recalculate Profit</button>
     </form>
   `;
 

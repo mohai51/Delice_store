@@ -275,18 +275,21 @@ exports.createOrder = async (req, res, next) => {
  */
 exports.getAllOrders = async (req, res, next) => {
   try {
-    const { status, paymentStatus, search } = req.query;
+    const { status, paymentStatus, paymentMethod, search } = req.query;
 
     if (isConnected()) {
       let query = {};
       if (status && status !== 'all') query.orderStatus = status;
       if (paymentStatus && paymentStatus !== 'all') query.paymentStatus = paymentStatus;
+      if (paymentMethod && paymentMethod !== 'all') query.paymentMethod = paymentMethod;
       if (search) {
         query.$or = [
           { orderNumber: new RegExp(search, 'i') },
           { transactionId: new RegExp(search, 'i') },
+          { senderNumber: new RegExp(search, 'i') },
           { 'customer.phone': new RegExp(search, 'i') },
-          { 'customer.fullName': new RegExp(search, 'i') }
+          { 'customer.fullName': new RegExp(search, 'i') },
+          { 'customer.district': new RegExp(search, 'i') }
         ];
       }
       const orders = await Order.find(query).sort({ createdAt: -1 });
@@ -331,13 +334,18 @@ exports.getAllOrders = async (req, res, next) => {
     if (paymentStatus && paymentStatus !== 'all') {
       orders = orders.filter(o => o.paymentStatus === paymentStatus);
     }
+    if (paymentMethod && paymentMethod !== 'all') {
+      orders = orders.filter(o => o.paymentMethod === paymentMethod);
+    }
     if (search) {
       const s = search.toLowerCase();
       orders = orders.filter(o => 
         (o.orderNumber && o.orderNumber.toLowerCase().includes(s)) ||
         (o.transactionId && o.transactionId.toLowerCase().includes(s)) ||
+        (o.senderNumber && o.senderNumber.toLowerCase().includes(s)) ||
         (o.customer?.phone && o.customer.phone.includes(s)) ||
-        (o.customer?.fullName && o.customer.fullName.toLowerCase().includes(s))
+        (o.customer?.fullName && o.customer.fullName.toLowerCase().includes(s)) ||
+        (o.customer?.district && o.customer.district.toLowerCase().includes(s))
       );
     }
 
