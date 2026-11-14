@@ -357,8 +357,9 @@ const DeliceCart = (function() {
     if (listenersAttached) return;
     listenersAttached = true;
 
-    // Delegated click listeners for open, close, and overlay
+    // Delegated click listeners for open, close, overlay, and Add to Cart
     document.addEventListener('click', (e) => {
+      // 1. Open drawer
       const openBtn = e.target.closest('[data-cart-open]');
       if (openBtn) {
         e.preventDefault();
@@ -366,6 +367,7 @@ const DeliceCart = (function() {
         return;
       }
 
+      // 2. Close drawer
       const closeBtn = e.target.closest('[data-cart-close]');
       if (closeBtn) {
         e.preventDefault();
@@ -373,8 +375,38 @@ const DeliceCart = (function() {
         return;
       }
 
+      // 3. Close on overlay click
       if (e.target && e.target.id === 'cartOverlay') {
         closeDrawer();
+        return;
+      }
+
+      // 4. ANY Add to Cart button on any page
+      const addCartBtn = e.target.closest('.btn-add-cart, .btn-add-cart-detail, .mood-match-btn-cart, [data-add-to-cart]');
+      if (addCartBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const prodId = addCartBtn.getAttribute('data-add-to-cart') ||
+                       addCartBtn.dataset.addToCart ||
+                       addCartBtn.getAttribute('data-product-id') ||
+                       addCartBtn.dataset.productId ||
+                       (typeof window !== 'undefined' && window.currentActiveProduct && window.currentActiveProduct.id) ||
+                       'delice-bloom';
+
+        // Provide immediate visual feedback on the button itself
+        const prevText = addCartBtn.innerHTML;
+        addCartBtn.innerHTML = 'Added! ✓';
+        addCartBtn.style.opacity = '0.9';
+        addCartBtn.style.pointerEvents = 'none';
+
+        setTimeout(() => {
+          addCartBtn.innerHTML = prevText;
+          addCartBtn.style.opacity = '1';
+          addCartBtn.style.pointerEvents = 'auto';
+        }, 1400);
+
+        addItem(prodId, 1);
       }
     });
 

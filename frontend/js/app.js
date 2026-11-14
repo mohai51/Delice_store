@@ -475,7 +475,7 @@ function renderProductGrid(products) {
             <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-buy-now" onclick="event.stopPropagation()" title="Buy ${prod.name} Now">
               Buy Now
             </a>
-            <button type="button" class="btn btn-add-cart" onclick="event.stopPropagation(); addProductToBag('${prod.id}')" title="Add ${prod.name} to Cart">
+            <button type="button" class="btn btn-add-cart" data-add-to-cart="${prod.id}" onclick="event.stopPropagation(); addProductToBag('${prod.id}')" title="Add ${prod.name} to Cart">
               Add to Cart
             </button>
           </div>
@@ -845,7 +845,7 @@ function viewProductDetails(productId) {
 
         <!-- Action Buttons -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;">
-          <button type="button" class="btn btn-primary" onclick="addProductToBag('${normId}'); closeModal('productModal');" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
+          <button type="button" class="btn btn-primary" data-add-to-cart="${normId}" onclick="addProductToBag('${normId}'); closeModal('productModal');" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">
             Add to Cart
           </button>
           <a href="/checkout.html?buyNow=${normId}" class="btn btn-gold" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700; text-align:center;">
@@ -1028,7 +1028,7 @@ function renderMoodFinderProduct() {
           </div>
           <div class="mood-match-btns">
             <a href="/checkout.html?buyNow=${matched.id}" class="btn btn-gold mood-match-btn-buy">Buy Now</a>
-            <button type="button" class="btn btn-primary mood-match-btn-cart" onclick="addProductToBag('${matched.id}')">Add to Cart</button>
+            <button type="button" class="btn btn-primary mood-match-btn-cart" data-add-to-cart="${matched.id}" onclick="addProductToBag('${matched.id}')">Add to Cart</button>
           </div>
         </div>
       </div>
