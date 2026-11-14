@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=5.0.0">
+  <link rel="stylesheet" href="/css/style.css?v=5.1.0">
 </head>
 <body>
 
@@ -30,7 +30,7 @@
         <ul class="nav-menu">
           <li><a href="/" class="nav-link active">Home</a></li>
           <li><a href="#collection" class="nav-link">Shop</a></li>
-          <li><a href="#story" class="nav-link">Our Story</a></li>
+          <li><a href="/story.html" class="nav-link">Our Story</a></li>
           <li><a href="#discovery" class="nav-link">Scent Guide</a></li>
           <li><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
@@ -58,43 +58,88 @@
   </header>
 
   <main>
-    <!-- HERO SLIDESHOW -->
+    <!-- HERO SLIDESHOW (100% Responsive Luxury Editorial Slideshow) -->
     <section class="hero-slider-container" id="heroSliderContainer" aria-label="Fragrance Highlights">
-      <!-- Slide 1 -->
-      <div class="hero-slide active">
-        <img src="/assets/images/hero-slide-1.svg" alt="DÉLICE Fragrance" class="hero-slide-bg">
-        <div class="hero-overlay"></div>
-        <div class="container hero-actions-container">
-          <div class="hero-actions clean-actions">
-            <a href="/checkout.html?buyNow=delice-bloom" class="btn btn-hero-buy">Buy Now</a>
-            <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-bloom')">Add to Cart</button>
-            <a href="#collection" class="btn btn-hero-explore">Explore Fragrance</a>
+      <!-- Slide 1: Bloom / Make It Yours -->
+      <div class="hero-slide active" data-slide="0">
+        <div class="hero-slide-backdrop hero-bg-1"></div>
+        <div class="container hero-slide-container">
+          <div class="hero-slide-content">
+            <span class="hero-badge-pill">Authentic Eau De Parfum &bull; 30ml</span>
+            <h1 class="hero-title">Make It <span class="hero-highlight">Yours.</span></h1>
+            <p class="hero-subtitle">Romantic in feeling. Bold in self-expression. Alive with youthful energy. An attainable luxury fragrance created for the moments you choose for yourself.</p>
+            <div class="hero-price-row">
+              <span class="hero-offer-price">৳799</span>
+              <span class="hero-orig-price">৳850</span>
+              <span class="hero-savings-chip">Save ৳51 &bull; Special Launch Price</span>
+            </div>
+            <div class="hero-actions clean-actions">
+              <a href="/checkout.html?buyNow=delice-bloom" class="btn btn-hero-buy">Buy Now &bull; ৳799</a>
+              <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-bloom')">Add to Cart</button>
+              <a href="#collection" class="btn btn-hero-explore">Explore Scents</a>
+            </div>
+          </div>
+          <div class="hero-slide-visual">
+            <div class="hero-bottle-wrap">
+              <img src="/assets/images/bloom.svg" alt="DÉLICE Bloom 30ml" class="hero-bottle-img">
+              <span class="hero-bottle-badge">Bloom &bull; 30ml</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 2 -->
-      <div class="hero-slide">
-        <img src="/assets/images/hero-slide-2.svg" alt="DÉLICE Fragrance" class="hero-slide-bg">
-        <div class="hero-overlay"></div>
-        <div class="container hero-actions-container">
-          <div class="hero-actions clean-actions">
-            <a href="/checkout.html?buyNow=delice-momentum" class="btn btn-hero-buy">Buy Now</a>
-            <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-momentum')">Add to Cart</button>
-            <a href="#collection" class="btn btn-hero-explore">Explore Fragrance</a>
+      <!-- Slide 2: Momentum / Signature Profiles -->
+      <div class="hero-slide" data-slide="1">
+        <div class="hero-slide-backdrop hero-bg-2"></div>
+        <div class="container hero-slide-container">
+          <div class="hero-slide-content">
+            <span class="hero-badge-pill">Crisp &bull; Sophisticated &bull; Magnetic</span>
+            <h1 class="hero-title">A Fragrance for <span class="hero-highlight">Every Side of You.</span></h1>
+            <p class="hero-subtitle">From university lectures and outdoor active days to intimate evenings and formal gatherings—explore fragrances attuned to your rhythm.</p>
+            <div class="hero-price-row">
+              <span class="hero-offer-price">৳799</span>
+              <span class="hero-orig-price">৳850</span>
+              <span class="hero-savings-chip">Save ৳51 &bull; Limited Edition</span>
+            </div>
+            <div class="hero-actions clean-actions">
+              <a href="/checkout.html?buyNow=delice-momentum" class="btn btn-hero-buy">Buy Now &bull; ৳799</a>
+              <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-momentum')">Add to Cart</button>
+              <a href="#collection" class="btn btn-hero-explore">Explore Scents</a>
+            </div>
+          </div>
+          <div class="hero-slide-visual">
+            <div class="hero-bottle-wrap">
+              <img src="/assets/images/momentum.svg" alt="DÉLICE Momentum 30ml" class="hero-bottle-img">
+              <span class="hero-bottle-badge">Momentum &bull; 30ml</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Slide 3 -->
-      <div class="hero-slide">
-        <img src="/assets/images/hero-slide-3.svg" alt="DÉLICE Fragrance" class="hero-slide-bg">
-        <div class="hero-overlay"></div>
-        <div class="container hero-actions-container">
-          <div class="hero-actions clean-actions">
-            <a href="/checkout.html?buyNow=delice-enigma" class="btn btn-hero-buy">Buy Now</a>
-            <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-enigma')">Add to Cart</button>
-            <a href="#collection" class="btn btn-hero-explore">Explore Fragrance</a>
+      <!-- Slide 3: Enigma / Special Opening Offer -->
+      <div class="hero-slide" data-slide="2">
+        <div class="hero-slide-backdrop hero-bg-3"></div>
+        <div class="container hero-slide-container">
+          <div class="hero-slide-content">
+            <span class="hero-badge-pill">Dark &bull; Woody &bull; Mysterious</span>
+            <h1 class="hero-title">Your Mood. <span class="hero-highlight">Your Moments.</span></h1>
+            <p class="hero-subtitle">Enjoy our introductory opening offer: ৳799 across all 30ml editions. Pure, dependable fragrance with considered packaging and fast nationwide delivery.</p>
+            <div class="hero-price-row">
+              <span class="hero-offer-price">৳799</span>
+              <span class="hero-orig-price">৳850</span>
+              <span class="hero-savings-chip">Save ৳51 &bull; Introductory Price</span>
+            </div>
+            <div class="hero-actions clean-actions">
+              <a href="/checkout.html?buyNow=delice-enigma" class="btn btn-hero-buy">Buy Now &bull; ৳799</a>
+              <button type="button" class="btn btn-hero-bag" onclick="addProductToBag('delice-enigma')">Add to Cart</button>
+              <a href="#collection" class="btn btn-hero-explore">Explore Scents</a>
+            </div>
+          </div>
+          <div class="hero-slide-visual">
+            <div class="hero-bottle-wrap">
+              <img src="/assets/images/enigma.svg" alt="DÉLICE Enigma 30ml" class="hero-bottle-img">
+              <span class="hero-bottle-badge">Enigma &bull; 30ml</span>
+            </div>
           </div>
         </div>
       </div>
@@ -228,163 +273,63 @@
       </div>
     </section>
 
-    <!-- BRAND STORY & FOUNDERS' JOURNEY -->
-    <section class="section" id="story">
-      <div class="container">
-        <div class="brand-story-grid">
-          <!-- Left Column: Authentic Craft & Founders Dual-Photo Showcase -->
-          <div class="brand-story-media-wrap">
-            <div class="story-media-frame" id="storyMediaFrame">
-              <span class="story-media-badge" id="storyPhotoBadge">Crafting The Essence</span>
-              <img src="/assets/images/d1.jpg" id="storyMainPhoto" alt="DÉLICE Founders during Perfumery Formulation Session">
-              
-              <div class="story-media-arrows">
-                <button type="button" class="story-arrow-btn" onclick="switchStoryPhoto(window.storyCurrentPhotoIndex - 1)" aria-label="Previous Photo" title="Previous Photo">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                  </svg>
-                </button>
-                <button type="button" class="story-arrow-btn" onclick="switchStoryPhoto(window.storyCurrentPhotoIndex + 1)" aria-label="Next Photo" title="Next Photo">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <!-- Two Interactive Photo Switchers -->
-            <div class="story-thumbs-row">
-              <button type="button" class="story-thumb-btn active" onclick="switchStoryPhoto(0)" id="storyThumb0">
-                <div class="story-thumb-preview">
-                  <img src="/assets/images/d1.jpg" alt="Lab Session & Essence Crafting">
-                </div>
-                <div class="story-thumb-meta">
-                  <h5>The Lab Session</h5>
-                  <span>Craft &amp; Formulation</span>
-                </div>
-              </button>
-
-              <button type="button" class="story-thumb-btn" onclick="switchStoryPhoto(1)" id="storyThumb1">
-                <div class="story-thumb-preview">
-                  <img src="/assets/images/d2.jpg" alt="The Founders of DÉLICE">
-                </div>
-                <div class="story-thumb-meta">
-                  <h5>The Founders</h5>
-                  <span>Four Close Friends</span>
-                </div>
-              </button>
-            </div>
-
-            <div class="story-sourcing-note">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A46D" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
-              <span><strong>Uncompromising Quality:</strong> Crafted exclusively with pure, high-concentration fine fragrance oils—zero cheap alcohol dilutions, zero shortcuts. True luxury, refined for lasting presence.</span>
-            </div>
-          </div>
-
-          <!-- Right Column: The Real Story Narrative -->
-          <div class="brand-story-content">
-            <span class="tagline-sub">HOW DÉLICE WAS BORN &bull; 4 FRIENDS &bull; 1 RELENTLESS QUEST</span>
-            <h2>"Four Friends, Countless Sleepless Nights, and an Uncompromising Dream."</h2>
-            
-            <p>DÉLICE was not born in a corporate boardroom. It began around late-night tables among four close friends—<strong>Sayod Sulayman Sukria</strong>, <strong>Mohaiminul Islam</strong>, <strong>Abdullah Basar Tarif</strong>, and <strong>Zayed Iqbal Munna</strong>. We all shared an undeniable obsession with fine fragrance, but we were constantly frustrated by what was available: authentic designer perfumes were priced far beyond reach, while cheap alternatives smelled harsh, burned the senses, and evaporated within thirty minutes.</p>
-
-            <p>We asked ourselves a simple question: <em>Why can’t young people in Bangladesh experience genuine, world-class luxury fragrances at an honest price?</em></p>
-
-            <blockquote class="brand-quote">
-              "We chose the harder road. In an industry flooded with diluted imitations, our greatest commitment was working only with 100% authentic, high-concentration perfume oils."
-            </blockquote>
-
-            <p>Bringing that vision to life demanded tireless dedication and months of trial. We spent night after night evaluating pure essences, rejecting countless substandard samples, and formulating dozens of prototypes. We mastered the maceration curve and precisely calibrated oil concentrations for Bangladesh’s tropical heat and daily rhythm—so every single drop radiates rich character, smooth evolution, and dependable longevity.</p>
-
-            <!-- Compact Founder Cards (4 Friends) -->
-            <div style="margin-top:1.5rem;">
-              <span style="font-size:0.75rem; color:#4A102A; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; display:block; margin-bottom:0.65rem;">THE FOUNDING CIRCLE</span>
-              <div class="founder-cards-grid">
-                <div class="founder-card-compact">
-                  <div class="founder-avatar-chip">SSS</div>
-                  <h4 class="founder-name">Sayod Sulayman Sukria</h4>
-                  <div class="founder-role">Co-Founder</div>
-                  <p class="founder-focus">Sourcing &amp; Raw Material Vision</p>
-                </div>
-
-                <div class="founder-card-compact">
-                  <div class="founder-avatar-chip">MI</div>
-                  <h4 class="founder-name">Mohaiminul Islam</h4>
-                  <div class="founder-role">Co-Founder</div>
-                  <p class="founder-focus">Brand Architecture &amp; Strategy</p>
-                </div>
-
-                <div class="founder-card-compact">
-                  <div class="founder-avatar-chip">ABT</div>
-                  <h4 class="founder-name">Abdullah Basar Tarif</h4>
-                  <div class="founder-role">Co-Founder</div>
-                  <p class="founder-focus">Formulation &amp; Olfactory Testing</p>
-                </div>
-
-                <div class="founder-card-compact">
-                  <div class="founder-avatar-chip">ZIM</div>
-                  <h4 class="founder-name">Zayed Iqbal Munna</h4>
-                  <div class="founder-role">Co-Founder</div>
-                  <p class="founder-focus">Operations &amp; Client Quality</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Compact Brand Pillars -->
-            <div class="brand-pillars">
-              <div class="pillar-card">
-                <h4>Individuality</h4>
-                <p>Room for different moods, aesthetics, and expressions without rigid expectations.</p>
-              </div>
-              <div class="pillar-card">
-                <h4>Uncut Purity</h4>
-                <p>Pure, premium-grade perfume oils crafted with rigorous standards—zero diluted shortcuts.</p>
-              </div>
-              <div class="pillar-card">
-                <h4>Honest Craft</h4>
-                <p>Accurate scent notes, calibrated micro-fine atomizers, and no fabricated longevity claims.</p>
-              </div>
-            </div>
-
-            <div style="margin-top:2rem;">
-              <a href="#collection" class="btn btn-primary" style="text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Explore The Scents</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- BRAND VALUES & CREDIBILITY -->
-    <section class="section section-tight" style="background-color: #FAF6F0; border-top:1px solid #E0D4C3;">
+    <!-- BRAND STORY PREVIEW (Visual Teaser with Explore Button) -->
+    <section class="section section-story-preview" id="story">
       <div class="container">
         <div class="section-header">
-          <span class="tagline-sub">WHAT MAKES OUR PROMISE CREDIBLE</span>
-          <h2>Crafted With Thought &amp; Transparency</h2>
-          <p>These are our foundational operating commitments to you, delivered in every single box.</p>
+          <span class="tagline-sub">HOW DÉLICE WAS BORN &bull; 4 FRIENDS &bull; 1 RELENTLESS QUEST</span>
+          <h2>Crafted by Passion. Bound by Brotherhood.</h2>
+          <p>Four friends united by one relentless mission: authentic luxury fragrances crafted for Bangladesh.</p>
         </div>
 
-        <div class="credibility-grid">
-          <div class="credibility-card">
-            <div class="credibility-num">01</div>
-            <h4>Consistent Batches</h4>
-            <p>Carefully blended and macerated batches to ensure the scent experience you order matches the bottle you receive.</p>
+        <div class="story-teaser-card">
+          <!-- Dual-Photo Interactive Frame -->
+          <div class="story-media-frame" id="storyMediaFrame">
+            <span class="story-media-badge" id="storyPhotoBadge">Crafting The Essence</span>
+            <img src="/assets/images/d1.jpg" id="storyMainPhoto" alt="DÉLICE Founders during Perfumery Formulation Session">
+            
+            <div class="story-media-arrows">
+              <button type="button" class="story-arrow-btn" onclick="switchStoryPhoto(window.storyCurrentPhotoIndex - 1)" aria-label="Previous Photo" title="Previous Photo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button type="button" class="story-arrow-btn" onclick="switchStoryPhoto(window.storyCurrentPhotoIndex + 1)" aria-label="Next Photo" title="Next Photo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
           </div>
-          <div class="credibility-card">
-            <div class="credibility-num">02</div>
-            <h4>Reliable Atomizers</h4>
-            <p>Tested sprayers delivering an even, micro-fine fragrance mist without spitting or dripping.</p>
+
+          <!-- Two Interactive Photo Switchers -->
+          <div class="story-thumbs-row">
+            <button type="button" class="story-thumb-btn active" onclick="switchStoryPhoto(0)" id="storyThumb0">
+              <div class="story-thumb-preview">
+                <img src="/assets/images/d1.jpg" alt="Lab Session & Essence Crafting">
+              </div>
+              <div class="story-thumb-meta">
+                <h5>The Lab Session</h5>
+                <span>Craft &amp; Formulation</span>
+              </div>
+            </button>
+
+            <button type="button" class="story-thumb-btn" onclick="switchStoryPhoto(1)" id="storyThumb1">
+              <div class="story-thumb-preview">
+                <img src="/assets/images/d2.jpg" alt="The Founders of DÉLICE">
+              </div>
+              <div class="story-thumb-meta">
+                <h5>The Founders</h5>
+                <span>Four Close Friends</span>
+              </div>
+            </button>
           </div>
-          <div class="credibility-card">
-            <div class="credibility-num">03</div>
-            <h4>Honest Guidance</h4>
-            <p>We do not invent artificial longevity numbers or miraculous claims. We provide accurate guidance for the occasions our scents fit best.</p>
-          </div>
-          <div class="credibility-card">
-            <div class="credibility-num">04</div>
-            <h4>Considered Unboxing</h4>
-            <p>Protective folding cartons, pristine labels, and safe packaging so your fragrance arrives in gift-ready condition.</p>
+
+          <!-- Explore Our Story Button -->
+          <div class="story-teaser-action">
+            <a href="/story.html" class="btn btn-primary btn-explore-story">
+              Explore Our Story &rarr;
+            </a>
           </div>
         </div>
       </div>
@@ -451,7 +396,7 @@
         <div class="footer-col">
           <h4>Explore</h4>
           <ul class="footer-links">
-            <li><a href="#story">Our Brand Story</a></li>
+            <li><a href="/story.html">Our Brand Story</a></li>
             <li><a href="#discovery">Scent Guide &amp; Moods</a></li>
             <li><a href="/checkout.html">Checkout</a></li>
             <li><a href="/admin">Admin Portal</a></li>
@@ -604,12 +549,12 @@
       <span>Shop</span>
     </a>
 
-    <a href="#discovery" class="mobile-bar-item" aria-label="Scent Guide">
+    <a href="/story.html" class="mobile-bar-item" aria-label="Our Story">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
       </svg>
-      <span>Guide</span>
+      <span>Story</span>
     </a>
 
     <button type="button" class="mobile-bar-item" data-cart-open aria-label="Shopping Bag">
@@ -634,7 +579,7 @@
   </nav>
 
   <!-- Scripts -->
-  <script src="/js/cart.js?v=5.0.0"></script>
-  <script src="/js/app.js?v=5.0.0"></script>
+  <script src="/js/cart.js?v=5.1.0"></script>
+  <script src="/js/app.js?v=5.1.0"></script>
 </body>
 </html>

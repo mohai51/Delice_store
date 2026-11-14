@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=5.0.0">
+  <link rel="stylesheet" href="/css/style.css?v=5.1.0">
   <style>
     .gallery-thumbs {
       display: flex;
@@ -78,8 +78,8 @@
         </a>
         <ul class="nav-menu">
           <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="/index.html#collection" class="nav-link active">Shop</a></li>
-          <li><a href="/index.html#story" class="nav-link">Our Story</a></li>
+          <li><a href="/index.html#collection" class="nav-link">Shop</a></li>
+          <li><a href="/story.html" class="nav-link">Our Story</a></li>
           <li><a href="/index.html#contact" class="nav-link">Contact</a></li>
         </ul>
         <div class="nav-actions">
@@ -168,12 +168,12 @@
       <span>Shop</span>
     </a>
 
-    <a href="/#discovery" class="mobile-bar-item" aria-label="Scent Guide">
+    <a href="/story.html" class="mobile-bar-item" aria-label="Our Story">
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
       </svg>
-      <span>Guide</span>
+      <span>Story</span>
     </a>
 
     <button type="button" class="mobile-bar-item" data-cart-open aria-label="Shopping Bag">
@@ -197,8 +197,8 @@
     </a>
   </nav>
 
-  <script src="/js/cart.js?v=5.0.0"></script>
-  <script src="/js/app.js?v=5.0.0"></script>
+  <script src="/js/cart.js?v=5.1.0"></script>
+  <script src="/js/app.js?v=5.1.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
