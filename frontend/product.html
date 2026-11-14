@@ -284,8 +284,9 @@
 
       // Match packaging box SVG fallback
       let boxImg = '/assets/images/bloom-box.svg';
-      if (product.id.includes('momentum')) boxImg = '/assets/images/momentum-box.svg';
-      if (product.id.includes('enigma')) boxImg = '/assets/images/enigma-box.svg';
+      const safeId = String(product.id || prodId || '').toLowerCase();
+      if (safeId.includes('momentum')) boxImg = '/assets/images/momentum-box.svg';
+      if (safeId.includes('enigma')) boxImg = '/assets/images/enigma-box.svg';
 
       // Up to 4 product pictures
       const imgs = (product.images && product.images.length > 0)
@@ -454,7 +455,7 @@
 
             <!-- 6. Action Buttons -->
             <div class="product-page-actions">
-              <button type="button" class="btn btn-primary" onclick="DeliceCart.addItem(window.currentActiveProduct, 1)">
+              <button type="button" class="btn btn-primary btn-add-cart-detail" onclick="event.stopPropagation(); addProductToBag('${product.id}')" title="Add ${product.name} to Cart">
                 Add to Cart
               </button>
               <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold">

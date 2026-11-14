@@ -7,25 +7,110 @@ const DeliceCart = (function() {
   const STORAGE_KEY = 'delice_cart_items';
   let cartItems = [];
 
-  // Initialize cart from localStorage
+  // Helper to resolve product from ID string or product object
+  function resolveProduct(productOrId) {
+    if (!productOrId) return null;
+
+    // 1. If it's already an object with name and price
+    if (typeof productOrId === 'object') {
+      const pId = String(productOrId.id || productOrId._id || '').trim().toLowerCase().replace(/_/g, '-');
+      if (pId && productOrId.name) {
+        return {
+          id: pId,
+          name: productOrId.name,
+          price: Number(productOrId.price) || 799,
+          originalPrice: Number(productOrId.originalPrice) || 850,
+          volume: productOrId.volume || '30ml',
+          image: (productOrId.images && productOrId.images.length > 0) ? productOrId.images[0] : (productOrId.image || '/assets/images/bloom.svg'),
+          images: productOrId.images || [(productOrId.image || '/assets/images/bloom.svg')]
+        };
+      }
+    }
+
+    // 2. If it's a string ID or object with only id/_id
+    const rawId = typeof productOrId === 'object' ? (productOrId.id || productOrId._id || '') : productOrId;
+    const normId = String(rawId || '').trim().toLowerCase().replace(/_/g, '-');
+    if (!normId) return null;
+
+    // Search in globalProducts if defined
+    if (typeof globalProducts !== 'undefined' && Array.isArray(globalProducts) && globalProducts.length) {
+      const found = globalProducts.find(p => {
+        const pid = String(p.id || '').trim().toLowerCase().replace(/_/g, '-');
+        const poid = String(p._id || '').trim();
+        return pid === normId || poid === normId;
+      });
+      if (found) return resolveProduct(found);
+    }
+
+    // Search in window.currentActiveProduct
+    if (typeof window !== 'undefined' && window.currentActiveProduct) {
+      const cur = window.currentActiveProduct;
+      const curId = String(cur.id || cur._id || '').trim().toLowerCase().replace(/_/g, '-');
+      if (curId === normId) return resolveProduct(cur);
+    }
+
+    // Search in DEFAULT_PRODUCTS if defined
+    if (typeof DEFAULT_PRODUCTS !== 'undefined' && Array.isArray(DEFAULT_PRODUCTS)) {
+      const def = DEFAULT_PRODUCTS.find(p => {
+        const pid = String(p.id || '').trim().toLowerCase().replace(/_/g, '-');
+        return pid === normId;
+      });
+      if (def) return resolveProduct(def);
+    }
+
+    // Fallback named items
+    const nameMap = {
+      'delice-bloom': 'DÉLICE BLOOM',
+      'delice-momentum': 'DÉLICE MOMENTUM',
+      'delice-enigma': 'DÉLICE ENIGMA'
+    };
+    const fallbackName = nameMap[normId] || normId.toUpperCase().replace(/-/g, ' ');
+
+    return {
+      id: normId,
+      name: fallbackName,
+      price: 799,
+      originalPrice: 850,
+      volume: '30ml',
+      image: `/assets/images/${normId.includes('momentum') ? 'momentum' : normId.includes('enigma') ? 'enigma' : 'bloom'}.svg`,
+      images: [`/assets/images/${normId.includes('momentum') ? 'momentum' : normId.includes('enigma') ? 'enigma' : 'bloom'}.svg`]
+    };
+  }
+
+  // Initialize cart from localStorage with corruption safety
   function init() {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       cartItems = stored ? JSON.parse(stored) : [];
+      if (!Array.isArray(cartItems)) cartItems = [];
     } catch (e) {
       console.warn('Could not read cart from localStorage', e);
       cartItems = [];
     }
+    // Filter and sanitize items
+    cartItems = cartItems.filter(item => item && (item.id || item._id)).map(item => ({
+      id: String(item.id || item._id).toLowerCase().replace(/_/g, '-'),
+      name: item.name || 'DÉLICE Fragrance',
+      price: Number(item.price) || 799,
+      originalPrice: Number(item.originalPrice) || 850,
+      volume: item.volume || '30ml',
+      image: item.image || '/assets/images/bloom.svg',
+      images: item.images || [item.image || '/assets/images/bloom.svg'],
+      quantity: Math.max(1, parseInt(item.quantity, 10) || 1)
+    }));
+
     updateBadge();
     renderDrawerItems();
     attachListeners();
   }
 
   function getItems() {
+    if (!Array.isArray(cartItems)) cartItems = [];
     return [...cartItems];
   }
 
   function save() {
+    if (!Array.isArray(cartItems)) cartItems = [];
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cartItems));
     } catch (e) {
@@ -36,17 +121,23 @@ const DeliceCart = (function() {
     window.dispatchEvent(new CustomEvent('delice:cartUpdated', { detail: { items: cartItems } }));
   }
 
-  function addItem(product, quantity = 1) {
-    if (!product || !product.id) return;
+  function addItem(productOrId, quantity = 1) {
+    const product = resolveProduct(productOrId);
+    if (!product || !product.id) {
+      console.warn('DeliceCart.addItem: Unable to resolve product:', productOrId);
+      return;
+    }
+
     const qty = parseInt(quantity, 10) || 1;
     if (qty <= 0) return;
 
-    const existingIndex = cartItems.findIndex(item => item.id === product.id);
+    if (!Array.isArray(cartItems)) cartItems = [];
 
+    const existingIndex = cartItems.findIndex(item => item && item.id === product.id);
     const primaryImg = (product.images && product.images.length > 0) ? product.images[0] : (product.image || '/assets/images/bloom.svg');
 
     if (existingIndex > -1) {
-      cartItems[existingIndex].quantity += qty;
+      cartItems[existingIndex].quantity = (parseInt(cartItems[existingIndex].quantity, 10) || 0) + qty;
       if (primaryImg) cartItems[existingIndex].image = primaryImg;
     } else {
       cartItems.push({
@@ -67,12 +158,14 @@ const DeliceCart = (function() {
   }
 
   function updateQuantity(productId, quantity) {
+    if (!Array.isArray(cartItems)) cartItems = [];
+    const normId = String(productId || '').toLowerCase().replace(/_/g, '-');
     const qty = parseInt(quantity, 10);
-    const index = cartItems.findIndex(item => item.id === productId);
+    const index = cartItems.findIndex(item => item && item.id === normId);
     if (index === -1) return;
 
     if (qty <= 0) {
-      removeItem(productId);
+      removeItem(normId);
     } else {
       cartItems[index].quantity = qty;
       save();
@@ -80,8 +173,10 @@ const DeliceCart = (function() {
   }
 
   function removeItem(productId) {
-    const item = cartItems.find(i => i.id === productId);
-    cartItems = cartItems.filter(item => item.id !== productId);
+    if (!Array.isArray(cartItems)) cartItems = [];
+    const normId = String(productId || '').toLowerCase().replace(/_/g, '-');
+    const item = cartItems.find(i => i && i.id === normId);
+    cartItems = cartItems.filter(i => i && i.id !== normId);
     save();
     if (item) {
       showToast(`Removed ${item.name} from your bag.`);
@@ -97,7 +192,7 @@ const DeliceCart = (function() {
     if (!productsList || !productsList.length || !cartItems.length) return;
     let changed = false;
     cartItems.forEach(item => {
-      const p = productsList.find(x => x.id === item.id);
+      const p = productsList.find(x => x && (x.id === item.id || x._id === item.id));
       if (p) {
         const primaryImg = (p.images && p.images.length > 0) ? p.images[0] : p.image;
         if (primaryImg && item.image !== primaryImg) {
@@ -108,23 +203,26 @@ const DeliceCart = (function() {
     });
     if (changed) {
       save();
-      renderDrawer();
     }
   }
 
   function getSubtotal() {
-    return cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    if (!Array.isArray(cartItems)) return 0;
+    return cartItems.reduce((acc, item) => acc + ((Number(item.price) || 0) * (parseInt(item.quantity, 10) || 1)), 0);
   }
 
   function getSavings() {
+    if (!Array.isArray(cartItems)) return 0;
     return cartItems.reduce((acc, item) => {
-      const orig = item.originalPrice || item.price;
-      return acc + ((orig - item.price) * item.quantity);
+      const orig = Number(item.originalPrice) || Number(item.price) || 0;
+      const cur = Number(item.price) || 0;
+      return acc + ((orig - cur) * (parseInt(item.quantity, 10) || 1));
     }, 0);
   }
 
   function getTotalItemsCount() {
-    return cartItems.reduce((acc, item) => acc + item.quantity, 0);
+    if (!Array.isArray(cartItems)) return 0;
+    return cartItems.reduce((acc, item) => acc + (parseInt(item.quantity, 10) || 0), 0);
   }
 
   function updateBadge() {
@@ -139,21 +237,25 @@ const DeliceCart = (function() {
   function openDrawer() {
     const drawer = document.getElementById('cartDrawer');
     const overlay = document.getElementById('cartOverlay');
-    if (drawer && overlay) {
+    if (drawer) {
       drawer.classList.add('active');
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
     }
+    if (overlay) {
+      overlay.classList.add('active');
+    }
+    document.body.style.overflow = 'hidden';
   }
 
   function closeDrawer() {
     const drawer = document.getElementById('cartDrawer');
     const overlay = document.getElementById('cartOverlay');
-    if (drawer && overlay) {
+    if (drawer) {
       drawer.classList.remove('active');
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
     }
+    if (overlay) {
+      overlay.classList.remove('active');
+    }
+    document.body.style.overflow = '';
   }
 
   function renderDrawerItems() {
@@ -161,7 +263,7 @@ const DeliceCart = (function() {
     const footerContainer = document.getElementById('drawerCartFooter');
     if (!container) return;
 
-    if (cartItems.length === 0) {
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
       container.innerHTML = `
         <div class="cart-empty-message">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -191,12 +293,12 @@ const DeliceCart = (function() {
           <h4>${item.name}</h4>
           <div class="cart-item-price">৳${item.price} <span style="font-size:0.75rem; color:#87828A;">(${item.volume})</span></div>
           <div class="quantity-control">
-            <button type="button" class="qty-btn" onclick="DeliceCart.updateQuantity('${item.id}', ${item.quantity - 1})">−</button>
+            <button type="button" class="qty-btn" onclick="DeliceCart.updateQuantity('${item.id}', ${item.quantity - 1})" aria-label="Decrease quantity">−</button>
             <span class="qty-val">${item.quantity}</span>
-            <button type="button" class="qty-btn" onclick="DeliceCart.updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
+            <button type="button" class="qty-btn" onclick="DeliceCart.updateQuantity('${item.id}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
           </div>
         </div>
-        <button type="button" class="cart-item-remove" title="Remove item" onclick="DeliceCart.removeItem('${item.id}')">&times;</button>
+        <button type="button" class="cart-item-remove" title="Remove item" onclick="DeliceCart.removeItem('${item.id}')" aria-label="Remove item">&times;</button>
       </div>
     `).join('');
 
@@ -222,8 +324,8 @@ const DeliceCart = (function() {
         color: #F6F0E8;
         padding: 0.9rem 1.4rem;
         border-radius: 4px;
-        box-shadow: 0 10px 25px rgba(24, 22, 25, 0.3);
-        z-index: 3000;
+        box-shadow: 0 10px 25px rgba(24, 22, 25, 0.35);
+        z-index: 9999;
         font-size: 0.875rem;
         font-weight: 500;
         border-left: 3px solid #C5A46D;
@@ -232,11 +334,13 @@ const DeliceCart = (function() {
         gap: 0.75rem;
         transform: translateY(100px);
         opacity: 0;
+        pointer-events: none;
         transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
       `;
       document.body.appendChild(toast);
     }
     toast.textContent = message;
+    toast.style.pointerEvents = 'auto';
     toast.style.transform = 'translateY(0)';
     toast.style.opacity = '1';
 
@@ -244,41 +348,52 @@ const DeliceCart = (function() {
     toast.timer = setTimeout(() => {
       toast.style.transform = 'translateY(100px)';
       toast.style.opacity = '0';
+      toast.style.pointerEvents = 'none';
     }, 3200);
   }
 
+  let listenersAttached = false;
   function attachListeners() {
-    // Cart open buttons
-    document.querySelectorAll('[data-cart-open]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+    if (listenersAttached) return;
+    listenersAttached = true;
+
+    // Delegated click listeners for open, close, and overlay
+    document.addEventListener('click', (e) => {
+      const openBtn = e.target.closest('[data-cart-open]');
+      if (openBtn) {
         e.preventDefault();
         openDrawer();
-      });
-    });
+        return;
+      }
 
-    // Cart close buttons
-    document.querySelectorAll('[data-cart-close]').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      const closeBtn = e.target.closest('[data-cart-close]');
+      if (closeBtn) {
         e.preventDefault();
         closeDrawer();
-      });
+        return;
+      }
+
+      if (e.target && e.target.id === 'cartOverlay') {
+        closeDrawer();
+      }
     });
 
-    // Close on overlay click
-    const overlay = document.getElementById('cartOverlay');
-    if (overlay) {
-      overlay.addEventListener('click', closeDrawer);
-    }
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeDrawer();
+      }
+    });
   }
 
-  // Auto-init on DOMContentLoaded
+  // Auto-init on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
 
-  return {
+  const api = {
     init,
     getItems,
     addItem,
@@ -291,6 +406,18 @@ const DeliceCart = (function() {
     openDrawer,
     closeDrawer,
     showToast,
-    syncWithProducts
+    syncWithProducts,
+    resolveProduct
   };
+
+  if (typeof window !== 'undefined') {
+    window.DeliceCart = api;
+    window.addProductToBag = function(productOrId, qty = 1) {
+      return api.addItem(productOrId, qty);
+    };
+    window.openCartDrawer = openDrawer;
+    window.closeCartDrawer = closeDrawer;
+  }
+
+  return api;
 })();

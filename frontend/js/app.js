@@ -663,12 +663,16 @@ function changeCardImage(prodId, imgSrc, btnEl, event) {
 }
 window.changeCardImage = changeCardImage;
 
-function addProductToBag(productId) {
-  const product = globalProducts.find(p => p.id === productId);
-  if (product) {
-    DeliceCart.addItem(product, 1);
+function addProductToBag(productOrId, quantity = 1) {
+  if (typeof DeliceCart !== 'undefined' && typeof DeliceCart.addItem === 'function') {
+    return DeliceCart.addItem(productOrId, quantity);
+  } else if (typeof window !== 'undefined' && window.DeliceCart && typeof window.DeliceCart.addItem === 'function') {
+    return window.DeliceCart.addItem(productOrId, quantity);
+  } else {
+    console.warn('DeliceCart is not ready yet');
   }
 }
+window.addProductToBag = addProductToBag;
 
 function viewProductDetails(productId) {
   const normId = String(productId).toLowerCase().replace(/_/g, '-');
