@@ -2,31 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Successful — DÉLICE Fragrances</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Order Confirmed — DÉLICE Fragrances</title>
   <link rel="icon" type="image/svg+xml" href="/assets/images/monogram.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=6.1.0">
-  <style>
-    @media print {
-      .site-header, .site-footer, .no-print {
-        display: none !important;
-      }
-      .payment-result-card {
-        border: none !important;
-        box-shadow: none !important;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="/css/style.css?v=6.6.0">
 </head>
 <body>
 
   <header class="site-header">
     <div class="container">
       <nav class="navbar" style="justify-content:center;">
-        <a href="/" class="navbar-brand">
+        <a href="/" class="navbar-brand" aria-label="DÉLICE Home">
           <img src="/assets/images/logo.svg" alt="DÉLICE" height="46">
         </a>
       </nav>
@@ -37,33 +26,25 @@
     <div class="container container-narrow">
       <div class="payment-result-card">
         <div class="status-icon-wrapper status-icon-success">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         </div>
 
-        <span class="tagline-sub">ORDER CONFIRMED &bull; FULLY PAID</span>
-        <h1 style="font-size:2rem; margin-bottom:0.5rem; color:#4A102A;">Thank You for Your Order</h1>
-        <p style="color:#59555B; margin-bottom:1.5rem;">
-          Your order and bKash / Nagad payment reference have been received. We are preparing your DÉLICE fragrance with considered care.
+        <span class="tagline-sub">ORDER CONFIRMED</span>
+        <h1 style="font-size:1.85rem; margin-bottom:0.4rem; color:#4A102A;">Thank You for Your Order</h1>
+        <p id="confirmSubMessage" style="color:#59555B; font-size:0.92rem; margin-bottom:1.5rem; line-height:1.5;">
+          Your order has been placed successfully. We are preparing your DÉLICE fragrance with considered care.
         </p>
 
         <div class="receipt-breakdown" id="receiptDetails">
           <div style="text-align:center; padding:1.5rem; color:#87828A;">
-            Loading order and verification details...
+            Loading order details...
           </div>
         </div>
 
-        <div class="no-print" style="display:flex; justify-content:center; gap:1rem; margin-top:2rem; flex-wrap:wrap;">
-          <button type="button" class="btn btn-secondary" onclick="window.print()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 6 2 18 2 18 9"></polyline>
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-              <rect x="6" y="14" width="12" height="8"></rect>
-            </svg>
-            Print Receipt
-          </button>
-          <a href="/" class="btn btn-primary">Return to Homepage</a>
+        <div style="display:flex; justify-content:center; margin-top:1.5rem;">
+          <a href="/" class="btn-return-home">Return to Homepage &rarr;</a>
         </div>
       </div>
     </div>
@@ -78,33 +59,32 @@
     </div>
   </footer>
 
-  <script src="/js/cart.js"></script>
+  <script src="/js/cart.js?v=6.6.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      // Clear shopping bag after successful payment
-      DeliceCart.clearCart();
+      // Clear shopping bag after successful order placement
+      if (typeof DeliceCart !== 'undefined') {
+        DeliceCart.clearCart();
+      }
 
       const urlParams = new URLSearchParams(window.location.search);
       const tranId = urlParams.get('tran_id') || urlParams.get('tranId');
       const orderId = urlParams.get('order_id') || urlParams.get('orderId');
 
       const receiptEl = document.getElementById('receiptDetails');
+      const subMessageEl = document.getElementById('confirmSubMessage');
 
       if (!tranId && !orderId) {
-        receiptEl.innerHTML = `
-          <div class="receipt-row"><span>Status:</span><strong style="color:#2E7D32;">PAID</strong></div>
-          <div class="receipt-row"><span>Date:</span><span>${new Date().toLocaleDateString('en-GB')}</span></div>
-          <p style="margin-top:1rem; font-size:0.85rem; color:#59555B;">Your order reference will be sent via SMS / email.</p>
-        `;
+        renderFallback('', '');
         return;
       }
 
       try {
-        const fetchUrl = tranId ? `/api/orders/by-transaction/${tranId}` : `/api/orders/${orderId}`;
+        const fetchUrl = tranId ? `/api/orders/by-transaction/${encodeURIComponent(tranId)}` : `/api/orders/${encodeURIComponent(orderId)}`;
         const res = await fetch(fetchUrl);
         if (res.ok) {
           const order = await res.json();
-          renderReceipt(order);
+          renderConfirmedOrder(order);
         } else {
           renderFallback(tranId, orderId);
         }
@@ -112,80 +92,226 @@
         renderFallback(tranId, orderId);
       }
 
-      function renderReceipt(order) {
+      function renderConfirmedOrder(order) {
+        const isCampusHub = Boolean(order.deliveryHub);
         const isCOD = order.paymentMethod === 'cod_advance';
-        const methodTitle = isCOD 
-          ? `Cash on Delivery (${order.paymentProvider ? order.paymentProvider.toUpperCase() : 'bKash'} Advance Delivery Fee Paid)`
-          : `100% Online Payment (${order.paymentProvider ? order.paymentProvider.toUpperCase() : 'bKash'} Send Money)`;
+        const provLower = (order.paymentProvider || 'bkash').toLowerCase();
+        const advancePaid = Number(order.advancePaid !== undefined ? order.advancePaid : (order.totalPaid || 0));
+        const cashDue = isCOD ? Number(order.cashDueOnDelivery || order.productSubtotal || 0) : 0;
+        const isHandCash = provLower === 'hand_cash' || (isCampusHub && isCOD && advancePaid === 0);
+
+        // Dynamic Subtitle message matching exact order mode
+        if (subMessageEl) {
+          if (isHandCash) {
+            subMessageEl.innerHTML = `Your order for campus delivery has been confirmed. Please pay <strong>৳${cashDue}</strong> in cash hand-to-hand upon parcel collection at <strong>${order.deliveryHub}</strong> campus.`;
+          } else if (isCOD) {
+            subMessageEl.innerHTML = `Your order and advance delivery fee have been received. Please keep <strong>৳${cashDue}</strong> cash ready for the courier rider upon delivery.`;
+          } else {
+            subMessageEl.innerHTML = `Your order and 100% online payment reference have been received. We are preparing your DÉLICE fragrance with considered care.`;
+          }
+        }
+
+        const totalSavings = (order.items || []).reduce((sum, item) => {
+          const diff = (item.originalPrice && item.originalPrice > item.price) ? (item.originalPrice - item.price) : 51;
+          return sum + (diff * (item.quantity || 1));
+        }, 0);
+
+        const orderDateStr = order.createdAt 
+          ? new Date(order.createdAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+          : new Date().toLocaleDateString('en-GB');
 
         receiptEl.innerHTML = `
-          <div class="receipt-row">
-            <span>Order Number:</span>
-            <strong>#${order.orderNumber || order._id}</strong>
-          </div>
-          <div class="receipt-row">
-            <span>Transaction ID (TrxID):</span>
-            <code style="font-size:0.95rem; font-weight:700; color:#4A102A;">${order.transactionId || tranId || 'N/A'}</code>
-          </div>
-          <div class="receipt-row">
-            <span>Recipient Name:</span>
-            <span>${order.customer?.fullName || 'Valued Customer'}</span>
-          </div>
-          <div class="receipt-row">
-            <span>Contact Phone:</span>
-            <span>${order.customer?.phone || 'N/A'}</span>
-          </div>
-          <div class="receipt-row">
-            <span>Delivery Destination:</span>
-            <span>${order.customer?.address}, ${order.customer?.district}</span>
-          </div>
-          <div class="receipt-row">
-            <span>Payment Method:</span>
-            <strong style="color:#4A102A;">${methodTitle}</strong>
-          </div>
-          ${order.senderNumber ? `
-          <div class="receipt-row">
-            <span>Sender Mobile Number:</span>
-            <span>${order.senderNumber}</span>
-          </div>` : ''}
-          <div class="receipt-row">
-            <span>Payment Status:</span>
-            <strong style="color:${order.paymentStatus === 'paid' ? '#15803D' : '#D97706'};">${(order.paymentStatus || 'AWAITING_VERIFICATION').toUpperCase().replace('_', ' ')}</strong>
-          </div>
-
-          <div style="margin:1rem 0 0.5rem; padding-top:0.75rem; border-top:1px dashed #E0D4C3;">
-            <strong style="font-size:0.85rem; text-transform:uppercase; color:#4A102A;">Items Purchased</strong>
-          </div>
-
-          ${(order.items || []).map(i => `
-            <div class="receipt-row" style="font-size:0.85rem;">
-              <span>${i.productName} (${i.volume || '30ml'}) × ${i.quantity}</span>
-              <span>৳${i.price * i.quantity}</span>
+          <div class="confirm-order-wrapper">
+            <!-- Order ID & Date Strip -->
+            <div class="confirm-order-strip">
+              <div class="confirm-order-id">
+                <span class="label">Order ID</span>
+                <strong class="value">#${order.orderNumber || order._id}</strong>
+              </div>
+              <div class="confirm-order-date">
+                <span class="label">Date &amp; Time</span>
+                <span class="value" style="font-size:0.85rem; color:#4B5563; font-weight:600;">${orderDateStr}</span>
+              </div>
             </div>
-          `).join('')}
 
-          <div class="receipt-row" style="margin-top:0.5rem; font-size:0.85rem;">
-            <span>Product Subtotal:</span>
-            <span>৳${order.productSubtotal || 0}</span>
-          </div>
-          <div class="receipt-row" style="font-size:0.85rem;">
-            <span>Delivery Fee (${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka' : 'Outside Dhaka'}):</span>
-            <span>৳${order.deliveryCharge || 0}</span>
-          </div>
-          <div class="receipt-row total">
-            <span>Total Order Value:</span>
-            <span>৳${order.totalPayable}</span>
-          </div>
-
-          <!-- Advance vs Cash Due Card -->
-          <div style="background:#FAF6F0; border:1px solid #C5A46D; border-radius:6px; padding:0.85rem 1rem; margin-top:1rem;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.35rem; font-size:0.9rem;">
-              <span style="font-weight:700; color:#4A102A;">Advance Received (bKash/Nagad):</span>
-              <strong style="color:#4A102A;">৳${order.advancePaid || order.totalPaid || 0}</strong>
+            <!-- 1. Recipient Details -->
+            <div class="confirm-card-section">
+              <div class="confirm-section-header">
+                <span class="sec-num">1</span>
+                <span class="sec-title">Recipient Details</span>
+              </div>
+              <div class="confirm-row">
+                <span>Full Name:</span>
+                <strong>${order.customer?.fullName || 'Valued Customer'}</strong>
+              </div>
+              <div class="confirm-row">
+                <span>Mobile Number:</span>
+                <strong>${order.customer?.phone || 'N/A'}</strong>
+              </div>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
-              <span style="font-weight:600; color:#181619;">Cash to Pay Courier Rider upon Delivery:</span>
-              <strong style="color:${isCOD ? '#B91C1C' : '#15803D'}; font-size:1rem;">৳${isCOD ? (order.cashDueOnDelivery || order.productSubtotal || 0) : 0}</strong>
+
+            <!-- 2. Delivery Destination -->
+            <div class="confirm-card-section">
+              <div class="confirm-section-header">
+                <span class="sec-num">2</span>
+                <span class="sec-title">Delivery Destination</span>
+              </div>
+              ${isCampusHub ? `
+                <div class="confirm-row">
+                  <span>Campus Delivery Hub:</span>
+                  <span class="hub-pill-highlight">🏫 ${order.deliveryHub} Campus • Free Delivery ৳0</span>
+                </div>
+              ` : `
+                <div class="confirm-row">
+                  <span>District:</span>
+                  <strong>${order.customer?.district || 'Dhaka'} (${order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka City • ৳60' : 'Outside Dhaka • ৳120'})</strong>
+                </div>
+              `}
+              <div class="confirm-row" style="align-items:flex-start; margin-top:0.25rem;">
+                <span style="white-space:nowrap; margin-right:0.5rem;">Detailed Address:</span>
+                <span style="font-weight:600; color:#181619; text-align:right;">${order.customer?.address || 'N/A'}</span>
+              </div>
+            </div>
+
+            <!-- 3. Ordered Fragrance Editions -->
+            <div class="confirm-card-section">
+              <div class="confirm-section-header">
+                <span class="sec-num">3</span>
+                <span class="sec-title">Ordered Fragrance Editions (30ml)</span>
+              </div>
+              <div class="confirm-items-list">
+                ${(order.items || []).map(i => {
+                  const price = Number(i.price) || 799;
+                  const origPrice = Number(i.originalPrice) || 850;
+                  const qty = Number(i.quantity) || 1;
+                  return `
+                    <div class="confirm-item-row">
+                      <div class="confirm-item-left">
+                        <span style="font-size:1.1rem;">✨</span>
+                        <div>
+                          <div class="confirm-item-name">${i.productName}</div>
+                          <div class="confirm-item-meta">${i.volume || '30ml'} Eau De Parfum &bull; Qty: ${qty}</div>
+                        </div>
+                      </div>
+                      <div class="confirm-item-right">
+                        <div class="confirm-item-price">৳${price * qty}</div>
+                        <div class="confirm-item-orig"><del>৳${origPrice * qty}</del></div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- 4. Order Summary & Price Breakdown -->
+            <div class="confirm-card-section">
+              <div class="confirm-section-header">
+                <span class="sec-num">4</span>
+                <span class="sec-title">Order Summary</span>
+              </div>
+              <div class="confirm-row">
+                <span>Product Subtotal:</span>
+                <span>৳${order.productSubtotal || 0}</span>
+              </div>
+              ${totalSavings > 0 ? `
+                <div class="confirm-row savings-highlight-row">
+                  <span>Savings (Special Launch Offer):</span>
+                  <span class="savings-tag">-৳${totalSavings}</span>
+                </div>
+              ` : ''}
+              <div class="confirm-row">
+                <span>Delivery Charge:</span>
+                <span>${isCampusHub ? '<strong style="color:#15803D;">৳0 (FREE Delivery)</strong>' : `৳${order.deliveryCharge || 0}`}</span>
+              </div>
+              <div class="confirm-row confirm-total-row">
+                <span>Total Order Value:</span>
+                <strong>৳${order.totalPayable}</strong>
+              </div>
+            </div>
+
+            <!-- 5. Payment Details & Settlement -->
+            <div class="confirm-card-section ${isHandCash ? 'hand-cash-border' : ''}">
+              <div class="confirm-section-header">
+                <span class="sec-num">5</span>
+                <span class="sec-title">Payment &amp; Settlement Details</span>
+              </div>
+
+              ${isHandCash ? `
+                <!-- Campus Hand-to-Hand Cash -->
+                <div class="hand-cash-box">
+                  <div class="hand-cash-badge">
+                    <span>🤝 Campus Hand-to-Hand Cash</span>
+                    <span class="zero-advance-pill">৳0 Advance</span>
+                  </div>
+                  <p class="hand-cash-desc">
+                    No advance payment was required. Please pay <strong>৳${cashDue}</strong> in cash directly upon parcel collection at <strong>${order.deliveryHub}</strong> campus.
+                  </p>
+                </div>
+                <div class="confirm-row">
+                  <span>Payment Method:</span>
+                  <strong>Cash on Delivery (Campus Handover)</strong>
+                </div>
+                <div class="confirm-row">
+                  <span>Advance Paid Now:</span>
+                  <strong style="color:#15803D;">৳0</strong>
+                </div>
+                <div class="confirm-row due-row">
+                  <span style="font-weight:700; color:#991B1B;">Cash to Pay at Campus:</span>
+                  <strong style="color:#B91C1C; font-size:1.05rem;">৳${cashDue}</strong>
+                </div>
+              ` : isCOD ? `
+                <!-- Regular Home Delivery COD -->
+                <div class="confirm-row">
+                  <span>Payment Method:</span>
+                  <strong>Cash on Delivery (Advance Fee Paid)</strong>
+                </div>
+                <div class="confirm-row">
+                  <span>Payment Provider:</span>
+                  <span style="font-weight:700; color:#4A102A; text-transform:uppercase;">${order.paymentProvider || 'bKash'} Send Money</span>
+                </div>
+                <div class="confirm-row">
+                  <span>Sender Mobile Number:</span>
+                  <code>${order.senderNumber || order.customer?.phone || 'N/A'}</code>
+                </div>
+                <div class="confirm-row">
+                  <span>Transaction ID (TrxID):</span>
+                  <code class="trxid-badge">${order.transactionId || 'N/A'}</code>
+                </div>
+                <div class="confirm-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
+                  <span>Advance Delivery Fee Paid:</span>
+                  <strong style="color:#15803D;">৳${advancePaid}</strong>
+                </div>
+                <div class="confirm-row due-row">
+                  <span style="font-weight:700; color:#991B1B;">Cash Due to Courier Rider:</span>
+                  <strong style="color:#B91C1C; font-size:1.05rem;">৳${cashDue}</strong>
+                </div>
+              ` : `
+                <!-- 100% Online Payment -->
+                <div class="confirm-row">
+                  <span>Payment Method:</span>
+                  <strong>100% Online Payment</strong>
+                </div>
+                <div class="confirm-row">
+                  <span>Payment Provider:</span>
+                  <span style="font-weight:700; color:#4A102A; text-transform:uppercase;">${order.paymentProvider || 'bKash'} Send Money</span>
+                </div>
+                <div class="confirm-row">
+                  <span>Sender Mobile Number:</span>
+                  <code>${order.senderNumber || order.customer?.phone || 'N/A'}</code>
+                </div>
+                <div class="confirm-row">
+                  <span>Transaction ID (TrxID):</span>
+                  <code class="trxid-badge">${order.transactionId || 'N/A'}</code>
+                </div>
+                <div class="confirm-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
+                  <span>Total Paid Online:</span>
+                  <strong style="color:#15803D; font-size:1.05rem;">৳${order.totalPayable}</strong>
+                </div>
+                <div class="confirm-row">
+                  <span>Cash Due on Delivery:</span>
+                  <strong style="color:#15803D;">৳0 (Fully Settled)</strong>
+                </div>
+              `}
             </div>
           </div>
         `;
@@ -193,10 +319,28 @@
 
       function renderFallback(tId, oId) {
         receiptEl.innerHTML = `
-          <div class="receipt-row"><span>Transaction Reference:</span><code>${tId || 'VERIFIED'}</code></div>
-          <div class="receipt-row"><span>Order ID:</span><strong>#${oId || 'DLC-' + Date.now().toString().slice(-6)}</strong></div>
-          <div class="receipt-row"><span>Payment Status:</span><strong style="color:#2E7D32;">PAID &amp; VERIFIED</strong></div>
-          <div class="receipt-row"><span>Estimated Dispatch:</span><span>Within 24 Hours</span></div>
+          <div class="confirm-order-wrapper">
+            <div class="confirm-order-strip">
+              <div class="confirm-order-id">
+                <span class="label">Order Reference</span>
+                <strong class="value">#${oId || 'DLC-' + Date.now().toString().slice(-6)}</strong>
+              </div>
+              <div class="confirm-order-date">
+                <span class="label">Status</span>
+                <strong style="color:#15803D; font-size:0.88rem;">ORDER RECEIVED</strong>
+              </div>
+            </div>
+            <div class="confirm-card-section">
+              <div class="confirm-row">
+                <span>Reference:</span>
+                <code>${tId || oId || 'CONFIRMED'}</code>
+              </div>
+              <div class="confirm-row">
+                <span>Estimated Processing:</span>
+                <span style="font-weight:600; color:#181619;">Within 24 Hours</span>
+              </div>
+            </div>
+          </div>
         `;
       }
     });
