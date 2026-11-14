@@ -2809,7 +2809,16 @@ body, p, li, span, input, select, textarea, label {
   gap: 0.45rem;
 }
 
+.hub-radio-hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
 .campus-hub-btn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2835,6 +2844,7 @@ body, p, li, span, input, select, textarea, label {
   transform: translateY(-1px);
 }
 
+.campus-hub-btn:has(input:checked),
 .campus-hub-btn.active {
   background: linear-gradient(135deg, #4A102A 0%, #300619 100%) !important;
   border-color: #4A102A !important;
@@ -2850,6 +2860,7 @@ body, p, li, span, input, select, textarea, label {
   line-height: 1.1;
 }
 
+.campus-hub-btn:has(input:checked) .hub-btn-name,
 .campus-hub-btn.active .hub-btn-name {
   color: #FFFFFF !important;
 }
@@ -2862,6 +2873,7 @@ body, p, li, span, input, select, textarea, label {
   letter-spacing: 0.02em;
 }
 
+.campus-hub-btn:has(input:checked) .hub-btn-badge,
 .campus-hub-btn.active .hub-btn-badge {
   color: #FBBF24 !important;
 }

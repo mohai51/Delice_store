@@ -47,11 +47,18 @@ exports.createOrder = async (req, res, next) => {
     const isHubTrx = Boolean(transactionId && (transactionId.toUpperCase().startsWith('HUB-COD-') || transactionId.toUpperCase().startsWith('CAMPUS-COD-')));
     const isHandCashProvider = (paymentProvider === 'hand_cash');
 
-    // Auto-detect hub if client omitted deliveryHub field but indicated campus delivery
+    // Auto-detect hub if client omitted deliveryHub field or passed it in district/address
+    if (!chosenHub) {
+      const combinedText = `${customer.district || ''} ${customer.address || ''} ${customer.orderNotes || ''}`.toUpperCase();
+      const matched = VALID_CAMPUS_HUBS.find(h => {
+        const regex = new RegExp(`(^|[^A-Z])${h}([^A-Z]|$)`, 'i');
+        return regex.test(combinedText);
+      });
+      if (matched) chosenHub = matched;
+    }
+
     if (!chosenHub && (isExplicitCampusArea || isHubTrx || isHandCashProvider)) {
-      const combinedText = `${customer.address || ''} ${customer.district || ''} ${customer.orderNotes || ''}`.toUpperCase();
-      const matched = VALID_CAMPUS_HUBS.find(h => combinedText.includes(h));
-      chosenHub = matched || 'UIU';
+      chosenHub = 'UIU';
     }
 
     const isCampusHub = Boolean(chosenHub && VALID_CAMPUS_HUBS.includes(chosenHub)) || isExplicitCampusArea || isHubTrx || isHandCashProvider;

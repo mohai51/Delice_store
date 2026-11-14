@@ -73,12 +73,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     checkoutItems = (typeof DeliceCart !== 'undefined') ? DeliceCart.getItems() : [];
   }
 
-  // 3. District selector listener — Auto Delivery Charge calculation
+  // 3. District selector listener — Auto Delivery Charge calculation & Campus Hub Sync
   const districtSelect = document.getElementById('districtSelect');
   if (districtSelect) {
-    syncDeliveryAreaFromDistrict(districtSelect.value);
     districtSelect.addEventListener('change', (e) => {
-      syncDeliveryAreaFromDistrict(e.target.value);
+      const val = (e.target.value || '').trim();
+      if (val.startsWith('Campus-')) {
+        const hub = val.replace('Campus-', '').toUpperCase();
+        selectCampusHub(hub);
+      } else {
+        if (selectedCampusHub) {
+          deselectCampusHub(false);
+        }
+        syncDeliveryAreaFromDistrict(val);
+      }
     });
   }
 
@@ -126,19 +134,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 6. Campus Delivery Hubs (Free Delivery ৳0 for UIU, NSU, IUB, AIUB, BRACU, EWU)
   const hubButtons = document.querySelectorAll('.campus-hub-btn');
+  const hubRadios = document.querySelectorAll('input[name="selectedCampusHubRadio"]');
   const activeHubBanner = document.getElementById('campusHubActiveBanner');
   const selectedHubDisplay = document.getElementById('selectedHubDisplay');
   const btnRemoveHub = document.getElementById('btnRemoveHub');
   const hiddenHubInput = document.getElementById('selectedCampusHubInput');
 
-  // Check if browser restored a value in hidden input
-  if (hiddenHubInput && hiddenHubInput.value) {
-    selectCampusHub(hiddenHubInput.value.trim().toUpperCase());
-  }
+  // Listen for native radio changes
+  hubRadios.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const hub = (e.target.value || '').trim().toUpperCase();
+      if (hub) {
+        selectCampusHub(hub);
+      } else {
+        deselectCampusHub();
+      }
+    });
+  });
 
+  // Direct label/button clicks
   hubButtons.forEach(btn => {
     btn.addEventListener('click', (e) => {
-      e.preventDefault();
       const hub = (btn.getAttribute('data-hub') || btn.dataset.hub || '').trim().toUpperCase();
       if (!hub) return;
       selectCampusHub(hub);
@@ -154,26 +170,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function selectCampusHub(hubCode) {
     selectedCampusHub = hubCode;
-    const inputEl = document.getElementById('selectedCampusHubInput');
-    if (inputEl) inputEl.value = hubCode;
+    if (hiddenHubInput) hiddenHubInput.value = hubCode;
+
+    // Check matching radio
+    const matchingRadio = document.querySelector(`input[name="selectedCampusHubRadio"][value="${hubCode}"]`);
+    if (matchingRadio) matchingRadio.checked = true;
+
+    // Sync district dropdown
+    if (districtSelect) {
+      districtSelect.value = `Campus-${hubCode}`;
+    }
 
     hubButtons.forEach(b => {
       const bHub = (b.getAttribute('data-hub') || b.dataset.hub || '').trim().toUpperCase();
       b.classList.toggle('active', bHub === hubCode);
     });
+
     if (activeHubBanner) activeHubBanner.style.display = 'flex';
     if (selectedHubDisplay) selectedHubDisplay.textContent = hubCode;
     renderOrderSummary();
   }
 
-  function deselectCampusHub() {
+  function deselectCampusHub(syncDistrict = true) {
     selectedCampusHub = null;
-    const inputEl = document.getElementById('selectedCampusHubInput');
-    if (inputEl) inputEl.value = '';
+    if (hiddenHubInput) hiddenHubInput.value = '';
+
+    const noneRadio = document.getElementById('hubRadioNone');
+    if (noneRadio) noneRadio.checked = true;
+
+    if (syncDistrict && districtSelect && districtSelect.value.startsWith('Campus-')) {
+      districtSelect.value = 'Dhaka';
+      selectedDeliveryArea = 'insideDhaka';
+    }
 
     hubButtons.forEach(b => b.classList.remove('active'));
     if (activeHubBanner) activeHubBanner.style.display = 'none';
     renderOrderSummary();
+  }
+
+  // Check initial state from district or hidden input
+  if (districtSelect && districtSelect.value.startsWith('Campus-')) {
+    selectCampusHub(districtSelect.value.replace('Campus-', '').toUpperCase());
+  } else if (hiddenHubInput && hiddenHubInput.value) {
+    selectCampusHub(hiddenHubInput.value.trim().toUpperCase());
   }
 
   // 5. One-Click Copy Wallet Number
@@ -406,8 +445,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
+      const checkedRadio = document.querySelector('input[name="selectedCampusHubRadio"]:checked');
+      const radioHub = (checkedRadio && checkedRadio.value) ? checkedRadio.value.trim().toUpperCase() : '';
       const domHub = (document.getElementById('selectedCampusHubInput')?.value || '').trim().toUpperCase();
-      const activeCampusHub = domHub || (selectedCampusHub ? selectedCampusHub.trim().toUpperCase() : '');
+      const districtVal = (document.getElementById('districtSelect')?.value || '').trim();
+      const districtHub = districtVal.startsWith('Campus-') ? districtVal.replace('Campus-', '').toUpperCase() : '';
+
+      const activeCampusHub = radioHub || domHub || districtHub || (selectedCampusHub ? selectedCampusHub.trim().toUpperCase() : '');
       const isFreeHubCOD = (Boolean(activeCampusHub) && selectedPaymentMethod === 'cod_advance');
 
       let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '') : '';
@@ -445,7 +489,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             fullName,
             phone: cleanedPhone,
             email: '',
-            district,
+            district: districtVal.startsWith('Campus-') ? 'Dhaka' : districtVal,
             address,
             orderNotes: ''
           },
