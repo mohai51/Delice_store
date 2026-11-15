@@ -461,11 +461,14 @@ function renderProductGrid(products) {
         </div>
 
         <div class="product-body">
-          <!-- 1. Name as Clickable Link (full width, no truncation) -->
+          <!-- 1. Name as Clickable Link with Details Button -->
           <div class="product-header-row">
             <h3 class="product-title">
               <a href="/product.html?id=${prod.id}" class="product-title-link" title="View ${prod.name} details">${prod.name}</a>
             </h3>
+            <a href="/product.html?id=${prod.id}" class="btn-product-details" onclick="event.stopPropagation()" title="View ${prod.name} details">
+              Details &rarr;
+            </a>
           </div>
 
           <!-- 2. Price right after Name -->
