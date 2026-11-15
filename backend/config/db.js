@@ -35,11 +35,11 @@ const connectDB = async () => {
     console.log(`[MongoDB] Connected successfully to: ${mongooseInstance.connection.host}/${mongooseInstance.connection.name}`);
     return mongooseInstance.connection;
   }).catch(async (error) => {
-    // If SRV DNS failed on Windows / local network, retry with direct replica set connection
-    if (String(error.message || '').includes('querySrv') || String(error.message || '').includes('ECONNREFUSED')) {
-      const directFallback = 'mongodb://jackknee6_db_user:J6JyEvQqmHpFQyF9@ac-mg8o9wn-shard-00-00.rcex35o.mongodb.net:27017,ac-mg8o9wn-shard-00-01.rcex35o.mongodb.net:27017,ac-mg8o9wn-shard-00-02.rcex35o.mongodb.net:27017/delice_fragrance?ssl=true&authSource=admin&retryWrites=true&w=majority';
+    // If SRV DNS failed on Windows / local network, retry with direct replica set connection if configured
+    const directFallback = process.env.MONGODB_DIRECT_URI;
+    if (directFallback && (String(error.message || '').includes('querySrv') || String(error.message || '').includes('ECONNREFUSED'))) {
       try {
-        console.log('[MongoDB] Retrying via direct Atlas replica nodes...');
+        console.log('[MongoDB] Retrying via direct MONGODB_DIRECT_URI replica nodes...');
         const retryInst = await mongoose.connect(directFallback, opts);
         console.log(`[MongoDB] Connected successfully via direct nodes to: ${retryInst.connection.host}/${retryInst.connection.name}`);
         return retryInst.connection;

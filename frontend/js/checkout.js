@@ -454,8 +454,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const activeCampusHub = radioHub || domHub || districtHub || (selectedCampusHub ? selectedCampusHub.trim().toUpperCase() : '');
       const isFreeHubCOD = (Boolean(activeCampusHub) && selectedPaymentMethod === 'cod_advance');
 
-      let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '') : '';
-      let trxIdClean = transactionId ? transactionId.toUpperCase().trim() : '';
+      let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
+      let trxIdClean = transactionId ? transactionId.replace(/[^A-Za-z0-9]/g, '').toUpperCase() : '';
 
       if (isFreeHubCOD) {
         if (!cleanedSender) cleanedSender = cleanedPhone;
@@ -467,8 +467,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
-        if (!trxIdClean || trxIdClean.length < 4) {
-          alert('Please enter the Transaction ID (TrxID).');
+        if (!trxIdClean || !/^[A-Z0-9]{8,12}$/.test(trxIdClean)) {
+          alert('Please enter a valid 8 to 12 character alphanumeric Transaction ID (TrxID).');
           document.getElementById('transactionId').focus();
           return;
         }

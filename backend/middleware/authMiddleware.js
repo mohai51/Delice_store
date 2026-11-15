@@ -1,7 +1,13 @@
 const jwt = require('jsonwebtoken');
 const AdminUser = require('../models/AdminUser');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'delice_fragrance_jwt_secret_2026_key';
+let JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('FATAL: JWT_SECRET environment variable is required in production.');
+  }
+  JWT_SECRET = 'delice_dev_fallback_jwt_secret_only';
+}
 
 const protectAdmin = async (req, res, next) => {
   let token = null;

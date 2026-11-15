@@ -12,6 +12,13 @@ const CATALOG_PRICES = {
   'delice-enigma': { name: 'DÉLICE ENIGMA', price: 799, originalPrice: 850, cogs: 320, volume: '30ml' }
 };
 
+function maskPhoneNumber(phone) {
+  if (!phone || typeof phone !== 'string') return '';
+  const clean = phone.trim();
+  if (clean.length < 7) return '***';
+  return clean.slice(0, 3) + '*****' + clean.slice(-3);
+}
+
 /**
  * Create Order with Bangladesh Payment Architecture
  * Supports:
@@ -21,6 +28,14 @@ const CATALOG_PRICES = {
  */
 exports.createOrder = async (req, res, next) => {
   try {
+    // 0. Fail-fast in production if database is disconnected (Prevent split-brain volatile RAM orders)
+    if (process.env.NODE_ENV === 'production' && !isConnected()) {
+      return res.status(503).json({
+        success: false,
+        error: 'Service temporarily unavailable. Please try again in a moment.'
+      });
+    }
+
     const { customer, deliveryArea, deliveryHub, items, paymentMethod, paymentProvider, senderNumber, transactionId } = req.body;
 
     // 1. Validate Customer Info
@@ -66,13 +81,24 @@ exports.createOrder = async (req, res, next) => {
       chosenHub = 'UIU';
     }
 
+    // Validate Campus Hub District: All campus hubs are strictly located within Dhaka district
+    if (isCampusHub) {
+      const customerDist = (customer.district || '').trim().toLowerCase();
+      if (customerDist !== 'dhaka') {
+        return res.status(400).json({
+          success: false,
+          error: 'Campus hub delivery is only available within Dhaka district.'
+        });
+      }
+    }
+
     const validMethods = ['full_online', 'cod_advance'];
     const pMethod = validMethods.includes(paymentMethod) ? paymentMethod : 'full_online';
     const isFreeCampusCOD = (isCampusHub && (pMethod === 'cod_advance' || isHandCashProvider || isHubTrx));
     const pProvider = isFreeCampusCOD ? 'hand_cash' : ((paymentProvider === 'nagad') ? 'nagad' : (paymentProvider === 'hand_cash' ? 'hand_cash' : 'bkash'));
 
     let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
-    let trxId = transactionId ? transactionId.trim().toUpperCase() : '';
+    let trxId = transactionId ? transactionId.replace(/[^A-Za-z0-9-]/g, '').toUpperCase() : '';
 
     // If campus hub + cash on delivery, advance is ৳0 so payment inputs are optional
     if (isFreeCampusCOD) {
@@ -86,10 +112,10 @@ exports.createOrder = async (req, res, next) => {
         });
       }
 
-      if (!trxId || trxId.length < 4) {
+      if (!trxId || !/^[A-Z0-9]{8,12}$/.test(trxId)) {
         return res.status(400).json({
           success: false,
-          error: 'Please provide a valid bKash or Nagad Transaction ID (TrxID).'
+          error: 'Please provide a valid 8 to 12 character alphanumeric Transaction ID (TrxID).'
         });
       }
     }
@@ -243,7 +269,61 @@ exports.createOrder = async (req, res, next) => {
       cashDueOnDelivery = 0;
     }
 
-    // 6. Generate IDs
+    // 6. Atomic Inventory Reservation
+    const decrementedItems = [];
+    if (isConnected()) {
+      for (const item of orderItems) {
+        const pId = item.productId;
+        const qty = Number(item.quantity) || 1;
+        if (!pId) continue;
+
+        const updatedProd = await Product.findOneAndUpdate(
+          { id: pId, stock: { $gte: qty } },
+          { $inc: { stock: -qty } },
+          { new: true }
+        );
+
+        if (!updatedProd) {
+          // Rollback any items decremented so far in this multi-item order
+          for (const roll of decrementedItems) {
+            try {
+              await Product.updateOne({ id: roll.id }, { $inc: { stock: roll.qty } });
+            } catch (rErr) {
+              console.error(`[Inventory Rollback Error] Failed to revert ${roll.id}:`, rErr.message);
+            }
+          }
+          return res.status(400).json({
+            success: false,
+            error: `Sorry, "${item.productName || pId}" is out of stock or requested quantity (${qty}) exceeds available inventory.`
+          });
+        }
+
+        decrementedItems.push({ id: pId, qty });
+        console.log(`[Inventory Stock Atomic] Deducted ${qty} bottle(s) from "${pId}". Remaining stock: ${updatedProd.stock}`);
+      }
+    } else if (memoryStore && memoryStore.products && memoryStore.products.length) {
+      for (const item of orderItems) {
+        const pId = item.productId;
+        const qty = Number(item.quantity) || 1;
+        const memProd = memoryStore.products.find(p => p.id === pId);
+        if (memProd && typeof memProd.stock === 'number') {
+          if (memProd.stock < qty) {
+            for (const roll of decrementedItems) {
+              const prev = memoryStore.products.find(p => p.id === roll.id);
+              if (prev) prev.stock += roll.qty;
+            }
+            return res.status(400).json({
+              success: false,
+              error: `Sorry, "${item.productName || pId}" is out of stock in memory store.`
+            });
+          }
+          memProd.stock -= qty;
+          decrementedItems.push({ id: pId, qty });
+        }
+      }
+    }
+
+    // 7. Generate IDs
     const now = Date.now();
     const orderNumber = `DLC-${now.toString().slice(-6)}`;
 
@@ -293,6 +373,15 @@ exports.createOrder = async (req, res, next) => {
       try {
         order = await Order.create(orderData);
       } catch (e) {
+        if (process.env.NODE_ENV === 'production') {
+          for (const roll of decrementedItems) {
+            try { await Product.updateOne({ id: roll.id }, { $inc: { stock: roll.qty } }); } catch (_) {}
+          }
+          return res.status(503).json({
+            success: false,
+            error: 'Service temporarily unavailable. Please try again in a moment.'
+          });
+        }
         order = {
           _id: 'MEM_' + Date.now(),
           ...orderData,
@@ -305,6 +394,15 @@ exports.createOrder = async (req, res, next) => {
         memoryStore.orders.push(order);
       }
     } else {
+      if (process.env.NODE_ENV === 'production') {
+        for (const roll of decrementedItems) {
+          try { await Product.updateOne({ id: roll.id }, { $inc: { stock: roll.qty } }); } catch (_) {}
+        }
+        return res.status(503).json({
+          success: false,
+          error: 'Service temporarily unavailable. Please try again in a moment.'
+        });
+      }
       order = {
         _id: 'MEM_' + Date.now(),
         ...orderData,
@@ -317,30 +415,12 @@ exports.createOrder = async (req, res, next) => {
       memoryStore.orders.push(order);
     }
 
-    // 7. Auto-Decrement Product Inventory Stock upon Sale
-    for (const item of orderItems) {
-      const pId = item.productId;
-      const qty = Number(item.quantity) || 1;
-      if (!pId) continue;
-
-      if (isConnected()) {
-        try {
-          const currentProd = await Product.findOne({ id: pId });
-          if (currentProd) {
-            const updatedStock = Math.max(0, (Number(currentProd.stock) || 0) - qty);
-            await Product.updateOne({ _id: currentProd._id }, { $set: { stock: updatedStock } });
-            console.log(`[Inventory Stock] Deducted ${qty} bottle(s) from "${pId}". New stock: ${updatedStock}`);
-          }
-        } catch (stockErr) {
-          console.error(`[Inventory Stock Error] Could not deduct stock for ${pId}:`, stockErr.message);
-        }
-      }
-
-      // Sync memoryStore product stock
-      if (memoryStore.products && memoryStore.products.length) {
-        const memProd = memoryStore.products.find(p => p.id === pId);
-        if (memProd) {
-          memProd.stock = Math.max(0, (Number(memProd.stock) || 0) - qty);
+    // Sync memoryStore product stock if running in hybrid mode
+    if (memoryStore.products && memoryStore.products.length) {
+      for (const roll of decrementedItems) {
+        const memProd = memoryStore.products.find(p => p.id === roll.id);
+        if (memProd && typeof memProd.stock === 'number') {
+          memProd.stock = Math.max(0, memProd.stock - roll.qty);
         }
       }
     }
@@ -499,34 +579,71 @@ exports.getOrderById = async (req, res, next) => {
 };
 
 /**
- * Get order by Transaction ID or Order Number (Publicly accessible for receipt)
+ * Get sanitized order receipt by Transaction ID strictly (Publicly accessible for receipt)
+ * Protects customer PII and prevents sequential enumeration of Order IDs or ObjectIds.
  */
 exports.getOrderByTransactionId = async (req, res, next) => {
   try {
     const { tranId } = req.params;
-    const mongoose = require('mongoose');
+    if (!tranId || typeof tranId !== 'string') {
+      return res.status(400).json({ success: false, error: 'Valid Transaction ID is required.' });
+    }
+
+    const cleanTranId = tranId.replace(/[^A-Za-z0-9-]/g, '').trim().toUpperCase();
     let order = null;
 
     if (isConnected()) {
       try {
-        const query = [{ transactionId: tranId }, { orderNumber: tranId }];
-        if (mongoose.Types.ObjectId.isValid(tranId)) {
-          query.push({ _id: tranId });
-        }
-        order = await Order.findOne({ $or: query });
+        order = await Order.findOne({ transactionId: cleanTranId }).lean();
       } catch (e) {}
     }
     if (!order) {
       order = memoryStore.orders.find(o => 
-        o.transactionId === tranId || 
-        o.orderNumber === tranId || 
-        String(o._id) === tranId
+        o.transactionId && o.transactionId.toUpperCase() === cleanTranId
       );
     }
     if (!order) {
-      return res.status(404).json({ success: false, error: 'Order not found.' });
+      return res.status(404).json({ success: false, error: 'Order not found for this Transaction ID.' });
     }
-    res.json(order);
+
+    const maskedPhone = maskPhoneNumber(order.customer?.phone);
+    const maskedSender = maskPhoneNumber(order.senderNumber);
+    const district = order.customer?.district || 'Dhaka';
+    const hub = order.deliveryHub || '';
+
+    const sanitizedReceipt = {
+      orderNumber: order.orderNumber,
+      transactionId: order.transactionId,
+      createdAt: order.createdAt,
+      deliveryArea: order.deliveryArea,
+      deliveryCharge: order.deliveryCharge,
+      deliveryHub: hub,
+      paymentMethod: order.paymentMethod,
+      paymentProvider: order.paymentProvider,
+      paymentStatus: order.paymentStatus,
+      orderStatus: order.orderStatus,
+      productSubtotal: order.productSubtotal,
+      totalPayable: order.totalPayable,
+      advancePaid: order.advancePaid,
+      cashDueOnDelivery: order.cashDueOnDelivery,
+      senderNumber: maskedSender,
+      items: (order.items || []).map(i => ({
+        productId: i.productId,
+        productName: i.productName,
+        price: i.price,
+        originalPrice: i.originalPrice,
+        quantity: i.quantity,
+        volume: i.volume || '30ml'
+      })),
+      customer: {
+        fullName: order.customer?.fullName || 'Valued Customer',
+        phone: maskedPhone,
+        district: district,
+        address: hub ? `${hub} Campus Hub, Dhaka` : `${district} (Detailed street address protected)`
+      }
+    };
+
+    res.json(sanitizedReceipt);
   } catch (err) {
     next(err);
   }

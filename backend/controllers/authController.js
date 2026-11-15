@@ -37,10 +37,21 @@ exports.login = async (req, res, next) => {
       const userCount = await AdminUser.countDocuments();
       if (userCount === 0) {
         const defaultUser = process.env.ADMIN_DEFAULT_USER || 'admin';
-        const defaultPass = process.env.ADMIN_DEFAULT_PASSWORD || 'Admin@Delice2026';
+        const defaultPass = process.env.ADMIN_DEFAULT_PASSWORD;
         const defaultEmail = process.env.ADMIN_DEFAULT_EMAIL || 'admin@delicefragrance.com';
 
-        const passwordHash = await bcrypt.hash(defaultPass, 10);
+        if (!defaultPass) {
+          if (process.env.NODE_ENV === 'production') {
+            console.error('[Auth Bootstrap] Cannot auto-bootstrap superadmin: ADMIN_DEFAULT_PASSWORD is not set.');
+            return res.status(500).json({
+              success: false,
+              error: 'Admin authentication is unconfigured. Please configure ADMIN_DEFAULT_PASSWORD.'
+            });
+          }
+        }
+
+        const effectivePass = defaultPass || 'Admin@DevOnly2026';
+        const passwordHash = await bcrypt.hash(effectivePass, 10);
         user = await AdminUser.create({
           username: defaultUser,
           email: defaultEmail,
