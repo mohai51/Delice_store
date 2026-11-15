@@ -152,6 +152,20 @@ exports.createOrder = async (req, res, next) => {
         cogs = prod.cogs || 320;
         name = prod.name;
         volume = prod.volume || '30ml';
+
+        // Verify stock availability
+        if (typeof prod.stock === 'number' && prod.stock <= 0) {
+          return res.status(400).json({
+            success: false,
+            error: `Sorry, "${prod.name}" is currently out of stock.`
+          });
+        }
+        if (typeof prod.stock === 'number' && prod.stock < qty) {
+          return res.status(400).json({
+            success: false,
+            error: `Sorry, only ${prod.stock} bottle(s) of "${prod.name}" available in stock.`
+          });
+        }
       } else if (CATALOG_PRICES[pId]) {
         price = CATALOG_PRICES[pId].price;
         origPrice = CATALOG_PRICES[pId].originalPrice;
@@ -301,6 +315,34 @@ exports.createOrder = async (req, res, next) => {
         }
       };
       memoryStore.orders.push(order);
+    }
+
+    // 7. Auto-Decrement Product Inventory Stock upon Sale
+    for (const item of orderItems) {
+      const pId = item.productId;
+      const qty = Number(item.quantity) || 1;
+      if (!pId) continue;
+
+      if (isConnected()) {
+        try {
+          const currentProd = await Product.findOne({ id: pId });
+          if (currentProd) {
+            const updatedStock = Math.max(0, (Number(currentProd.stock) || 0) - qty);
+            await Product.updateOne({ _id: currentProd._id }, { $set: { stock: updatedStock } });
+            console.log(`[Inventory Stock] Deducted ${qty} bottle(s) from "${pId}". New stock: ${updatedStock}`);
+          }
+        } catch (stockErr) {
+          console.error(`[Inventory Stock Error] Could not deduct stock for ${pId}:`, stockErr.message);
+        }
+      }
+
+      // Sync memoryStore product stock
+      if (memoryStore.products && memoryStore.products.length) {
+        const memProd = memoryStore.products.find(p => p.id === pId);
+        if (memProd) {
+          memProd.stock = Math.max(0, (Number(memProd.stock) || 0) - qty);
+        }
+      }
     }
 
     res.status(201).json({
@@ -510,6 +552,62 @@ exports.updateOrderStatus = async (req, res, next) => {
 
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found.' });
+    }
+
+    const previousOrderStatus = order.orderStatus;
+    const isNowCancelled = (orderStatus === 'cancelled');
+    const wasCancelled = (previousOrderStatus === 'cancelled');
+
+    // Handle stock restoration on cancellation
+    if (isNowCancelled && !wasCancelled) {
+      for (const item of (order.items || [])) {
+        const pId = item.productId || item.id;
+        const qty = Number(item.quantity) || 1;
+        if (!pId) continue;
+
+        if (isConnected()) {
+          try {
+            await Product.updateOne({ id: pId }, { $inc: { stock: qty } });
+            console.log(`[Inventory Stock] Restored ${qty} bottle(s) to "${pId}" (Order cancelled).`);
+          } catch (e) {
+            console.error(`[Stock Restore Error] Failed for ${pId}:`, e.message);
+          }
+        }
+
+        if (memoryStore.products && memoryStore.products.length) {
+          const memProd = memoryStore.products.find(p => p.id === pId);
+          if (memProd) {
+            memProd.stock = (Number(memProd.stock) || 0) + qty;
+          }
+        }
+      }
+    } else if (!isNowCancelled && wasCancelled && orderStatus) {
+      // Re-deduct stock if un-cancelling / reopening an order
+      for (const item of (order.items || [])) {
+        const pId = item.productId || item.id;
+        const qty = Number(item.quantity) || 1;
+        if (!pId) continue;
+
+        if (isConnected()) {
+          try {
+            const currentProd = await Product.findOne({ id: pId });
+            if (currentProd) {
+              const updatedStock = Math.max(0, (Number(currentProd.stock) || 0) - qty);
+              await Product.updateOne({ _id: currentProd._id }, { $set: { stock: updatedStock } });
+              console.log(`[Inventory Stock] Re-deducted ${qty} bottle(s) from "${pId}" (Order reopened).`);
+            }
+          } catch (e) {
+            console.error(`[Stock Re-deduct Error] Failed for ${pId}:`, e.message);
+          }
+        }
+
+        if (memoryStore.products && memoryStore.products.length) {
+          const memProd = memoryStore.products.find(p => p.id === pId);
+          if (memProd) {
+            memProd.stock = Math.max(0, (Number(memProd.stock) || 0) - qty);
+          }
+        }
+      }
     }
 
     if (orderStatus) {

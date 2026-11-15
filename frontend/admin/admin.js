@@ -754,7 +754,7 @@ async function handleOrderStatusUpdate(e, orderId) {
    ========================================================================== */
 async function loadProducts() {
   try {
-    const res = await fetchWithAuth('/api/products/admin');
+    const res = await fetchWithAuth('/api/products/admin?t=' + Date.now());
     let products = [];
     if (res.ok) {
       const data = await res.json();
@@ -762,7 +762,7 @@ async function loadProducts() {
     }
     // Fallback if auth check failed or empty array
     if (!products || products.length === 0) {
-      const fallbackRes = await fetch('/api/products');
+      const fallbackRes = await fetch('/api/products?t=' + Date.now());
       if (fallbackRes.ok) {
         const fallbackData = await fallbackRes.json();
         if (Array.isArray(fallbackData)) products = fallbackData;
@@ -777,6 +777,18 @@ async function loadProducts() {
     tbody.innerHTML = products.map(p => {
       const prodId = p.id || p._id;
       const imgs = (p.images && p.images.length) ? p.images : [p.image || '/assets/images/bloom.svg'];
+      const stockNum = Number(p.stock !== undefined ? p.stock : 0);
+      const soldNum = Number(p.soldCount || 0);
+
+      let stockBadgeHtml = `<strong>${stockNum}</strong>`;
+      if (stockNum <= 0) {
+        stockBadgeHtml = `<span style="color:#B91C1C; font-weight:800; font-size:0.95rem;">0</span> <span class="badge-status cancelled" style="font-size:0.68rem; margin-left:3px;">Out of Stock</span>`;
+      } else if (stockNum <= 15) {
+        stockBadgeHtml = `<span style="color:#D97706; font-weight:800; font-size:0.95rem;">${stockNum}</span> <span class="badge-status awaiting_verification" style="font-size:0.68rem; margin-left:3px;">Low Stock</span>`;
+      } else {
+        stockBadgeHtml = `<span style="color:#15803D; font-weight:800; font-size:0.95rem;">${stockNum}</span>`;
+      }
+
       return `
         <tr>
           <td>
@@ -793,7 +805,10 @@ async function loadProducts() {
           <td style="color:#6B7280; text-decoration:line-through;">৳${p.originalPrice}</td>
           <td style="font-size:0.8rem;"><span style="color:#C5A46D; font-weight:700;">৳732.60</span> / <span style="color:#15803D; font-weight:700;">৳66.40</span></td>
           <td>৳${p.cogs || 320}</td>
-          <td><strong>${p.stock}</strong></td>
+          <td>
+            <div>${stockBadgeHtml}</div>
+            <div style="font-size:0.75rem; color:#6B7280; margin-top:2px;">${soldNum} bottle(s) sold</div>
+          </td>
           <td><span class="badge-status ${p.isActive !== false ? 'delivered' : 'cancelled'}">${p.isActive !== false ? 'Active' : 'Inactive'}</span></td>
           <td>
             <div style="display:flex; gap:0.4rem; align-items:center;">

@@ -319,9 +319,14 @@
                 <h3 style="font-size:1.1rem; color:#4A102A; margin:0;">Shop Management (Fragrance Editions)</h3>
                 <small style="color:#6B7280;">Manage 4-image gallery, name, scent profile, usage tags, regular &amp; offer pricing.</small>
               </div>
-              <button class="btn btn-primary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="openProductModal()">
-                + Add New Fragrance Edition
-              </button>
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.4rem 0.8rem; cursor:pointer;" onclick="loadProducts()" title="Refresh live stock and catalog">
+                  ↻ Refresh Stock
+                </button>
+                <button type="button" class="btn btn-primary" style="font-size:0.75rem; padding:0.4rem 0.8rem; cursor:pointer;" onclick="openProductModal()">
+                  + Add New Fragrance Edition
+                </button>
+              </div>
             </div>
             <div class="table-responsive">
               <table class="admin-table">

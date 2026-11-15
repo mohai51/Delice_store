@@ -455,12 +455,18 @@
 
             <!-- 6. Action Buttons -->
             <div class="product-page-actions">
-              <button type="button" class="btn btn-primary btn-add-cart-detail" data-add-to-cart="${product.id}" onclick="event.stopPropagation(); addProductToBag('${product.id}')" title="Add ${product.name} to Cart">
-                Add to Cart
-              </button>
-              <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold">
-                Buy Now
-              </a>
+              ${(product.stock !== undefined && product.stock <= 0) ? `
+                <button type="button" class="btn btn-secondary btn-block" disabled style="opacity:0.65; cursor:not-allowed; width:100%; padding:0.8rem; font-size:1rem;">
+                  Sold Out
+                </button>
+              ` : `
+                <button type="button" class="btn btn-primary btn-add-cart-detail" data-add-to-cart="${product.id}" onclick="event.stopPropagation(); addProductToBag('${product.id}')" title="Add ${product.name} to Cart">
+                  Add to Cart
+                </button>
+                <a href="/checkout.html?buyNow=${product.id}" class="btn btn-gold">
+                  Buy Now
+                </a>
+              `}
             </div>
 
             <!-- 7. Frequently Asked Questions Accordion -->

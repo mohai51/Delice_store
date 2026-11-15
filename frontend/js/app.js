@@ -477,12 +477,18 @@ function renderProductGrid(products) {
 
           <!-- 3. Direct Action Buttons (Buy Now & Add to Cart) -->
           <div class="product-card-actions">
-            <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-buy-now" onclick="event.stopPropagation()" title="Buy ${prod.name} Now">
-              Buy Now
-            </a>
-            <button type="button" class="btn btn-add-cart" data-add-to-cart="${prod.id}" onclick="event.stopPropagation(); addProductToBag('${prod.id}')" title="Add ${prod.name} to Cart">
-              Add to Cart
-            </button>
+            ${(prod.stock !== undefined && prod.stock <= 0) ? `
+              <button type="button" class="btn btn-secondary" disabled style="opacity:0.65; cursor:not-allowed; width:100%; font-size:0.82rem; padding:0.6rem; text-align:center;">
+                Sold Out
+              </button>
+            ` : `
+              <a href="/checkout.html?buyNow=${prod.id}" class="btn btn-buy-now" onclick="event.stopPropagation()" title="Buy ${prod.name} Now">
+                Buy Now
+              </a>
+              <button type="button" class="btn btn-add-cart" data-add-to-cart="${prod.id}" onclick="event.stopPropagation(); addProductToBag('${prod.id}')" title="Add ${prod.name} to Cart">
+                Add to Cart
+              </button>
+            `}
           </div>
         </div>
       </article>

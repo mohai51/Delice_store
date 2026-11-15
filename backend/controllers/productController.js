@@ -100,12 +100,13 @@ exports.getAllProducts = async (req, res) => {
 };
 
 /**
- * Get all products for Admin
+ * Get all products for Admin (Enriched with soldCount from active orders)
  */
 exports.getAdminProducts = async (req, res) => {
   try {
+    let products = [];
     if (isConnected()) {
-      const products = await Product.find().sort({ createdAt: -1 });
+      products = await Product.find().sort({ createdAt: -1 });
       if (products && products.length > 0) {
         // Auto-heal images array if empty on older MongoDB Atlas records
         for (const p of products) {
@@ -117,10 +118,44 @@ exports.getAdminProducts = async (req, res) => {
             }
           }
         }
-        return res.json(products);
       }
     }
-    res.json(memoryStore.products.length ? memoryStore.products : DEFAULT_PRODUCTS);
+
+    if (!products || products.length === 0) {
+      products = memoryStore.products.length ? memoryStore.products : DEFAULT_PRODUCTS;
+    }
+
+    // Calculate total sold quantities from non-cancelled orders
+    const Order = require('../models/Order');
+    const soldCounts = {};
+    try {
+      if (isConnected()) {
+        const activeOrders = await Order.find({ orderStatus: { $ne: 'cancelled' } }).select('items');
+        activeOrders.forEach(o => {
+          (o.items || []).forEach(item => {
+            const pid = (item.productId || item.id || '').toLowerCase();
+            if (pid) soldCounts[pid] = (soldCounts[pid] || 0) + (Number(item.quantity) || 1);
+          });
+        });
+      } else {
+        (memoryStore.orders || []).filter(o => o.orderStatus !== 'cancelled').forEach(o => {
+          (o.items || []).forEach(item => {
+            const pid = (item.productId || item.id || '').toLowerCase();
+            if (pid) soldCounts[pid] = (soldCounts[pid] || 0) + (Number(item.quantity) || 1);
+          });
+        });
+      }
+    } catch (e) {
+      console.warn('Could not aggregate sold counts:', e.message);
+    }
+
+    const enrichedProducts = products.map(p => {
+      const plain = (typeof p.toObject === 'function') ? p.toObject() : { ...p };
+      plain.soldCount = soldCounts[plain.id] || 0;
+      return plain;
+    });
+
+    res.json(enrichedProducts);
   } catch (err) {
     res.json(DEFAULT_PRODUCTS);
   }
@@ -240,6 +275,10 @@ exports.updateProduct = async (req, res, next) => {
       updateData.images = [updateData.image];
     }
 
+    if (updateData.stock !== undefined) {
+      updateData.stock = Math.max(0, parseInt(updateData.stock, 10) || 0);
+    }
+
     let product;
 
     if (isConnected()) {
@@ -257,9 +296,14 @@ exports.updateProduct = async (req, res, next) => {
     if (!product) {
       const idx = (memoryStore.products.length ? memoryStore.products : DEFAULT_PRODUCTS).findIndex(p => p.id === id.toLowerCase() || p._id === id);
       if (idx > -1) {
-        if (!memoryStore.products.length) memoryStore.products = [...DEFAULT_PRODUCTS];
+        if (!memoryStore.products.length) memoryStore.products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         memoryStore.products[idx] = { ...memoryStore.products[idx], ...updateData };
         product = memoryStore.products[idx];
+      }
+    } else if (memoryStore.products && memoryStore.products.length) {
+      const idx = memoryStore.products.findIndex(p => p.id === id.toLowerCase() || String(p._id) === String(id));
+      if (idx > -1) {
+        memoryStore.products[idx] = { ...memoryStore.products[idx], ...updateData };
       }
     }
 
@@ -290,3 +334,5 @@ exports.deleteProduct = async (req, res, next) => {
     next(err);
   }
 };
+
+module.exports.DEFAULT_PRODUCTS = DEFAULT_PRODUCTS;
