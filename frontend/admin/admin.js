@@ -1243,13 +1243,8 @@ async function loadSettings() {
 
     settings.forEach(s => {
       if (s.key === 'bkashNagadNumber' && document.getElementById('setBkashNagad')) document.getElementById('setBkashNagad').value = s.value;
-      if (s.key === 'deliveryChargeInsideDhaka') document.getElementById('setDhaka').value = s.value;
-      if (s.key === 'deliveryChargeOutsideDhaka') document.getElementById('setOutside').value = s.value;
-      if (s.key === 'defaultProductCOGS') document.getElementById('setCOGS').value = s.value;
-      if (s.key === 'gatewayFeePercentage') document.getElementById('setFee').value = s.value;
-      if (s.key === 'storePhone') document.getElementById('setPhone').value = s.value;
-      if (s.key === 'storeEmail') document.getElementById('setEmail').value = s.value;
-      if (s.key === 'facebookUrl') document.getElementById('setFb').value = s.value;
+      if (s.key === 'deliveryChargeInsideDhaka' && document.getElementById('setDhaka')) document.getElementById('setDhaka').value = s.value;
+      if (s.key === 'deliveryChargeOutsideDhaka' && document.getElementById('setOutside')) document.getElementById('setOutside').value = s.value;
     });
 
     // Connect with DÉLICE Capital Recovery Settings
@@ -1285,12 +1280,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const payload = {
         bkashNagadNumber: document.getElementById('setBkashNagad') ? document.getElementById('setBkashNagad').value.trim() : '01731101780',
         deliveryChargeInsideDhaka: Number(document.getElementById('setDhaka').value),
-        deliveryChargeOutsideDhaka: Number(document.getElementById('setOutside').value),
-        defaultProductCOGS: Number(document.getElementById('setCOGS').value),
-        gatewayFeePercentage: Number(document.getElementById('setFee').value),
-        storePhone: document.getElementById('setPhone').value.trim(),
-        storeEmail: document.getElementById('setEmail').value.trim(),
-        facebookUrl: document.getElementById('setFb').value.trim()
+        deliveryChargeOutsideDhaka: Number(document.getElementById('setOutside').value)
       };
 
       const btn = document.getElementById('saveSettingsBtn');
