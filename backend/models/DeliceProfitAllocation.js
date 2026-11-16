@@ -45,6 +45,20 @@ const deliceProfitAllocationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  paymentProvider: {
+    type: String,
+    default: 'bkash'
+  },
+  paymentMethod: {
+    type: String,
+    default: 'full_online'
+  },
+  paymentSegment: {
+    type: String,
+    enum: ['bkash', 'nagad', 'cash_on_delivery'],
+    default: 'bkash',
+    index: true
+  },
   bottlesSold: {
     type: Number,
     required: true,

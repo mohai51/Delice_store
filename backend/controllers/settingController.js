@@ -94,7 +94,7 @@ exports.updateSettings = async (req, res) => {
     Object.assign(memoryStore.settings, updates);
 
     // Sync with DÉLICE Capital Recovery Baseline if provided
-    if (updates.initialPrincipal || updates.unitCost || updates.profitPerBottle || updates.totalInitialStock) {
+    if (updates.initialPrincipal || updates.unitCost || updates.profitPerBottle || updates.totalInitialStock || updates.cashoutFeePercentages) {
       try {
         await deliceProfitService.updateSettings(updates, req.admin?.username || 'Admin');
       } catch (e) {

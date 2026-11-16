@@ -422,25 +422,50 @@
               <div class="stat-card-val" id="dpStatOutstanding" style="color:#FF665C;">৳73,260.00</div>
               <div class="stat-card-sub">Remaining investment balance</div>
             </div>
+            <div class="stat-card" style="border-left: 3px solid #B91C1C;">
+              <div class="stat-card-title">5. Cash-out Deductions</div>
+              <div class="stat-card-val" id="dpStatCashoutFees" style="color:#B91C1C;">৳0.00</div>
+              <div class="stat-card-sub">bKash (1.1%), Nagad (0.85%), COD (1%)</div>
+            </div>
             <div class="stat-card" style="border-left: 3px solid #15803D;">
-              <div class="stat-card-title">5. Distributable Profit</div>
+              <div class="stat-card-title">6. Net Distributable Profit</div>
               <div class="stat-card-val" id="dpStatProfit" style="color:#15803D;">৳0.00</div>
-              <div class="stat-card-sub">Net profit allocated to funds</div>
+              <div class="stat-card-sub">After cash-out fees (feeds 6 funds)</div>
             </div>
             <div class="stat-card" style="border-left: 3px solid #181619;">
-              <div class="stat-card-title">6. Employee Salary Fund</div>
+              <div class="stat-card-title">7. Employee Salary Fund</div>
               <div class="stat-card-val" id="dpStatEmployeeSalary">৳0.00</div>
-              <div class="stat-card-sub">60% of total distributable profit</div>
+              <div class="stat-card-sub">60% of net distributable profit</div>
             </div>
             <div class="stat-card" style="border-left: 3px solid #C5A46D;">
-              <div class="stat-card-title">7. Development Fund</div>
+              <div class="stat-card-title">8. Development Fund</div>
               <div class="stat-card-val" id="dpStatDevFund">৳0.00</div>
-              <div class="stat-card-sub">20% of total distributable profit</div>
+              <div class="stat-card-sub">20% of net distributable profit</div>
             </div>
-            <div class="stat-card" style="border-left: 3px solid #34495E;">
-              <div class="stat-card-title">8. Reserve Fund</div>
-              <div class="stat-card-val" id="dpStatReserveFund">৳0.00</div>
-              <div class="stat-card-sub">2% emergency buffer</div>
+          </div>
+
+          <!-- PAYMENT SEGMENT BREAKDOWN & CASH-OUT CHARGES -->
+          <div class="data-table-card" style="margin-bottom:2rem; padding:1.5rem; background:#FFFFFF; border:1px solid var(--admin-border); border-radius:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.25rem;">
+              <div>
+                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Revenue Channels &amp; Fee Deductions</span>
+                <h3 style="font-size:1.2rem; color:#4A102A; margin:0.25rem 0 0;">Payment Segment Breakdown &amp; Cash-out Charges</h3>
+                <small style="color:#6B7280;">Deducted on total channel collections (bKash: 1.10%, Nagad: 0.85%, Courier COD: 1.00%).</small>
+              </div>
+              <div id="dpSegmentSummaryPill" style="background:#FAF6F0; border:1px solid #E0D4C3; padding:0.4rem 0.85rem; border-radius:8px; font-size:0.82rem; color:#4A102A; font-weight:600;">
+                Total Cash-out Deductions: <strong id="dpTotalCashoutBadge" style="color:#B91C1C;">৳0.00</strong>
+              </div>
+            </div>
+
+            <!-- 3 CHANNEL CARDS: bKash, Nagad, Cash on Delivery -->
+            <div class="delice-segment-grid" id="dpSegmentsContainer" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin-bottom:1.25rem;">
+              <!-- Dynamically populated by admin.js -->
+            </div>
+
+            <!-- CALCULATION RULE BANNER -->
+            <div style="background:#FAF6F0; border-left:4px solid #C5A46D; border-radius:0 6px 6px 0; padding:0.85rem 1.25rem; font-size:0.82rem; color:#4A102A; line-height:1.5;">
+              <strong>Calculation Rule:</strong> Cash-out fees are calculated on <em>total segment collections</em> (bKash: 1.10%, Nagad: 0.85%, COD handling: 1.00%).
+              Whatever profit remains after deducting principal repayment and these channel fees is the <strong>Net Distributable Profit</strong>, which is routed 100% directly into the 6 Brand Funds below.
             </div>
           </div>
 
@@ -709,6 +734,25 @@
                     </div>
                   </div>
                 </div>
+
+                <!-- CHANNEL CASH-OUT CHARGES -->
+                <div class="form-row" style="margin-top:0.5rem; border-top:1px dashed #E0D4C3; padding-top:0.75rem;">
+                  <div class="form-group">
+                    <label class="form-label">bKash Cash-out Charge (%)</label>
+                    <input type="number" step="0.01" id="setBkashFee" class="form-control" value="1.10">
+                    <small style="color:#6B7280; font-size:0.75rem;">Default: 1.10% (Send Money)</small>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Nagad Cash-out Charge (%)</label>
+                    <input type="number" step="0.01" id="setNagadFee" class="form-control" value="0.85">
+                    <small style="color:#6B7280; font-size:0.75rem;">Default: 0.85% (Send Money)</small>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Cash on Delivery Handling Fee (%)</label>
+                    <input type="number" step="0.01" id="setCodFee" class="form-control" value="1.00">
+                    <small style="color:#6B7280; font-size:0.75rem;">Default: 1.00% (Courier COD)</small>
+                  </div>
+                </div>
               </div>
 
               <div style="margin-top:2rem;">
@@ -973,6 +1017,28 @@
               <option value="full_revenue_as_profit">Distribute Full Revenue as Profit (Principal repayment stops at ৳0)</option>
               <option value="development_fund_boost">Direct Unit Cost Share to DÉLICE Development Fund</option>
             </select>
+          </div>
+
+          <!-- CASHOUT FEE PERCENTAGES PER SEGMENT -->
+          <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.9rem; margin:1rem 0;">
+            <div style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700; margin-bottom:0.5rem;">Channel Cash-out Charges (%)</div>
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:0.75rem;">bKash (%)</label>
+                <input type="number" step="0.01" id="dpSetBkashFee" class="form-control" value="1.10" required min="0">
+                <small style="color:#6B7280; font-size:0.7rem;">Default: 1.10%</small>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:0.75rem;">Nagad (%)</label>
+                <input type="number" step="0.01" id="dpSetNagadFee" class="form-control" value="0.85" required min="0">
+                <small style="color:#6B7280; font-size:0.7rem;">Default: 0.85%</small>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" style="font-size:0.75rem;">COD Fee (%)</label>
+                <input type="number" step="0.01" id="dpSetCodFee" class="form-control" value="1.00" required min="0">
+                <small style="color:#6B7280; font-size:0.7rem;">Default: 1.00%</small>
+              </div>
+            </div>
           </div>
 
           <button type="submit" class="btn btn-primary btn-block" style="margin-top:1.25rem;">Save Settings</button>

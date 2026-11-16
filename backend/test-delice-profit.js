@@ -134,8 +134,74 @@ async function runDeliceProfitTests() {
   assert(ledger.totalDebits >= 500);
   console.log('  ✔ Fund expense debited and ledger verified.\n');
 
+  // 9. Payment Segments & Cash-out Fee Deductions on Total Revenue
+  console.log('▶ Test 9: Payment Segments & Cash-out Fee Deductions (bKash 1.10%, Nagad 0.85%, COD 1.00%)');
+  const { memoryStore } = require('./config/db');
+  if (!memoryStore.orders) memoryStore.orders = [];
+
+  const bkashOrder = {
+    _id: 'TEST_BKASH_' + Date.now(),
+    orderNumber: 'DLC-BKASH-01',
+    paymentStatus: 'paid',
+    orderStatus: 'confirmed',
+    paymentProvider: 'bkash',
+    paymentMethod: 'full_online',
+    items: [{ productId: 'delice-bloom', quantity: 2, price: 799 }]
+  };
+  const nagadOrder = {
+    _id: 'TEST_NAGAD_' + Date.now(),
+    orderNumber: 'DLC-NAGAD-01',
+    paymentStatus: 'paid',
+    orderStatus: 'confirmed',
+    paymentProvider: 'nagad',
+    paymentMethod: 'full_online',
+    items: [{ productId: 'delice-momentum', quantity: 1, price: 799 }]
+  };
+  const codOrder = {
+    _id: 'TEST_COD_' + Date.now(),
+    orderNumber: 'DLC-COD-01',
+    paymentStatus: 'paid',
+    orderStatus: 'delivered',
+    paymentProvider: 'hand_cash',
+    paymentMethod: 'cash_on_delivery',
+    items: [{ productId: 'delice-enigma', quantity: 1, price: 799 }]
+  };
+
+  memoryStore.orders.push(bkashOrder, nagadOrder, codOrder);
+
+  await deliceProfitService.allocateOrderSale(bkashOrder);
+  await deliceProfitService.allocateOrderSale(nagadOrder);
+  await deliceProfitService.allocateOrderSale(codOrder);
+
+  const dashData = await deliceProfitService.getDashboardData();
+  const segMap = dashData.segmentsMap;
+  console.log('  bKash Gross:', segMap.bkash.grossRevenue, 'Fee (1.10%):', segMap.bkash.cashoutFee, 'Net:', segMap.bkash.netRevenue);
+  console.log('  Nagad Gross:', segMap.nagad.grossRevenue, 'Fee (0.85%):', segMap.nagad.cashoutFee, 'Net:', segMap.nagad.netRevenue);
+  console.log('  COD Gross:', segMap.cash_on_delivery.grossRevenue, 'Fee (1.00%):', segMap.cash_on_delivery.cashoutFee, 'Net:', segMap.cash_on_delivery.netRevenue);
+  console.log('  Total Cash-out Fees:', dashData.summary.totalCashoutFees);
+  console.log('  Gross Profit:', dashData.summary.grossDistributableProfit);
+  console.log('  Net Distributable Profit into Funds:', dashData.summary.totalDistributableProfit);
+
+  // Assertions
+  assert(segMap.bkash.grossRevenue >= 1598);
+  assert(segMap.nagad.grossRevenue >= 799);
+  assert(segMap.cash_on_delivery.grossRevenue >= 799);
+  assert.strictEqual(segMap.bkash.rate, 1.10);
+  assert.strictEqual(segMap.nagad.rate, 0.85);
+  assert.strictEqual(segMap.cash_on_delivery.rate, 1.00);
+
+  // Verify net profit calculation: Net = Gross - Fees
+  const expectedNet = Math.max(0, Math.round((dashData.summary.grossDistributableProfit - dashData.summary.totalCashoutFees) * 100) / 100);
+  assert.strictEqual(dashData.summary.totalDistributableProfit, expectedNet);
+
+  // Verify that the funds sum up exactly to net distributable profit
+  const sumOfFunds = Math.round(dashData.fundsOverview.reduce((acc, f) => acc + f.totalAccumulated, 0) * 100) / 100;
+  assert.strictEqual(sumOfFunds, dashData.summary.totalDistributableProfit);
+  console.log('  ✔ All 6 funds sum up to exactly Net Distributable Profit (Zero Penny Loss).');
+  console.log('  ✔ Payment segment & cash-out charge verification passed!\n');
+
   console.log('====================================================');
-  console.log('   ALL DÉLICE PROFIT ENGINE TESTS PASSED (8/8) ✔');
+  console.log('   ALL DÉLICE PROFIT ENGINE TESTS PASSED (9/9) ✔');
   console.log('====================================================\n');
 }
 

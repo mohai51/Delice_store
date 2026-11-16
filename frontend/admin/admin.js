@@ -1165,6 +1165,11 @@ async function loadSettings() {
           if (document.getElementById('setUnitCost')) document.getElementById('setUnitCost').value = s.unitCost;
           if (document.getElementById('setSellingPrice')) document.getElementById('setSellingPrice').value = s.defaultSellingPrice;
           if (document.getElementById('setProfitPerBottle')) document.getElementById('setProfitPerBottle').value = (s.defaultSellingPrice - s.unitCost).toFixed(2);
+          if (s.cashoutFeePercentages) {
+            if (document.getElementById('setBkashFee')) document.getElementById('setBkashFee').value = s.cashoutFeePercentages.bkash !== undefined ? s.cashoutFeePercentages.bkash : 1.10;
+            if (document.getElementById('setNagadFee')) document.getElementById('setNagadFee').value = s.cashoutFeePercentages.nagad !== undefined ? s.cashoutFeePercentages.nagad : 0.85;
+            if (document.getElementById('setCodFee')) document.getElementById('setCodFee').value = s.cashoutFeePercentages.cod !== undefined ? s.cashoutFeePercentages.cod : 1.00;
+          }
         }
       }
     } catch (e) {}
@@ -1206,19 +1211,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const dpUnitCost = parseFloat(document.getElementById('setUnitCost')?.value);
         const dpPrice = parseFloat(document.getElementById('setSellingPrice')?.value);
         const dpProfit = parseFloat((dpPrice - dpUnitCost).toFixed(2));
+        const dpBkashFee = parseFloat(document.getElementById('setBkashFee')?.value);
+        const dpNagadFee = parseFloat(document.getElementById('setNagadFee')?.value);
+        const dpCodFee = parseFloat(document.getElementById('setCodFee')?.value);
 
         if (!isNaN(dpPrincipal) && !isNaN(dpUnitCost)) {
+          const dpPayload = {
+            initialPrincipal: dpPrincipal,
+            totalInitialStock: dpStock,
+            unitCost: dpUnitCost,
+            defaultSellingPrice: dpPrice,
+            profitPerBottle: dpProfit
+          };
+          if (!isNaN(dpBkashFee) || !isNaN(dpNagadFee) || !isNaN(dpCodFee)) {
+            dpPayload.cashoutFeePercentages = {
+              bkash: isNaN(dpBkashFee) ? 1.10 : dpBkashFee,
+              nagad: isNaN(dpNagadFee) ? 0.85 : dpNagadFee,
+              cod: isNaN(dpCodFee) ? 1.00 : dpCodFee
+            };
+          }
           try {
             await fetchWithAuth('/api/admin/delice-profit/settings', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                initialPrincipal: dpPrincipal,
-                totalInitialStock: dpStock,
-                unitCost: dpUnitCost,
-                defaultSellingPrice: dpPrice,
-                profitPerBottle: dpProfit
-              })
+              body: JSON.stringify(dpPayload)
             });
           } catch (e) {}
         }
@@ -1605,6 +1621,7 @@ async function loadDeliceProfit() {
     const elRevenue = document.getElementById('dpStatRevenue');
     const elRepaid = document.getElementById('dpStatRepaid');
     const elOutstanding = document.getElementById('dpStatOutstanding');
+    const elCashoutFees = document.getElementById('dpStatCashoutFees');
     const elProfit = document.getElementById('dpStatProfit');
     const elEmployeeSalary = document.getElementById('dpStatEmployeeSalary');
     const elDevFund = document.getElementById('dpStatDevFund');
@@ -1614,10 +1631,58 @@ async function loadDeliceProfit() {
     if (elRevenue) elRevenue.textContent = `৳${summary.totalSalesRevenue.toFixed(2)}`;
     if (elRepaid) elRepaid.textContent = `৳${summary.totalPrincipalRepaid.toFixed(2)}`;
     if (elOutstanding) elOutstanding.textContent = `৳${summary.outstandingPrincipal.toFixed(2)}`;
+    if (elCashoutFees) elCashoutFees.textContent = `৳${(summary.totalCashoutFees || 0).toFixed(2)}`;
     if (elProfit) elProfit.textContent = `৳${summary.totalDistributableProfit.toFixed(2)}`;
     if (elEmployeeSalary) elEmployeeSalary.textContent = `৳${summary.totalEmployeeSalary.toFixed(2)}`;
     if (elDevFund) elDevFund.textContent = `৳${summary.totalDevelopmentFund.toFixed(2)}`;
     if (elReserveFund) elReserveFund.textContent = `৳${summary.totalReserveFund.toFixed(2)}`;
+
+    // 1b. Payment Segment Breakdown (bKash, Nagad, Cash on Delivery)
+    const segContainer = document.getElementById('dpSegmentsContainer');
+    const totalCashoutBadge = document.getElementById('dpTotalCashoutBadge');
+    if (totalCashoutBadge && result.data.cashoutSummary) {
+      totalCashoutBadge.textContent = `৳${result.data.cashoutSummary.totalCashoutFees.toFixed(2)}`;
+    }
+
+    if (segContainer && Array.isArray(result.data.segments)) {
+      segContainer.innerHTML = result.data.segments.map(seg => {
+        const segBorderColor = seg.key === 'bkash' ? '#E2136E' : (seg.key === 'nagad' ? '#F7941D' : '#059669');
+        const segBgLight = seg.key === 'bkash' ? '#FDF2F7' : (seg.key === 'nagad' ? '#FFF7ED' : '#F0FDF4');
+        return `
+          <div class="delice-segment-card" style="background:#FFFFFF; border:1px solid #E0D4C3; border-top:4px solid ${segBorderColor}; border-radius:8px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <h4 style="margin:0; font-size:1.02rem; color:#4A102A; display:flex; align-items:center; gap:0.45rem; font-weight:700;">
+                  <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${segBorderColor};"></span>
+                  ${seg.name}
+                </h4>
+                <span style="background:${segBgLight}; color:${segBorderColor}; border:1px solid ${segBorderColor}33; padding:0.18rem 0.55rem; border-radius:9999px; font-size:0.75rem; font-weight:700;">
+                  ${seg.rate}% Fee
+                </span>
+              </div>
+              <div style="margin-bottom:1rem;">
+                <div style="font-size:0.72rem; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Gross Collections</div>
+                <div style="font-size:1.35rem; font-weight:700; color:#181619;">৳${seg.grossRevenue.toFixed(2)}</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1rem; font-size:0.8rem;">
+                <div style="background:#F9FAFB; padding:0.5rem 0.65rem; border-radius:4px; border:1px solid #F3F4F6;">
+                  <div style="font-size:0.68rem; color:#6B7280; text-transform:uppercase;">Volume</div>
+                  <div style="font-weight:700; color:#181619;">${seg.orderCount} orders (${seg.bottlesSold} btls)</div>
+                </div>
+                <div style="background:#FEF2F2; padding:0.5rem 0.65rem; border-radius:4px; border:1px solid #FEE2E2;">
+                  <div style="font-size:0.68rem; color:#991B1B; text-transform:uppercase;">Fee (${seg.rate}%)</div>
+                  <div style="font-weight:700; color:#B91C1C;">-৳${seg.cashoutFee.toFixed(2)}</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.65rem 0.85rem; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.75rem; color:#6B7280; text-transform:uppercase; font-weight:600;">Net Inflow</span>
+              <span style="font-size:1.15rem; font-weight:700; color:#15803D;">৳${seg.netRevenue.toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
 
     // 2. Investment Repayment Progress Bar
     const progressFill = document.getElementById('dpProgressFill');
@@ -1839,6 +1904,12 @@ async function openDeliceSettingsModal() {
         document.getElementById('dpSetUnitCost').value = s.unitCost;
         document.getElementById('dpSetProfit').value = (s.defaultSellingPrice - s.unitCost).toFixed(2);
         document.getElementById('dpSetPolicy').value = s.postRepaymentPolicy || 'full_revenue_as_profit';
+
+        if (s.cashoutFeePercentages) {
+          if (document.getElementById('dpSetBkashFee')) document.getElementById('dpSetBkashFee').value = s.cashoutFeePercentages.bkash !== undefined ? s.cashoutFeePercentages.bkash : 1.10;
+          if (document.getElementById('dpSetNagadFee')) document.getElementById('dpSetNagadFee').value = s.cashoutFeePercentages.nagad !== undefined ? s.cashoutFeePercentages.nagad : 0.85;
+          if (document.getElementById('dpSetCodFee')) document.getElementById('dpSetCodFee').value = s.cashoutFeePercentages.cod !== undefined ? s.cashoutFeePercentages.cod : 1.00;
+        }
       }
     }
   } catch (e) {}
@@ -1877,6 +1948,10 @@ if (deliceSettingsForm) {
     const profit = parseFloat((price - unitCost).toFixed(2));
     const policy = document.getElementById('dpSetPolicy').value;
 
+    const bkashFee = parseFloat(document.getElementById('dpSetBkashFee')?.value) || 1.10;
+    const nagadFee = parseFloat(document.getElementById('dpSetNagadFee')?.value) || 0.85;
+    const codFee = parseFloat(document.getElementById('dpSetCodFee')?.value) || 1.00;
+
     try {
       const res = await fetchWithAuth('/api/admin/delice-profit/settings', {
         method: 'PUT',
@@ -1887,7 +1962,12 @@ if (deliceSettingsForm) {
           defaultSellingPrice: price,
           unitCost,
           profitPerBottle: profit,
-          postRepaymentPolicy: policy
+          postRepaymentPolicy: policy,
+          cashoutFeePercentages: {
+            bkash: bkashFee,
+            nagad: nagadFee,
+            cod: codFee
+          }
         })
       });
       const data = await res.json();
@@ -2231,7 +2311,7 @@ async function loadDeliceReport(rangeType) {
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; text-align:center;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.75rem; text-align:center;">
           <div style="background:#FFF; padding:0.75rem; border-radius:6px; border:1px solid #E5E7EB;">
             <div style="font-size:0.7rem; color:#6B7280;">BOTTLES SOLD</div>
             <div style="font-size:1.25rem; font-weight:700; color:#4A102A;">${r.bottlesSold}</div>
@@ -2244,12 +2324,48 @@ async function loadDeliceReport(rangeType) {
             <div style="font-size:0.7rem; color:#6B7280;">PRINCIPAL REPAID</div>
             <div style="font-size:1.25rem; font-weight:700; color:#C5A46D;">৳${r.principalRepaid.toFixed(2)}</div>
           </div>
-          <div style="background:#FFF; padding:0.75rem; border-radius:6px; border:1px solid #E5E7EB;">
-            <div style="font-size:0.7rem; color:#6B7280;">PROFIT ALLOCATED</div>
+          <div style="background:#FFF; padding:0.75rem; border-radius:6px; border:1px solid #FEE2E2;">
+            <div style="font-size:0.7rem; color:#991B1B;">CASHOUT CHARGES</div>
+            <div style="font-size:1.25rem; font-weight:700; color:#B91C1C;">-৳${(r.totalCashoutFees || 0).toFixed(2)}</div>
+          </div>
+          <div style="background:#FFF; padding:0.75rem; border-radius:6px; border:1px solid #DCFCE7;">
+            <div style="font-size:0.7rem; color:#166534;">NET PROFIT</div>
             <div style="font-size:1.25rem; font-weight:700; color:#15803D;">৳${r.distributableProfit.toFixed(2)}</div>
           </div>
         </div>
       </div>
+
+      ${Array.isArray(r.segments) ? `
+        <h4 style="font-size:0.95rem; color:#4A102A; margin:0 0 0.5rem;">Payment Channel Collections &amp; Cash-out Deductions</h4>
+        <table class="admin-table" style="font-size:0.85rem; margin-bottom:1.25rem;">
+          <thead>
+            <tr>
+              <th>Channel</th>
+              <th>Rate (%)</th>
+              <th>Gross Collections</th>
+              <th>Cash-out Deducted</th>
+              <th>Net Collections</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${r.segments.map(s => `
+              <tr>
+                <td style="font-weight:600;">${s.name}</td>
+                <td>${s.rate}%</td>
+                <td>৳${s.grossRevenue.toFixed(2)}</td>
+                <td style="color:#B91C1C;">-৳${s.cashoutFee.toFixed(2)}</td>
+                <td style="font-weight:700; color:#15803D;">৳${s.netRevenue.toFixed(2)}</td>
+              </tr>
+            `).join('')}
+            <tr style="background:#FAF6F0; font-weight:700;">
+              <td colspan="2">TOTAL DEDUCTIONS</td>
+              <td>৳${r.salesRevenue.toFixed(2)}</td>
+              <td style="color:#B91C1C;">-৳${(r.totalCashoutFees || 0).toFixed(2)}</td>
+              <td style="color:#15803D;">৳${(r.salesRevenue - (r.totalCashoutFees || 0)).toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
+      ` : ''}
 
       <h4 style="font-size:0.95rem; color:#4A102A; margin-bottom:0.75rem;">Fund Allocations in this Period</h4>
       <table class="admin-table" style="font-size:0.85rem;">

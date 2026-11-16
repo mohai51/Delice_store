@@ -38,6 +38,11 @@ class DeliceProfitService {
               marketingFund: 5,
               reserveFund: 2
             },
+            cashoutFeePercentages: {
+              bkash: 1.10,
+              nagad: 0.85,
+              cod: 1.00
+            },
             employees: [
               { slot: 1, name: 'Employee 1', percentage: 15 },
               { slot: 2, name: 'Employee 2', percentage: 15 },
@@ -47,7 +52,11 @@ class DeliceProfitService {
             postRepaymentPolicy: 'full_revenue_as_profit'
           });
         }
-        return settings.toObject ? settings.toObject() : settings;
+        const sObj = settings.toObject ? settings.toObject() : settings;
+        if (!sObj.cashoutFeePercentages) {
+          sObj.cashoutFeePercentages = { bkash: 1.10, nagad: 0.85, cod: 1.00 };
+        }
+        return sObj;
       } catch (err) {
         console.error('[DeliceProfitService] Error fetching settings from DB:', err.message);
       }
@@ -70,6 +79,11 @@ class DeliceProfitService {
           marketingFund: 5,
           reserveFund: 2
         },
+        cashoutFeePercentages: {
+          bkash: 1.10,
+          nagad: 0.85,
+          cod: 1.00
+        },
         employees: [
           { slot: 1, name: 'Employee 1', percentage: 15 },
           { slot: 2, name: 'Employee 2', percentage: 15 },
@@ -78,6 +92,9 @@ class DeliceProfitService {
         ],
         postRepaymentPolicy: 'full_revenue_as_profit'
       };
+    }
+    if (!memoryStore.deliceProfitSettings.cashoutFeePercentages) {
+      memoryStore.deliceProfitSettings.cashoutFeePercentages = { bkash: 1.10, nagad: 0.85, cod: 1.00 };
     }
     return memoryStore.deliceProfitSettings;
   }
@@ -101,6 +118,13 @@ class DeliceProfitService {
       updatedPayload.fundPercentages = {
         ...current.fundPercentages,
         ...newSettings.fundPercentages
+      };
+    }
+
+    if (newSettings.cashoutFeePercentages) {
+      updatedPayload.cashoutFeePercentages = {
+        ...(current.cashoutFeePercentages || { bkash: 1.10, nagad: 0.85, cod: 1.00 }),
+        ...newSettings.cashoutFeePercentages
       };
     }
 
@@ -352,6 +376,17 @@ class DeliceProfitService {
       // Reconciled fund distribution
       const { fundAllocations, employeeBreakdown } = this.calculateFundDistribution(totalDistributableProfit, settings);
 
+      const pMethod = String(order.paymentMethod || '').toLowerCase();
+      const pProvider = String(order.paymentProvider || '').toLowerCase();
+      let paymentSegment = 'bkash';
+      if (pMethod === 'cod_advance' || pProvider === 'hand_cash' || pMethod === 'cash_on_delivery') {
+        paymentSegment = 'cash_on_delivery';
+      } else if (pProvider === 'nagad') {
+        paymentSegment = 'nagad';
+      } else {
+        paymentSegment = 'bkash';
+      }
+
       const allocationRecord = {
         idempotencyKey,
         orderId: String(order._id || order.orderNumber),
@@ -359,6 +394,9 @@ class DeliceProfitService {
         transactionId: order.transactionId || '',
         customerName: order.customer?.fullName || 'Valued Customer',
         customerPhone: order.customer?.phone || '',
+        paymentProvider: order.paymentProvider || 'bkash',
+        paymentMethod: order.paymentMethod || 'full_online',
+        paymentSegment,
         productId: item.productId || 'delice-perfume',
         productName: item.productName || 'DÉLICE Fragrance',
         bottlesSold: qty,
@@ -608,6 +646,35 @@ class DeliceProfitService {
       }
     }
 
+    // 1b. Backfill and sync payment segment on allocations from orders
+    for (const alloc of allocations) {
+      if (orphanAllocIds.includes(alloc._id)) continue;
+      const order = orderMap.get(String(alloc.orderId)) || orderMap.get(String(alloc.orderNumber));
+      if (order) {
+        const pMethod = String(order.paymentMethod || '').toLowerCase();
+        const pProvider = String(order.paymentProvider || '').toLowerCase();
+        let segment = 'bkash';
+        if (pMethod === 'cod_advance' || pProvider === 'hand_cash' || pMethod === 'cash_on_delivery') {
+          segment = 'cash_on_delivery';
+        } else if (pProvider === 'nagad') {
+          segment = 'nagad';
+        } else {
+          segment = 'bkash';
+        }
+        alloc.paymentMethod = order.paymentMethod || 'full_online';
+        alloc.paymentProvider = order.paymentProvider || 'bkash';
+        alloc.paymentSegment = segment;
+        if (isConnected() && alloc._id) {
+          try {
+            await DeliceProfitAllocation.updateOne(
+              { _id: alloc._id },
+              { $set: { paymentMethod: alloc.paymentMethod, paymentProvider: alloc.paymentProvider, paymentSegment: segment } }
+            );
+          } catch (_) {}
+        }
+      }
+    }
+
     // 2. Ensure all verified paid / delivered orders are allocated
     const eligibleOrders = orders.filter(
       o => o.paymentStatus === 'paid' || o.orderStatus === 'delivered'
@@ -680,51 +747,79 @@ class DeliceProfitService {
     let totalBottlesSold = 0;
     let totalSalesRevenue = 0;
     let totalPrincipalRepaid = 0;
-    let totalDistributableProfit = 0;
 
-    const fundsAccumulated = {
-      financeMember: 0,
-      developmentFund: 0,
-      employeeSalaryFund: 0,
-      charityFund: 0,
-      marketingFund: 0,
-      reserveFund: 0
+    // Payment Segments & Cash-out Analysis (bKash 1.10%, Nagad 0.85%, COD 1.00%)
+    const feeRates = settings.cashoutFeePercentages || { bkash: 1.10, nagad: 0.85, cod: 1.00 };
+    const segments = {
+      bkash: {
+        key: 'bkash',
+        name: 'bKash (Send Money)',
+        color: '#E2136E',
+        rate: Number(feeRates.bkash !== undefined ? feeRates.bkash : 1.10),
+        bottlesSold: 0,
+        orderCount: 0,
+        grossRevenue: 0,
+        cashoutFee: 0,
+        netRevenue: 0
+      },
+      nagad: {
+        key: 'nagad',
+        name: 'Nagad (Send Money)',
+        color: '#F7941D',
+        rate: Number(feeRates.nagad !== undefined ? feeRates.nagad : 0.85),
+        bottlesSold: 0,
+        orderCount: 0,
+        grossRevenue: 0,
+        cashoutFee: 0,
+        netRevenue: 0
+      },
+      cash_on_delivery: {
+        key: 'cash_on_delivery',
+        name: 'Cash on Delivery (Courier COD)',
+        color: '#059669',
+        rate: Number(feeRates.cod !== undefined ? feeRates.cod : 1.00),
+        bottlesSold: 0,
+        orderCount: 0,
+        grossRevenue: 0,
+        cashoutFee: 0,
+        netRevenue: 0
+      }
     };
 
-    const employeeEarnings = {
-      1: { slot: 1, name: settings.employees?.[0]?.name || 'Employee 1', total: 0, bottles: 0 },
-      2: { slot: 2, name: settings.employees?.[1]?.name || 'Employee 2', total: 0, bottles: 0 },
-      3: { slot: 3, name: settings.employees?.[2]?.name || 'Employee 3', total: 0, bottles: 0 },
-      4: { slot: 4, name: settings.employees?.[3]?.name || 'Employee 4', total: 0, bottles: 0 }
-    };
+    const segmentOrders = { bkash: new Set(), nagad: new Set(), cash_on_delivery: new Set() };
 
     allocations.forEach(alloc => {
       const multiplier = alloc.isReversal ? -1 : 1;
       const bQty = (alloc.bottlesSold || 0) * multiplier;
+      const rev = (alloc.totalRevenue || 0) * multiplier;
 
       totalBottlesSold += bQty;
-      totalSalesRevenue += (alloc.totalRevenue || 0) * multiplier;
+      totalSalesRevenue += rev;
       totalPrincipalRepaid += (alloc.totalPrincipalRepaid || 0) * multiplier;
-      totalDistributableProfit += (alloc.totalDistributableProfit || 0) * multiplier;
 
-      if (alloc.fundAllocations) {
-        fundsAccumulated.financeMember += (alloc.fundAllocations.financeMember || 0) * multiplier;
-        fundsAccumulated.developmentFund += (alloc.fundAllocations.developmentFund || 0) * multiplier;
-        fundsAccumulated.employeeSalaryFund += (alloc.fundAllocations.employeeSalaryFund || 0) * multiplier;
-        fundsAccumulated.charityFund += (alloc.fundAllocations.charityFund || 0) * multiplier;
-        fundsAccumulated.marketingFund += (alloc.fundAllocations.marketingFund || 0) * multiplier;
-        fundsAccumulated.reserveFund += (alloc.fundAllocations.reserveFund || 0) * multiplier;
+      let seg = alloc.paymentSegment;
+      if (!seg || !segments[seg]) {
+        seg = (alloc.paymentProvider === 'nagad') ? 'nagad' : ((alloc.paymentMethod === 'cod_advance' || alloc.paymentProvider === 'hand_cash') ? 'cash_on_delivery' : 'bkash');
       }
 
-      if (Array.isArray(alloc.employeeBreakdown)) {
-        alloc.employeeBreakdown.forEach(emp => {
-          if (employeeEarnings[emp.slot]) {
-            employeeEarnings[emp.slot].total += (emp.amount || 0) * multiplier;
-            employeeEarnings[emp.slot].bottles += bQty;
-          }
-        });
+      if (segments[seg]) {
+        segments[seg].bottlesSold += bQty;
+        segments[seg].grossRevenue += rev;
+        if (alloc.orderNumber) segmentOrders[seg].add(alloc.orderNumber);
       }
     });
+
+    // Calculate Cashout Fees on TOTAL revenue per segment (NOT per order)
+    let totalCashoutFees = 0;
+    Object.keys(segments).forEach(k => {
+      const s = segments[k];
+      s.orderCount = segmentOrders[k].size;
+      s.grossRevenue = Math.max(0, Math.round(s.grossRevenue * 100) / 100);
+      s.cashoutFee = Math.round(s.grossRevenue * (s.rate / 100) * 100) / 100;
+      s.netRevenue = Math.max(0, Math.round((s.grossRevenue - s.cashoutFee) * 100) / 100);
+      totalCashoutFees += s.cashoutFee;
+    });
+    totalCashoutFees = Math.round(totalCashoutFees * 100) / 100;
 
     // Expenses by fund
     const fundExpenses = {
@@ -749,16 +844,26 @@ class DeliceProfitService {
     const repaymentProgress = Math.min(100, Math.round((totalPrincipalRepaid / initialPrincipal) * 10000) / 100);
     const isFullyRepaid = totalPrincipalRepaid >= initialPrincipal;
 
+    // Distributable Profit Calculation:
+    // Gross Distributable Profit = Total Sales Revenue - Total Principal Repaid
+    const grossDistributableProfit = Math.max(0, Math.round((totalSalesRevenue - totalPrincipalRepaid) * 100) / 100);
+
+    // Rule 2 & 3: Cash-out charges deducted from total money; whatever remains goes into Fund-Wise Financial Breakdown!
+    const totalDistributableProfit = Math.max(0, Math.round((grossDistributableProfit - totalCashoutFees) * 100) / 100);
+
+    // Calculate Fund Distribution strictly from remaining Net Distributable Profit
+    const { fundAllocations, employeeBreakdown } = this.calculateFundDistribution(totalDistributableProfit, settings);
+
     // Cleaned 2-decimal rounded funds
     const fundsOverview = [
       {
         key: 'financeMember',
         name: 'NirmAN Finance Member Profit',
         percentage: 10,
-        amountPerBottle: 6.64,
-        totalAccumulated: Math.max(0, Math.round(fundsAccumulated.financeMember * 100) / 100),
+        amountPerBottle: totalBottlesSold > 0 ? Math.round((fundAllocations.financeMember / totalBottlesSold) * 100) / 100 : 0,
+        totalAccumulated: Math.max(0, fundAllocations.financeMember || 0),
         totalExpenses: Math.round(fundExpenses.financeMember * 100) / 100,
-        availableBalance: Math.round((fundsAccumulated.financeMember - fundExpenses.financeMember) * 100) / 100,
+        availableBalance: Math.round(((fundAllocations.financeMember || 0) - fundExpenses.financeMember) * 100) / 100,
         bottlesContributing: Math.max(0, totalBottlesSold),
         color: '#4A102A'
       },
@@ -766,10 +871,10 @@ class DeliceProfitService {
         key: 'developmentFund',
         name: 'DÉLICE Development Fund',
         percentage: 20,
-        amountPerBottle: 13.28,
-        totalAccumulated: Math.max(0, Math.round(fundsAccumulated.developmentFund * 100) / 100),
+        amountPerBottle: totalBottlesSold > 0 ? Math.round((fundAllocations.developmentFund / totalBottlesSold) * 100) / 100 : 0,
+        totalAccumulated: Math.max(0, fundAllocations.developmentFund || 0),
         totalExpenses: Math.round(fundExpenses.developmentFund * 100) / 100,
-        availableBalance: Math.round((fundsAccumulated.developmentFund - fundExpenses.developmentFund) * 100) / 100,
+        availableBalance: Math.round(((fundAllocations.developmentFund || 0) - fundExpenses.developmentFund) * 100) / 100,
         bottlesContributing: Math.max(0, totalBottlesSold),
         color: '#C5A46D'
       },
@@ -777,10 +882,10 @@ class DeliceProfitService {
         key: 'employeeSalaryFund',
         name: 'Employee Salary Fund',
         percentage: 60,
-        amountPerBottle: 39.84,
-        totalAccumulated: Math.max(0, Math.round(fundsAccumulated.employeeSalaryFund * 100) / 100),
+        amountPerBottle: totalBottlesSold > 0 ? Math.round((fundAllocations.employeeSalaryFund / totalBottlesSold) * 100) / 100 : 0,
+        totalAccumulated: Math.max(0, fundAllocations.employeeSalaryFund || 0),
         totalExpenses: Math.round(fundExpenses.employeeSalaryFund * 100) / 100,
-        availableBalance: Math.round((fundsAccumulated.employeeSalaryFund - fundExpenses.employeeSalaryFund) * 100) / 100,
+        availableBalance: Math.round(((fundAllocations.employeeSalaryFund || 0) - fundExpenses.employeeSalaryFund) * 100) / 100,
         bottlesContributing: Math.max(0, totalBottlesSold),
         color: '#181619'
       },
@@ -788,10 +893,10 @@ class DeliceProfitService {
         key: 'charityFund',
         name: 'Charity Fund',
         percentage: 3,
-        amountPerBottle: 1.99,
-        totalAccumulated: Math.max(0, Math.round(fundsAccumulated.charityFund * 100) / 100),
+        amountPerBottle: totalBottlesSold > 0 ? Math.round((fundAllocations.charityFund / totalBottlesSold) * 100) / 100 : 0,
+        totalAccumulated: Math.max(0, fundAllocations.charityFund || 0),
         totalExpenses: Math.round(fundExpenses.charityFund * 100) / 100,
-        availableBalance: Math.round((fundsAccumulated.charityFund - fundExpenses.charityFund) * 100) / 100,
+        availableBalance: Math.round(((fundAllocations.charityFund || 0) - fundExpenses.charityFund) * 100) / 100,
         bottlesContributing: Math.max(0, totalBottlesSold),
         color: '#FF665C'
       },
@@ -799,10 +904,10 @@ class DeliceProfitService {
         key: 'marketingFund',
         name: 'Marketing Fund',
         percentage: 5,
-        amountPerBottle: 3.32,
-        totalAccumulated: Math.max(0, Math.round(fundsAccumulated.marketingFund * 100) / 100),
+        amountPerBottle: totalBottlesSold > 0 ? Math.round((fundAllocations.marketingFund / totalBottlesSold) * 100) / 100 : 0,
+        totalAccumulated: Math.max(0, fundAllocations.marketingFund || 0),
         totalExpenses: Math.round(fundExpenses.marketingFund * 100) / 100,
-        availableBalance: Math.round((fundsAccumulated.marketingFund - fundExpenses.marketingFund) * 100) / 100,
+        availableBalance: Math.round(((fundAllocations.marketingFund || 0) - fundExpenses.marketingFund) * 100) / 100,
         bottlesContributing: Math.max(0, totalBottlesSold),
         color: '#8E2800'
       },
@@ -810,22 +915,22 @@ class DeliceProfitService {
         key: 'reserveFund',
         name: 'Reserve & Emergency Fund',
         percentage: 2,
-        amountPerBottle: 1.33,
-        totalAccumulated: Math.max(0, Math.round(fundsAccumulated.reserveFund * 100) / 100),
+        amountPerBottle: totalBottlesSold > 0 ? Math.round((fundAllocations.reserveFund / totalBottlesSold) * 100) / 100 : 0,
+        totalAccumulated: Math.max(0, fundAllocations.reserveFund || 0),
         totalExpenses: Math.round(fundExpenses.reserveFund * 100) / 100,
-        availableBalance: Math.round((fundsAccumulated.reserveFund - fundExpenses.reserveFund) * 100) / 100,
+        availableBalance: Math.round(((fundAllocations.reserveFund || 0) - fundExpenses.reserveFund) * 100) / 100,
         bottlesContributing: Math.max(0, totalBottlesSold),
         color: '#34495E'
       }
     ];
 
-    const employeesSummary = Object.values(employeeEarnings).map(emp => ({
+    const employeesSummary = employeeBreakdown.map(emp => ({
       slot: emp.slot,
       name: emp.name,
-      percentage: 15,
-      earningsPerBottle: 9.96,
-      totalAccumulated: Math.max(0, Math.round(emp.total * 100) / 100),
-      bottlesSold: Math.max(0, emp.bottles)
+      percentage: emp.percentage,
+      earningsPerBottle: totalBottlesSold > 0 ? Math.round((emp.amount / totalBottlesSold) * 100) / 100 : 0,
+      totalAccumulated: emp.amount,
+      bottlesSold: totalBottlesSold
     }));
 
     return {
@@ -838,10 +943,23 @@ class DeliceProfitService {
         outstandingPrincipal,
         repaymentProgress,
         isFullyRepaid,
+        grossDistributableProfit,
+        totalCashoutFees,
         totalDistributableProfit: Math.max(0, Math.round(totalDistributableProfit * 100) / 100),
-        totalEmployeeSalary: Math.max(0, Math.round(fundsAccumulated.employeeSalaryFund * 100) / 100),
-        totalDevelopmentFund: Math.max(0, Math.round(fundsAccumulated.developmentFund * 100) / 100),
-        totalReserveFund: Math.max(0, Math.round(fundsAccumulated.reserveFund * 100) / 100)
+        totalEmployeeSalary: Math.max(0, Math.round(fundAllocations.employeeSalaryFund * 100) / 100),
+        totalDevelopmentFund: Math.max(0, Math.round(fundAllocations.developmentFund * 100) / 100),
+        totalReserveFund: Math.max(0, Math.round(fundAllocations.reserveFund * 100) / 100)
+      },
+      segments: [
+        segments.bkash,
+        segments.nagad,
+        segments.cash_on_delivery
+      ],
+      segmentsMap: segments,
+      cashoutSummary: {
+        totalCashoutFees,
+        grossDistributableProfit,
+        netDistributableProfit: totalDistributableProfit
       },
       fundsOverview,
       employeesSummary,
@@ -1035,32 +1153,47 @@ class DeliceProfitService {
     let bottlesSold = 0;
     let salesRevenue = 0;
     let principalRepaid = 0;
-    let distributableProfit = 0;
-    const funds = {
-      financeMember: 0,
-      developmentFund: 0,
-      employeeSalaryFund: 0,
-      charityFund: 0,
-      marketingFund: 0,
-      reserveFund: 0
+
+    const settings = await this.getSettings();
+    const feeRates = settings.cashoutFeePercentages || { bkash: 1.10, nagad: 0.85, cod: 1.00 };
+    const segments = {
+      bkash: { key: 'bkash', name: 'bKash (Send Money)', rate: Number(feeRates.bkash !== undefined ? feeRates.bkash : 1.10), grossRevenue: 0, cashoutFee: 0, netRevenue: 0, bottlesSold: 0 },
+      nagad: { key: 'nagad', name: 'Nagad (Send Money)', rate: Number(feeRates.nagad !== undefined ? feeRates.nagad : 0.85), grossRevenue: 0, cashoutFee: 0, netRevenue: 0, bottlesSold: 0 },
+      cash_on_delivery: { key: 'cash_on_delivery', name: 'Cash on Delivery (Courier COD)', rate: Number(feeRates.cod !== undefined ? feeRates.cod : 1.00), grossRevenue: 0, cashoutFee: 0, netRevenue: 0, bottlesSold: 0 }
     };
 
     allocations.forEach(a => {
       const m = a.isReversal ? -1 : 1;
-      bottlesSold += (a.bottlesSold || 0) * m;
-      salesRevenue += (a.totalRevenue || 0) * m;
-      principalRepaid += (a.totalPrincipalRepaid || 0) * m;
-      distributableProfit += (a.totalDistributableProfit || 0) * m;
+      const bQty = (a.bottlesSold || 0) * m;
+      const rev = (a.totalRevenue || 0) * m;
 
-      if (a.fundAllocations) {
-        funds.financeMember += (a.fundAllocations.financeMember || 0) * m;
-        funds.developmentFund += (a.fundAllocations.developmentFund || 0) * m;
-        funds.employeeSalaryFund += (a.fundAllocations.employeeSalaryFund || 0) * m;
-        funds.charityFund += (a.fundAllocations.charityFund || 0) * m;
-        funds.marketingFund += (a.fundAllocations.marketingFund || 0) * m;
-        funds.reserveFund += (a.fundAllocations.reserveFund || 0) * m;
+      bottlesSold += bQty;
+      salesRevenue += rev;
+      principalRepaid += (a.totalPrincipalRepaid || 0) * m;
+
+      let seg = a.paymentSegment;
+      if (!seg || !segments[seg]) {
+        seg = (a.paymentProvider === 'nagad') ? 'nagad' : ((a.paymentMethod === 'cod_advance' || a.paymentProvider === 'hand_cash') ? 'cash_on_delivery' : 'bkash');
+      }
+      if (segments[seg]) {
+        segments[seg].bottlesSold += bQty;
+        segments[seg].grossRevenue += rev;
       }
     });
+
+    let totalCashoutFees = 0;
+    Object.keys(segments).forEach(k => {
+      const s = segments[k];
+      s.grossRevenue = Math.max(0, Math.round(s.grossRevenue * 100) / 100);
+      s.cashoutFee = Math.round(s.grossRevenue * (s.rate / 100) * 100) / 100;
+      s.netRevenue = Math.max(0, Math.round((s.grossRevenue - s.cashoutFee) * 100) / 100);
+      totalCashoutFees += s.cashoutFee;
+    });
+    totalCashoutFees = Math.round(totalCashoutFees * 100) / 100;
+
+    const grossDistributableProfit = Math.max(0, Math.round((salesRevenue - principalRepaid) * 100) / 100);
+    const totalDistributableProfit = Math.max(0, Math.round((grossDistributableProfit - totalCashoutFees) * 100) / 100);
+    const { fundAllocations } = this.calculateFundDistribution(totalDistributableProfit, settings);
 
     return {
       rangeType,
@@ -1070,14 +1203,17 @@ class DeliceProfitService {
       bottlesSold: Math.max(0, bottlesSold),
       salesRevenue: Math.max(0, Math.round(salesRevenue * 100) / 100),
       principalRepaid: Math.max(0, Math.round(principalRepaid * 100) / 100),
-      distributableProfit: Math.max(0, Math.round(distributableProfit * 100) / 100),
+      grossDistributableProfit,
+      totalCashoutFees,
+      distributableProfit: Math.max(0, Math.round(totalDistributableProfit * 100) / 100),
+      segments: [segments.bkash, segments.nagad, segments.cash_on_delivery],
       funds: {
-        financeMember: Math.max(0, Math.round(funds.financeMember * 100) / 100),
-        developmentFund: Math.max(0, Math.round(funds.developmentFund * 100) / 100),
-        employeeSalaryFund: Math.max(0, Math.round(funds.employeeSalaryFund * 100) / 100),
-        charityFund: Math.max(0, Math.round(funds.charityFund * 100) / 100),
-        marketingFund: Math.max(0, Math.round(funds.marketingFund * 100) / 100),
-        reserveFund: Math.max(0, Math.round(funds.reserveFund * 100) / 100)
+        financeMember: fundAllocations.financeMember || 0,
+        developmentFund: fundAllocations.developmentFund || 0,
+        employeeSalaryFund: fundAllocations.employeeSalaryFund || 0,
+        charityFund: fundAllocations.charityFund || 0,
+        marketingFund: fundAllocations.marketingFund || 0,
+        reserveFund: fundAllocations.reserveFund || 0
       },
       allocations
     };

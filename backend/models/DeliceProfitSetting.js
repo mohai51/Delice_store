@@ -52,6 +52,12 @@ const deliceProfitSettingSchema = new mongoose.Schema({
     marketingFund: { type: Number, default: 5 }, // Marketing Fund (5%)
     reserveFund: { type: Number, default: 2 } // Reserve & Emergency Fund (2%)
   },
+  // Cash-out and Payment Gateway Fee percentages per segment
+  cashoutFeePercentages: {
+    bkash: { type: Number, default: 1.10 }, // 1.10% bKash Send Money cash-out
+    nagad: { type: Number, default: 0.85 }, // 0.85% Nagad Send Money cash-out
+    cod: { type: Number, default: 1.00 }    // 1.00% Cash on Delivery handling fee
+  },
   employees: {
     type: [employeeSlotSchema],
     default: () => [
