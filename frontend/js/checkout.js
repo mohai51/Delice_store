@@ -6,6 +6,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const checkoutPageLoadTime = Date.now();
   let deliveryRates = { insideDhaka: 60, outsideDhaka: 120 };
   let bkashNagadNumber = '01731101780';
   let checkoutItems = [];
@@ -489,7 +490,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           })),
           paymentMethod: selectedPaymentMethod,
           paymentProvider: isFreeHubCOD ? 'hand_cash' : selectedProvider,
-          senderNumber: cleanedSender
+          senderNumber: cleanedSender,
+          website_url_hp: document.getElementById('order_hp_verification')?.value || '',
+          _loadTimestamp: checkoutPageLoadTime
         };
 
         const response = await fetch('/api/orders', {

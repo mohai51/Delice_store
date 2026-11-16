@@ -43,6 +43,12 @@
       </div>
 
       <form id="checkoutForm" novalidate>
+        <!-- Honeypot Bot Trap (Invisible to humans, auto-filled by spam bots) -->
+        <div style="opacity:0; position:absolute; top:0; left:-9999px; height:0; width:0; z-index:-1; pointer-events:none;" aria-hidden="true">
+          <label for="order_hp_verification">Leave this empty</label>
+          <input type="text" id="order_hp_verification" name="website_url_hp" tabindex="-1" autocomplete="off">
+        </div>
+
         <!-- Persistent Hidden Field for Campus Hub Selection -->
         <input type="hidden" name="deliveryHub" id="selectedCampusHubInput" value="">
         <div class="checkout-compact-card">

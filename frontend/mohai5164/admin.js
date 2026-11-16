@@ -476,9 +476,14 @@ async function loadOrders() {
           <td><span class="badge-status ${o.paymentStatus}">${(o.paymentStatus || 'awaiting_verification').replace('_', ' ')}</span></td>
           <td><span class="badge-status ${o.orderStatus}">${(o.orderStatus || 'processing').replace('_', ' ')}</span></td>
           <td>
-            <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.7rem; white-space:nowrap;" onclick="viewOrderModal('${o._id}')">
-              Manage &rarr;
-            </button>
+            <div style="display:flex; align-items:center; gap:0.4rem;">
+              <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.7rem; white-space:nowrap;" onclick="viewOrderModal('${o._id}')">
+                Manage &rarr;
+              </button>
+              <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.35rem 0.55rem; color:#B91C1C; border-color:#FECACA;" onclick="event.stopPropagation(); deleteOrderPrompt('${o._id}', '${o.orderNumber}')" title="Permanently delete order from MongoDB">
+                🗑️
+              </button>
+            </div>
           </td>
         </tr>
       `;
@@ -863,10 +868,44 @@ function viewOrderModal(orderId) {
       </div>
       <button type="submit" class="btn btn-primary btn-block" style="padding:0.75rem; font-size:0.95rem; font-weight:700;">Update Status &amp; Recalculate Profit</button>
     </form>
+
+    <div style="margin-top:1.5rem; padding-top:1rem; border-top:1px solid #E5E7EB; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div>
+        <strong style="color:#B91C1C; font-size:0.85rem;">Danger Zone:</strong>
+        <span style="font-size:0.8rem; color:#6B7280; display:block;">Permanently delete fake, test, or spam orders from MongoDB</span>
+      </div>
+      <button type="button" class="btn btn-secondary" style="color:#B91C1C; border-color:#FECACA; background:#FEF2F2; font-weight:700; font-size:0.82rem; padding:0.45rem 0.95rem;" onclick="deleteOrderPrompt('${order._id}', '${order.orderNumber}')">
+        🗑️ Permanently Delete Order
+      </button>
+    </div>
   `;
 
   openModal('orderModal');
 }
+
+async function deleteOrderPrompt(orderId, orderNumber) {
+  const confirmMsg = `WARNING: Are you sure you want to PERMANENTLY DELETE order #${orderNumber}?\n\nThis order will be removed from MongoDB database forever. If inventory stock was reserved for this order, it will be automatically restored to your stock.`;
+  if (!confirm(confirmMsg)) return;
+
+  try {
+    const res = await fetchWithAuth(`/api/orders/${orderId}`, {
+      method: 'DELETE'
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert(`Order #${orderNumber} has been permanently deleted from MongoDB.`);
+      closeModal('orderModal');
+      await loadOrders();
+      await loadOverview();
+    } else {
+      alert(data.error || 'Failed to delete order.');
+    }
+  } catch (err) {
+    console.error('Error deleting order:', err);
+    alert('Failed to delete order. Please try again.');
+  }
+}
+window.deleteOrderPrompt = deleteOrderPrompt;
 
 async function handleOrderStatusUpdate(e, orderId) {
   e.preventDefault();

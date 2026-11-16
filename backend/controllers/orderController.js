@@ -28,7 +28,28 @@ function maskPhoneNumber(phone) {
  */
 exports.createOrder = async (req, res, next) => {
   try {
-    // 0. Ensure database connection is active (vital for Vercel serverless cold starts)
+    // 1. Honeypot Protection (Invisible anti-bot trap: blocks bots instantly with 0ms DB overhead)
+    if (req.body.website_url_hp || req.body.hp_verification) {
+      console.warn('[Bot Honeypot Triggered] Blocked automated bot spam submission.');
+      return res.status(400).json({
+        success: false,
+        error: 'Automated request detected and blocked.'
+      });
+    }
+
+    // 2. Invisible Bot Timing Shield (Sub-human instant form submissions blocked)
+    if (req.body._loadTimestamp && typeof req.body._loadTimestamp === 'number') {
+      const elapsed = Date.now() - req.body._loadTimestamp;
+      if (elapsed < 1200 && process.env.NODE_ENV !== 'test') {
+        console.warn(`[Bot Timing Triggered] Form submitted in ${elapsed}ms (sub-human). Blocked.`);
+        return res.status(400).json({
+          success: false,
+          error: 'Please take a moment to review and complete your order details.'
+        });
+      }
+    }
+
+    // 3. Ensure database connection is active (vital for Vercel serverless cold starts)
     if (!isConnected()) {
       try {
         const connectDB = require('../config/db');
@@ -58,6 +79,31 @@ exports.createOrder = async (req, res, next) => {
         success: false,
         error: 'Please enter a valid 11-digit Bangladeshi mobile number (e.g. 01712345678).'
       });
+    }
+
+    // Phone Rapid-Spam Guard (Blocks bot scripts looping on identical mobile number)
+    if (cleanedPhone && process.env.NODE_ENV !== 'test') {
+      const recentWindow = new Date(Date.now() - 45 * 1000);
+      let recentOrderSamePhone = null;
+      if (isConnected()) {
+        try {
+          recentOrderSamePhone = await Order.findOne({
+            'customer.phone': cleanedPhone,
+            createdAt: { $gte: recentWindow }
+          });
+        } catch (_) {}
+      } else if (memoryStore.orders) {
+        recentOrderSamePhone = memoryStore.orders.find(o => 
+          o.customer?.phone === cleanedPhone && 
+          new Date(o.createdAt).getTime() >= recentWindow.getTime()
+        );
+      }
+      if (recentOrderSamePhone) {
+        return res.status(429).json({
+          success: false,
+          error: 'An order was just submitted with this mobile number. Please wait 45 seconds before placing another order.'
+        });
+      }
     }
 
     // 2. Validate Payment Details & Campus Delivery Hub
@@ -815,6 +861,83 @@ exports.updateOrderStatus = async (req, res, next) => {
 
     res.json({ success: true, order });
   } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * Permanently Delete Order (Admin Only)
+ * Restores product inventory stock if order was holding stock.
+ * Completely deletes the order document from MongoDB Atlas forever.
+ * DELETE /api/orders/:id
+ */
+exports.deleteOrder = async (req, res, next) => {
+  try {
+    const orderId = req.params.id;
+    let order = null;
+
+    if (isConnected()) {
+      try {
+        order = await Order.findById(orderId);
+      } catch (e) {}
+    }
+    if (!order && memoryStore.orders) {
+      order = memoryStore.orders.find(o => String(o._id) === String(orderId));
+    }
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found.' });
+    }
+
+    // 1. Critical Inventory Protection: Restore stock if the order was holding stock
+    const wasCancelled = order.orderStatus === 'cancelled';
+    if (!wasCancelled) {
+      for (const item of (order.items || [])) {
+        const pId = item.productId || item.id;
+        const qty = Number(item.quantity) || 1;
+        if (isConnected()) {
+          try {
+            await Product.updateOne({ id: pId }, { $inc: { stock: qty } });
+            console.log(`[Inventory Stock] Restored ${qty} bottle(s) to "${pId}" on order permanent deletion.`);
+          } catch (e) {
+            console.error(`[Stock Restore Error on Delete] Failed for ${pId}:`, e.message);
+          }
+        }
+        if (memoryStore.products) {
+          const memProd = memoryStore.products.find(p => p.id === pId);
+          if (memProd) {
+            memProd.stock = (Number(memProd.stock) || 0) + qty;
+          }
+        }
+      }
+    }
+
+    // 2. If order had allocated profit, reverse it cleanly
+    try {
+      if (order.paymentStatus === 'paid' || order.orderStatus === 'delivered') {
+        await deliceProfitService.reverseOrderSale(order, `Order #${order.orderNumber} permanently deleted by admin.`);
+        await deliceProfitService.reconcileWithOrders();
+      }
+    } catch (_) {}
+
+    // 3. Permanently Delete from MongoDB Atlas Database
+    if (isConnected()) {
+      await Order.findByIdAndDelete(order._id);
+    }
+
+    // 4. Permanently Delete from in-memory fallback
+    if (memoryStore.orders) {
+      memoryStore.orders = memoryStore.orders.filter(o => String(o._id) !== String(order._id));
+    }
+
+    console.log(`[Order Permanent Delete] Order #${order.orderNumber} (${order._id}) permanently purged from MongoDB.`);
+
+    res.json({
+      success: true,
+      message: `Order #${order.orderNumber} has been permanently deleted from database and stock restored.`
+    });
+  } catch (err) {
+    console.error('[Delete Order Error]', err.message);
     next(err);
   }
 };
