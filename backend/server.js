@@ -51,7 +51,7 @@ app.use(express.urlencoded({ extended: true }));
 const frontendPath = path.join(__dirname, '..', 'frontend');
 app.use((req, res, next) => {
   const urlPath = req.path || '';
-  if (urlPath.startsWith('/admin') || urlPath.includes('admin.')) {
+  if (urlPath.startsWith('/mohai5164') || urlPath.startsWith('/admin') || urlPath.includes('admin.')) {
     // Admin scripts, styles and views must NEVER be cached by browser
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   } else if (urlPath.match(/\.(png|jpg|jpeg|webp|svg|gif|ico|woff2?|ttf|eot)$/i)) {
@@ -88,9 +88,14 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/slides', slideRoutes);
 app.use('/api/admin/delice-profit', deliceProfitRoutes);
 
-// Admin Portal Direct Route
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'admin', 'index.html'));
+// Admin Portal Direct Route (Custom Secret URL)
+app.get(['/mohai5164', '/mohai5164/'], (req, res) => {
+  res.sendFile(path.join(frontendPath, 'mohai5164', 'index.html'));
+});
+
+// Conceal /admin completely from public/customers - redirect to storefront
+app.get(['/admin', '/admin/*'], (req, res) => {
+  res.redirect(301, '/');
 });
 
 // Fallback HTML Routes for clean URLs
@@ -122,7 +127,7 @@ if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
     Environment: ${process.env.NODE_ENV || 'development'}
     Port:        ${PORT}
     Storefront:  http://localhost:${PORT}/
-    Admin Panel: http://localhost:${PORT}/admin
+    Admin Panel: http://localhost:${PORT}/mohai5164
   ==============================================================
     `);
   });

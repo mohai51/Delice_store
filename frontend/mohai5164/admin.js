@@ -75,6 +75,26 @@ function initAuth() {
       window.location.reload();
     });
   }
+
+  // Toggle Password Visibility (Show/Hide Password)
+  const togglePassBtn = document.getElementById('toggleLoginPassBtn');
+  if (togglePassBtn) {
+    togglePassBtn.addEventListener('click', () => {
+      const passInput = document.getElementById('loginPass');
+      const icon = document.getElementById('toggleLoginPassIcon');
+      if (passInput) {
+        if (passInput.type === 'password') {
+          passInput.type = 'text';
+          if (icon) icon.textContent = '🙈';
+          togglePassBtn.title = 'Hide password';
+        } else {
+          passInput.type = 'password';
+          if (icon) icon.textContent = '👁️';
+          togglePassBtn.title = 'Show password';
+        }
+      }
+    });
+  }
 }
 
 async function verifyTokenAndLoad() {
