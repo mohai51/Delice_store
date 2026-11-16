@@ -130,8 +130,9 @@ const viewTitles = {
   orders: '2. Orders Management',
   products: '3. Shop Catalog & Products',
   'delice-profit': '4. DÉLICE Profit Calculation & Capital Recovery',
-  'hero-slides': '5. Hero Slides Management',
-  settings: '6. System & Financial Settings'
+  analytics: '5. Customer Traffic & Visitor Analytics',
+  'hero-slides': '6. Hero Slides Management',
+  settings: '7. System & Financial Settings'
 };
 
 function initNav() {
@@ -163,6 +164,7 @@ function switchTab(viewId) {
   else if (viewId === 'orders') loadOrders();
   else if (viewId === 'products') loadProducts();
   else if (viewId === 'delice-profit') loadDeliceProfit();
+  else if (viewId === 'analytics') loadAnalyticsData();
   else if (viewId === 'hero-slides') loadHeroSlidesAdmin();
   else if (viewId === 'settings') loadSettings();
 }
@@ -286,6 +288,25 @@ async function loadOverview() {
         }).join('');
       }
     }
+
+    // Quick Visitor Traffic Summary (24h)
+    try {
+      const anRes = await fetchWithAuth('/api/admin/analytics?range=24h');
+      if (anRes.ok) {
+        const anData = await anRes.json();
+        const s = anData.summary || {};
+        const d = anData.deviceBreakdown || {};
+        const elAnTxt = document.getElementById('ovAnalyticsSummaryText');
+        if (elAnTxt) {
+          elAnTxt.innerHTML = `
+            <strong>${(s.uniqueVisitors || 0).toLocaleString()} visitors</strong> (${(s.totalSessions || 0).toLocaleString()} sessions) &bull; 
+            Avg Screen Time: <strong style="color:#059669;">${s.avgScreenTimeFormatted || '0m'}</strong> &bull; 
+            Devices: 📱 ${d.mobile?.percentage || 0}% Mobile | 📟 ${d.tablet?.percentage || 0}% Tab | 💻 ${d.pc?.percentage || 0}% PC &bull; 
+            Cart Conversion: <strong style="color:#EA580C;">${s.cartToBuyNowRate || 0}%</strong>
+          `;
+        }
+      }
+    } catch (_) {}
   } catch (err) {
     console.error('Error loading overview:', err);
   }
@@ -1364,7 +1385,172 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   5. HERO SLIDES MANAGEMENT
+   5. VISITOR & TRAFFIC ANALYTICS
+   ========================================================================== */
+async function loadAnalyticsData() {
+  const rangeSelect = document.getElementById('analyticsTimeRange');
+  const range = rangeSelect ? rangeSelect.value : '24h';
+
+  try {
+    const res = await fetchWithAuth(`/api/admin/analytics?range=${range}`);
+    if (!res.ok) {
+      console.error('Failed to load analytics, status:', res.status);
+      return;
+    }
+
+    const data = await res.json();
+    if (!data.success) return;
+
+    const s = data.summary || {};
+    const d = data.deviceBreakdown || {};
+    const recent = data.recentSessions || [];
+
+    // Row 1: Stat Cards
+    const elVisitors = document.getElementById('anStatVisitors');
+    const elSessions = document.getElementById('anStatSessions');
+    const elAvgScreenTime = document.getElementById('anStatAvgScreenTime');
+    const elTotalScreenTime = document.getElementById('anStatTotalScreenTime');
+    const elAddToCart = document.getElementById('anStatAddToCart');
+    const elCartRate = document.getElementById('anStatCartRate');
+    const elBuyNow = document.getElementById('anStatBuyNow');
+    const elCartToBuyRate = document.getElementById('anStatCartToBuyRate');
+    const elOrders = document.getElementById('anStatOrders');
+    const elOverallConversion = document.getElementById('anStatOverallConversion');
+
+    if (elVisitors) elVisitors.textContent = (s.uniqueVisitors || 0).toLocaleString();
+    if (elSessions) elSessions.textContent = `${(s.totalSessions || 0).toLocaleString()} Total Sessions`;
+    if (elAvgScreenTime) elAvgScreenTime.textContent = s.avgScreenTimeFormatted || '0m 0s';
+    if (elTotalScreenTime) elTotalScreenTime.textContent = `Total: ${s.totalScreenTimeFormatted || '0m'}`;
+    if (elAddToCart) elAddToCart.textContent = (s.addToCartSessions || 0).toLocaleString();
+    
+    const cartPct = s.uniqueVisitors > 0 ? ((s.addToCartSessions / s.uniqueVisitors) * 100).toFixed(1) : 0;
+    if (elCartRate) elCartRate.textContent = `${cartPct}% of Visitors`;
+
+    if (elBuyNow) elBuyNow.textContent = (s.buyNowSessions || 0).toLocaleString();
+    if (elCartToBuyRate) elCartToBuyRate.textContent = `${s.cartToBuyNowRate || 0}% from Cart`;
+
+    if (elOrders) elOrders.textContent = (s.orderCompletedSessions || 0).toLocaleString();
+    if (elOverallConversion) elOverallConversion.textContent = `${s.overallConversionRate || 0}% Conversion`;
+
+    // Row 2: Device Breakdown
+    const elDeviceBadge = document.getElementById('anDeviceTotalBadge');
+    if (elDeviceBadge) elDeviceBadge.textContent = `${(s.totalSessions || 0).toLocaleString()} Total Sessions`;
+
+    // Mobile
+    const mob = d.mobile || {};
+    const elMobCount = document.getElementById('anMobileCount');
+    const elMobPercent = document.getElementById('anMobilePercent');
+    const elMobBar = document.getElementById('anMobileBar');
+    const elMobAvgTime = document.getElementById('anMobileAvgTime');
+    if (elMobCount) elMobCount.textContent = (mob.count || 0).toLocaleString();
+    if (elMobPercent) elMobPercent.textContent = `${mob.percentage || 0}%`;
+    if (elMobBar) elMobBar.style.width = `${Math.min(100, mob.percentage || 0)}%`;
+    if (elMobAvgTime) elMobAvgTime.textContent = mob.avgScreenTimeFormatted || '0m 0s';
+
+    // Tablet
+    const tab = d.tablet || {};
+    const elTabCount = document.getElementById('anTabletCount');
+    const elTabPercent = document.getElementById('anTabletPercent');
+    const elTabBar = document.getElementById('anTabletBar');
+    const elTabAvgTime = document.getElementById('anTabletAvgTime');
+    if (elTabCount) elTabCount.textContent = (tab.count || 0).toLocaleString();
+    if (elTabPercent) elTabPercent.textContent = `${tab.percentage || 0}%`;
+    if (elTabBar) elTabBar.style.width = `${Math.min(100, tab.percentage || 0)}%`;
+    if (elTabAvgTime) elTabAvgTime.textContent = tab.avgScreenTimeFormatted || '0m 0s';
+
+    // PC
+    const pc = d.pc || {};
+    const elPcCount = document.getElementById('anPcCount');
+    const elPcPercent = document.getElementById('anPcPercent');
+    const elPcBar = document.getElementById('anPcBar');
+    const elPcAvgTime = document.getElementById('anPcAvgTime');
+    if (elPcCount) elPcCount.textContent = (pc.count || 0).toLocaleString();
+    if (elPcPercent) elPcPercent.textContent = `${pc.percentage || 0}%`;
+    if (elPcBar) elPcBar.style.width = `${Math.min(100, pc.percentage || 0)}%`;
+    if (elPcAvgTime) elPcAvgTime.textContent = pc.avgScreenTimeFormatted || '0m 0s';
+
+    // Row 3: Funnel Metrics
+    const elFnVisitors = document.getElementById('anFunnelVisitors');
+    const elFnCart = document.getElementById('anFunnelCart');
+    const elFnCartBadge = document.getElementById('anFunnelCartBadge');
+    const elFnBuyNow = document.getElementById('anFunnelBuyNow');
+    const elFnBuyNowBadge = document.getElementById('anFunnelBuyNowBadge');
+    const elFnOrders = document.getElementById('anFunnelOrders');
+    const elFnOrdersBadge = document.getElementById('anFunnelOrdersBadge');
+
+    if (elFnVisitors) elFnVisitors.textContent = (s.uniqueVisitors || 0).toLocaleString();
+    if (elFnCart) elFnCart.textContent = (s.addToCartSessions || 0).toLocaleString();
+    if (elFnCartBadge) elFnCartBadge.textContent = `${cartPct}% Converted`;
+
+    if (elFnBuyNow) elFnBuyNow.textContent = (s.buyNowSessions || 0).toLocaleString();
+    if (elFnBuyNowBadge) elFnBuyNowBadge.textContent = `${s.cartToBuyNowRate || 0}% from Cart`;
+
+    if (elFnOrders) elFnOrders.textContent = (s.orderCompletedSessions || 0).toLocaleString();
+    if (elFnOrdersBadge) elFnOrdersBadge.textContent = `${s.overallConversionRate || 0}% Sales Conversion`;
+
+    // Row 4: Recent Sessions Table
+    const tbody = document.getElementById('anRecentSessionsTableBody');
+    if (tbody) {
+      if (recent.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:2rem; color:#6B7280;">
+              No visitor sessions recorded yet for this timeframe.
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = recent.map(r => {
+          const dt = new Date(r.createdAt);
+          const timeFormatted = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + dt.toLocaleDateString([], { month: 'short', day: 'numeric' });
+          const devIcon = r.deviceType === 'pc' ? '💻 PC' : (r.deviceType === 'tablet' ? '📟 Tablet' : '📱 Mobile');
+
+          let milestones = [];
+          milestones.push('<span style="background:#E5E7EB; color:#374151; font-size:0.7rem; font-weight:600; padding:0.15rem 0.45rem; border-radius:4px;">Page View</span>');
+          if (r.hasAddToCart) {
+            milestones.push('<span style="background:#FFF7ED; color:#EA580C; border:1px solid #EA580C44; font-size:0.7rem; font-weight:700; padding:0.15rem 0.45rem; border-radius:4px;">🛒 Added to Bag</span>');
+          }
+          if (r.hasBuyNow) {
+            milestones.push('<span style="background:#EFF6FF; color:#2563EB; border:1px solid #2563EB44; font-size:0.7rem; font-weight:700; padding:0.15rem 0.45rem; border-radius:4px;">⚡ Buy Now</span>');
+          }
+          if (r.hasConverted) {
+            milestones.push(`<span style="background:#ECFDF5; color:#059669; border:1px solid #05966944; font-size:0.7rem; font-weight:800; padding:0.15rem 0.45rem; border-radius:4px;">💰 Ordered (${r.orderNumber || 'CONFIRMED'})</span>`);
+          }
+
+          return `
+            <tr>
+              <td style="font-size:0.8rem; color:#6B7280; white-space:nowrap;">${timeFormatted}</td>
+              <td>
+                <strong style="font-size:0.85rem; color:#181619;">${r.visitorId}</strong>
+                <small style="display:block; font-size:0.7rem; color:#87828A; font-family:monospace;">${r.sessionId.substring(0, 18)}...</small>
+              </td>
+              <td>
+                <span style="font-weight:700; font-size:0.82rem; color:#4A102A;">${devIcon}</span>
+              </td>
+              <td style="font-size:0.82rem; color:#4B5563; font-family:monospace;">
+                ${r.page}
+              </td>
+              <td>
+                <strong style="color:#059669; font-size:0.85rem;">${r.screenTimeFormatted}</strong>
+              </td>
+              <td>
+                <div style="display:flex; flex-wrap:wrap; gap:0.35rem;">
+                  ${milestones.join('')}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+  } catch (err) {
+    console.error('Error loading analytics data:', err);
+  }
+}
+window.loadAnalyticsData = loadAnalyticsData;
+
+/* ==========================================================================
+   6. HERO SLIDES MANAGEMENT
    ========================================================================== */
 async function loadHeroSlidesAdmin() {
   try {

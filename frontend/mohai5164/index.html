@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=7.1.0">
-  <link rel="stylesheet" href="/mohai5164/admin.css?v=7.4.0">
+  <link rel="stylesheet" href="/mohai5164/admin.css?v=7.5.0">
 </head>
 <body class="admin-body">
 
@@ -92,13 +92,22 @@
           <span>4. DÉLICE Profit Calculation</span>
         </div>
 
+        <div class="sidebar-link" data-view="analytics">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>5. Visitor Analytics</span>
+        </div>
+
         <div class="sidebar-link" data-view="hero-slides">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
             <line x1="8" y1="21" x2="16" y2="21"></line>
             <line x1="12" y1="17" x2="12" y2="21"></line>
           </svg>
-          <span>5. Hero Slides</span>
+          <span>6. Hero Slides</span>
         </div>
 
         <div class="sidebar-link" data-view="settings">
@@ -106,7 +115,7 @@
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
-          <span>6. Settings</span>
+          <span>7. Settings</span>
         </div>
       </nav>
 
@@ -190,6 +199,22 @@
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;" id="ovSegmentsGrid">
               <!-- Dynamically populated by admin.js -->
             </div>
+          </div>
+
+          <!-- QUICK VISITOR TRAFFIC SUMMARY WIDGET -->
+          <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:10px; padding:1.1rem 1.5rem; margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+              <span style="font-size:1.6rem;">📊</span>
+              <div>
+                <h4 style="margin:0; font-size:1rem; color:#4A102A; font-weight:700;">Customer Traffic Today (Last 24 Hours)</h4>
+                <div style="font-size:0.82rem; color:#6B7280; margin-top:0.2rem;" id="ovAnalyticsSummaryText">
+                  Tracking active storefront visitor sessions, screen time, and device breakdown...
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="switchTab('analytics')" style="font-size:0.8rem; padding:0.4rem 0.9rem; white-space:nowrap;">
+              View 5. Visitor Analytics &rarr;
+            </button>
           </div>
 
           <!-- DÉLICE CAPITAL RECOVERY & PROFIT STATUS WIDGET (CONNECTED TO TAB 5) -->
@@ -638,7 +663,235 @@
           </div>
         </section>
 
-        <!-- ==================== 5. HERO SLIDES VIEW ==================== -->
+        <!-- ==================== 5. VISITOR & TRAFFIC ANALYTICS VIEW ==================== -->
+        <section class="dashboard-view" id="view-analytics">
+          <!-- Top Control Header -->
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; background:#FAF6F0; border:1px solid #E0D4C3; border-radius:8px; padding:1.25rem 1.5rem;">
+            <div>
+              <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Performance &amp; Traffic Intelligence</span>
+              <h3 style="font-size:1.35rem; color:#4A102A; margin:0.2rem 0 0.15rem; font-weight:700;">Customer Traffic &amp; Visitor Analytics</h3>
+              <p style="font-size:0.82rem; color:#6B7280; margin:0;">Real-time visitor counts, device breakdown (Mobile/Tablet/PC), average screen time, and checkout conversion funnel.</p>
+            </div>
+            
+            <!-- Timeframe Filter Dropdown -->
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <label for="analyticsTimeRange" style="font-size:0.85rem; font-weight:700; color:#4A102A; margin:0; white-space:nowrap;">Select Period:</label>
+              <select id="analyticsTimeRange" class="form-control" style="font-size:0.9rem; font-weight:700; color:#4A102A; background:#FFFFFF; border:1.5px solid #4A102A; border-radius:6px; padding:0.45rem 1rem; cursor:pointer;" onchange="loadAnalyticsData()">
+                <option value="24h" selected>Last 24 Hours</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 1 Month (30 Days)</option>
+                <option value="1y">Last 1 Year</option>
+                <option value="lifetime">Lifetime (All Time)</option>
+              </select>
+              <button type="button" class="btn btn-secondary" onclick="loadAnalyticsData()" style="padding:0.45rem 0.85rem; font-size:0.85rem;" title="Refresh Analytics Data">
+                🔄 Refresh
+              </button>
+            </div>
+          </div>
+
+          <!-- KEY METRICS STAT CARDS (ROW 1) -->
+          <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-bottom:1.5rem;">
+            <!-- Unique Visitors -->
+            <div class="stat-card" style="border-top:3.5px solid #4A102A;">
+              <div class="stat-card-title">Unique Visitors</div>
+              <div class="stat-card-val" id="anStatVisitors" style="color:#4A102A;">0</div>
+              <div class="stat-card-sub" id="anStatSessions">0 Total Sessions</div>
+            </div>
+
+            <!-- Avg Screen Time -->
+            <div class="stat-card" style="border-top:3.5px solid #059669;">
+              <div class="stat-card-title">Average Screen Time</div>
+              <div class="stat-card-val" id="anStatAvgScreenTime" style="color:#059669;">0m 0s</div>
+              <div class="stat-card-sub" id="anStatTotalScreenTime">Total: 0h 0m</div>
+            </div>
+
+            <!-- Add to Cart Count -->
+            <div class="stat-card" style="border-top:3.5px solid #EA580C;">
+              <div class="stat-card-title">Add to Cart (Bag)</div>
+              <div class="stat-card-val" id="anStatAddToCart" style="color:#EA580C;">0</div>
+              <div class="stat-card-sub" id="anStatCartRate">0% of Visitors</div>
+            </div>
+
+            <!-- Buy Now / Checkout Initiated -->
+            <div class="stat-card" style="border-top:3.5px solid #2563EB;">
+              <div class="stat-card-title">Buy Now Initiated</div>
+              <div class="stat-card-val" id="anStatBuyNow" style="color:#2563EB;">0</div>
+              <div class="stat-card-sub" id="anStatCartToBuyRate">0% from Cart</div>
+            </div>
+
+            <!-- Confirmed Purchases -->
+            <div class="stat-card" style="border-top:3.5px solid #C5A46D;">
+              <div class="stat-card-title">Completed Orders</div>
+              <div class="stat-card-val" id="anStatOrders" style="color:#181619;">0</div>
+              <div class="stat-card-sub" id="anStatOverallConversion" style="color:#15803D; font-weight:700;">0% Conversion</div>
+            </div>
+          </div>
+
+          <!-- DEVICE BREAKDOWN SECTION (MOBILE, TAB, PC) -->
+          <div class="data-table-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem;">
+              <div>
+                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">User Device Intelligence</span>
+                <h4 style="font-size:1.1rem; color:#4A102A; margin:0.15rem 0 0; font-weight:700;">Device Breakdown (Mobile, Tablet &amp; PC)</h4>
+              </div>
+              <span id="anDeviceTotalBadge" style="font-size:0.8rem; background:#FAF6F0; border:1px solid #C5A46D; color:#4A102A; padding:0.25rem 0.75rem; border-radius:9999px; font-weight:700;">
+                0 Total Sessions
+              </span>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
+              <!-- Mobile Card -->
+              <div style="background:#FAF6F0; border:1.5px solid #E0D4C3; border-top:4px solid #4A102A; border-radius:8px; padding:1.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                  <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <span style="font-size:1.4rem;">📱</span>
+                    <div>
+                      <h5 style="margin:0; font-size:1rem; color:#4A102A; font-weight:700;">Mobile Users</h5>
+                      <small style="color:#6B7280; font-size:0.75rem;">Smartphones (iOS &amp; Android)</small>
+                    </div>
+                  </div>
+                  <span id="anMobilePercent" style="font-size:1.25rem; font-weight:800; color:#4A102A;">0%</span>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div style="background:#E5E7EB; border-radius:9999px; height:8px; overflow:hidden; margin-bottom:0.85rem;">
+                  <div id="anMobileBar" style="background:#4A102A; height:100%; width:0%; transition:width 0.4s ease;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; font-size:0.82rem; color:#4B5563; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
+                  <span>Total Sessions: <strong id="anMobileCount" style="color:#181619;">0</strong></span>
+                  <span>Avg Screen Time: <strong id="anMobileAvgTime" style="color:#059669;">0m 0s</strong></span>
+                </div>
+              </div>
+
+              <!-- Tablet Card -->
+              <div style="background:#FAF6F0; border:1.5px solid #E0D4C3; border-top:4px solid #C5A46D; border-radius:8px; padding:1.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                  <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <span style="font-size:1.4rem;">📟</span>
+                    <div>
+                      <h5 style="margin:0; font-size:1rem; color:#4A102A; font-weight:700;">Tablet Users</h5>
+                      <small style="color:#6B7280; font-size:0.75rem;">iPads &amp; Android Tablets</small>
+                    </div>
+                  </div>
+                  <span id="anTabletPercent" style="font-size:1.25rem; font-weight:800; color:#C5A46D;">0%</span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div style="background:#E5E7EB; border-radius:9999px; height:8px; overflow:hidden; margin-bottom:0.85rem;">
+                  <div id="anTabletBar" style="background:#C5A46D; height:100%; width:0%; transition:width 0.4s ease;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; font-size:0.82rem; color:#4B5563; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
+                  <span>Total Sessions: <strong id="anTabletCount" style="color:#181619;">0</strong></span>
+                  <span>Avg Screen Time: <strong id="anTabletAvgTime" style="color:#059669;">0m 0s</strong></span>
+                </div>
+              </div>
+
+              <!-- PC / Desktop Card -->
+              <div style="background:#FAF6F0; border:1.5px solid #E0D4C3; border-top:4px solid #2563EB; border-radius:8px; padding:1.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                  <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <span style="font-size:1.4rem;">💻</span>
+                    <div>
+                      <h5 style="margin:0; font-size:1rem; color:#4A102A; font-weight:700;">PC &amp; Desktop</h5>
+                      <small style="color:#6B7280; font-size:0.75rem;">Laptops &amp; Desktop Browsers</small>
+                    </div>
+                  </div>
+                  <span id="anPcPercent" style="font-size:1.25rem; font-weight:800; color:#2563EB;">0%</span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div style="background:#E5E7EB; border-radius:9999px; height:8px; overflow:hidden; margin-bottom:0.85rem;">
+                  <div id="anPcBar" style="background:#2563EB; height:100%; width:0%; transition:width 0.4s ease;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; font-size:0.82rem; color:#4B5563; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
+                  <span>Total Sessions: <strong id="anPcCount" style="color:#181619;">0</strong></span>
+                  <span>Avg Screen Time: <strong id="anPcAvgTime" style="color:#059669;">0m 0s</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FUNNEL CONVERSION SECTION (ADD TO CART -> BUY NOW -> ORDER) -->
+          <div class="data-table-card" style="padding:1.5rem; margin-bottom:1.5rem;">
+            <div style="margin-bottom:1.25rem;">
+              <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Customer Buying Journey</span>
+              <h4 style="font-size:1.1rem; color:#4A102A; margin:0.15rem 0 0; font-weight:700;">Add to Cart &rarr; Buy Now Conversion Funnel</h4>
+              <p style="font-size:0.8rem; color:#6B7280; margin:0.25rem 0 0;">Tracks how visitors transition from browsing to adding items to bag, clicking buy now / checkout, and completing orders.</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; align-items:stretch;">
+              <!-- Step 1: Website Visitors -->
+              <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:8px; padding:1.2rem; text-align:center;">
+                <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#6B7280;">Step 1 &bull; Discovery</div>
+                <h5 style="margin:0.25rem 0; font-size:1.05rem; color:#4A102A;">Website Visitors</h5>
+                <div id="anFunnelVisitors" style="font-size:1.6rem; font-weight:800; color:#181619; margin:0.4rem 0;">0</div>
+                <span style="background:#E5E7EB; color:#374151; font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:9999px;">100% Traffic</span>
+              </div>
+
+              <!-- Step 2: Add to Cart -->
+              <div style="background:#FAF6F0; border:1.5px solid #EA580C; border-radius:8px; padding:1.2rem; text-align:center;">
+                <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#EA580C;">Step 2 &bull; High Intent</div>
+                <h5 style="margin:0.25rem 0; font-size:1.05rem; color:#4A102A;">Added to Bag (Cart)</h5>
+                <div id="anFunnelCart" style="font-size:1.6rem; font-weight:800; color:#EA580C; margin:0.4rem 0;">0</div>
+                <span id="anFunnelCartBadge" style="background:#FFF7ED; color:#EA580C; border:1px solid #EA580C44; font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:9999px;">0% Converted</span>
+              </div>
+
+              <!-- Step 3: Buy Now -->
+              <div style="background:#FAF6F0; border:1.5px solid #2563EB; border-radius:8px; padding:1.2rem; text-align:center;">
+                <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#2563EB;">Step 3 &bull; Checkout Flow</div>
+                <h5 style="margin:0.25rem 0; font-size:1.05rem; color:#4A102A;">Buy Now Initiated</h5>
+                <div id="anFunnelBuyNow" style="font-size:1.6rem; font-weight:800; color:#2563EB; margin:0.4rem 0;">0</div>
+                <span id="anFunnelBuyNowBadge" style="background:#EFF6FF; color:#2563EB; border:1px solid #2563EB44; font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:9999px;">0% from Cart</span>
+              </div>
+
+              <!-- Step 4: Completed Orders -->
+              <div style="background:#FAF6F0; border:1.5px solid #059669; border-radius:8px; padding:1.2rem; text-align:center;">
+                <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:#059669;">Step 4 &bull; Realized Sales</div>
+                <h5 style="margin:0.25rem 0; font-size:1.05rem; color:#4A102A;">Completed Orders</h5>
+                <div id="anFunnelOrders" style="font-size:1.6rem; font-weight:800; color:#059669; margin:0.4rem 0;">0</div>
+                <span id="anFunnelOrdersBadge" style="background:#ECFDF5; color:#059669; border:1px solid #05966944; font-size:0.75rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:9999px;">0% Sales Conversion</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT VISITOR SESSIONS TABLE -->
+          <div class="data-table-card" style="padding:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+              <div>
+                <span style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Live Feed</span>
+                <h4 style="font-size:1.1rem; color:#4A102A; margin:0.15rem 0 0; font-weight:700;">Recent Visitor Activity Logs</h4>
+              </div>
+              <small style="color:#6B7280; font-size:0.78rem;">Latest visitor sessions and interactions</small>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table class="data-table" style="width:100%;">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Visitor &amp; Session</th>
+                    <th>Device</th>
+                    <th>Page / Entry</th>
+                    <th>Screen Time</th>
+                    <th>Journey Milestones</th>
+                  </tr>
+                </thead>
+                <tbody id="anRecentSessionsTableBody">
+                  <tr>
+                    <td colspan="6" style="text-align:center; padding:2rem; color:#6B7280;">
+                      Loading visitor activity logs...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== 6. HERO SLIDES VIEW ==================== -->
         <section class="dashboard-view" id="view-hero-slides">
           <div class="data-table-card">
             <div class="data-table-header">
@@ -1231,6 +1484,6 @@
     </div>
   </div>
 
-  <script src="/mohai5164/admin.js?v=7.4.0"></script>
+  <script src="/mohai5164/admin.js?v=7.5.0"></script>
 </body>
 </html>

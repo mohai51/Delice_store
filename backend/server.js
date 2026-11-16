@@ -16,6 +16,7 @@ const settingRoutes = require('./routes/settingRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const slideRoutes = require('./routes/slideRoutes');
 const deliceProfitRoutes = require('./routes/deliceProfitRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -87,6 +88,7 @@ app.use('/api/settings', settingRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/slides', slideRoutes);
 app.use('/api/admin/delice-profit', deliceProfitRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Admin Portal Direct Route (Custom Secret URL)
 app.get(['/mohai5164', '/mohai5164/'], (req, res) => {
