@@ -317,9 +317,10 @@ exports.createOrder = async (req, res, next) => {
       }
     }
 
-    // 7. Generate IDs
-    const now = Date.now();
-    const orderNumber = `DLC-${now.toString().slice(-6)}`;
+    // 7. Generate Collision-Proof Unique IDs (Safe for high-concurrency bursts of 300-1000+ simultaneous orders)
+    const crypto = require('crypto');
+    const uniqueSuffix = crypto.randomBytes(2).toString('hex').toUpperCase();
+    const orderNumber = `DLC-${Date.now().toString().slice(-6)}-${uniqueSuffix}`;
 
     const orderData = {
       orderNumber,
@@ -367,25 +368,37 @@ exports.createOrder = async (req, res, next) => {
       try {
         order = await Order.create(orderData);
       } catch (e) {
-        if (process.env.NODE_ENV === 'production') {
-          for (const roll of decrementedItems) {
-            try { await Product.updateOne({ id: roll.id }, { $inc: { stock: roll.qty } }); } catch (_) {}
+        if (e.code === 11000) {
+          try {
+            orderData.orderNumber = `DLC-${Date.now().toString().slice(-6)}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+            orderData.transactionId = `TXN-${cleanedSender.slice(-4)}-${Date.now().toString().slice(-6)}-${crypto.randomBytes(2).toString('hex').toUpperCase()}`;
+            order = await Order.create(orderData);
+          } catch (retryErr) {
+            e = retryErr;
           }
-          return res.status(503).json({
-            success: false,
-            error: 'Service temporarily unavailable. Please try again in a moment.'
-          });
         }
-        order = {
-          _id: 'MEM_' + Date.now(),
-          ...orderData,
-          save: async function() {
-            const idx = memoryStore.orders.findIndex(o => o.transactionId === this.transactionId);
-            if (idx > -1) memoryStore.orders[idx] = this;
-            return this;
+
+        if (!order) {
+          if (process.env.NODE_ENV === 'production') {
+            for (const roll of decrementedItems) {
+              try { await Product.updateOne({ id: roll.id }, { $inc: { stock: roll.qty } }); } catch (_) {}
+            }
+            return res.status(503).json({
+              success: false,
+              error: 'Service temporarily unavailable. Please try again in a moment.'
+            });
           }
-        };
-        memoryStore.orders.push(order);
+          order = {
+            _id: 'MEM_' + Date.now(),
+            ...orderData,
+            save: async function() {
+              const idx = memoryStore.orders.findIndex(o => o.transactionId === this.transactionId);
+              if (idx > -1) memoryStore.orders[idx] = this;
+              return this;
+            }
+          };
+          memoryStore.orders.push(order);
+        }
       }
     } else {
       if (process.env.NODE_ENV === 'production') {
