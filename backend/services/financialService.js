@@ -103,8 +103,8 @@ class FinancialService {
       expensesByCategory[exp.category] = (expensesByCategory[exp.category] || 0) + exp.amount;
     });
 
-    const totalAllExpenses = totalProductCOGS + totalCourierCost + totalGatewayFees + totalGeneralExpenses;
-    const netProfit = totalGrossRevenue - totalAllExpenses;
+    const totalAllExpenses = Math.round((totalProductCOGS + totalCourierCost + totalGatewayFees + totalGeneralExpenses) * 100) / 100;
+    const netProfit = Math.round((totalGrossRevenue - totalAllExpenses) * 100) / 100;
 
     // Default Fund Allocations if empty
     if (!allocationsConfig || allocationsConfig.length === 0) {
@@ -193,10 +193,10 @@ class FinancialService {
     }
 
     if (order.paymentStatus === 'paid') {
-      order.netProfit = (order.totalPaid || order.totalPayable) 
+      order.netProfit = Math.round(((order.totalPaid || order.totalPayable) 
         - (order.totalProductCost || 0) 
         - (order.actualCourierCost || 0) 
-        - (order.gatewayFee || 0);
+        - (order.gatewayFee || 0)) * 100) / 100;
     } else {
       order.netProfit = 0;
     }

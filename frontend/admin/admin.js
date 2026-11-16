@@ -160,11 +160,11 @@ async function loadOverview() {
     document.getElementById('statTotalOrders').textContent = stats.totalOrdersCount || 0;
     document.getElementById('statPendingOrders').textContent = `${stats.pendingOrdersCount || 0} Pending Payment`;
     document.getElementById('statUnitsSold').textContent = stats.totalUnitsSold || 0;
-    document.getElementById('statGrossRevenue').textContent = `৳${stats.totalGrossRevenue || 0}`;
-    document.getElementById('statProductRevenue').textContent = `Product: ৳${stats.totalProductRevenue || 0}`;
-    document.getElementById('statDeliveryCollected').textContent = `৳${stats.totalDeliveryCollected || 0}`;
-    document.getElementById('statTotalExpenses').textContent = `৳${stats.totalAllExpenses || 0}`;
-    document.getElementById('statNetProfit').textContent = `৳${stats.netProfit || 0}`;
+    document.getElementById('statGrossRevenue').textContent = `৳${Number(stats.totalGrossRevenue || 0).toFixed(2)}`;
+    document.getElementById('statProductRevenue').textContent = `Product: ৳${Number(stats.totalProductRevenue || 0).toFixed(2)}`;
+    document.getElementById('statDeliveryCollected').textContent = `৳${Number(stats.totalDeliveryCollected || 0).toFixed(2)}`;
+    document.getElementById('statTotalExpenses').textContent = `৳${Number(stats.totalAllExpenses || 0).toFixed(2)}`;
+    document.getElementById('statNetProfit').textContent = `৳${Number(stats.netProfit || 0).toFixed(2)}`;
 
     // Render Payment Channel Breakdown Widget on Overview
     const ovSegmentsGrid = document.getElementById('ovSegmentsGrid');
@@ -428,7 +428,7 @@ async function loadOrders() {
           </td>
           <td>
             <div style="font-size:0.85rem; font-weight:700; color:${(o.netProfit || 0) >= 0 ? '#15803D' : '#B91C1C'};">
-              Profit: ৳${o.netProfit || 0}
+              Profit: ৳${Number(o.netProfit || 0).toFixed(2)}
             </div>
             <div style="margin-top:0.25rem;">${crDisplay}</div>
           </td>
@@ -728,7 +728,7 @@ function viewOrderModal(orderId) {
           📋 Copy Dispatch Details (for Steadfast/Pathao)
         </button>
         <span style="font-size:0.85rem; font-weight:700; color:#4A102A;">
-          Realized Net Profit: <span style="color:${(order.netProfit || 0) >= 0 ? '#15803D' : '#B91C1C'};">৳${order.netProfit || 0}</span>
+          Realized Net Profit: <span style="color:${(order.netProfit || 0) >= 0 ? '#15803D' : '#B91C1C'};">৳${Number(order.netProfit || 0).toFixed(2)}</span>
         </span>
       </div>
     </div>

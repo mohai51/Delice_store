@@ -794,10 +794,10 @@ exports.updateOrderStatus = async (req, res, next) => {
       ? order.totalPayable
       : (order.advancePaid || 0);
 
-    order.netProfit = revenue
+    order.netProfit = Math.round((revenue
       - (order.totalProductCost || 0)
       - (order.actualCourierCost || 0)
-      - (order.gatewayFee || 0);
+      - (order.gatewayFee || 0)) * 100) / 100;
 
     await order.save();
 
