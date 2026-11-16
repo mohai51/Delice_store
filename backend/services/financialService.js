@@ -37,17 +37,61 @@ class FinancialService {
     let totalGatewayFees = 0;
     let totalUnitsSold = 0;
 
+    let bkashRevenue = 0;
+    let nagadRevenue = 0;
+    let codRevenue = 0;
+    let bkashOrdersCount = 0;
+    let nagadOrdersCount = 0;
+    let codOrdersCount = 0;
+    let bkashBottles = 0;
+    let nagadBottles = 0;
+    let codBottles = 0;
+
     paidOrders.forEach(order => {
       totalProductRevenue += (order.productSubtotal || 0);
       totalDeliveryCollected += (order.deliveryCharge || 0);
       totalProductCOGS += (order.totalProductCost || 0);
       totalCourierCost += (order.actualCourierCost || 0);
-      totalGatewayFees += (order.gatewayFee || 0);
+
+      const pMethod = String(order.paymentMethod || '').toLowerCase();
+      const pProvider = String(order.paymentProvider || '').toLowerCase();
+      const rev = (order.productSubtotal || 0);
+      let orderBottles = 0;
 
       (order.items || []).forEach(item => {
-        totalUnitsSold += (item.quantity || 0);
+        const qty = (item.quantity || 0);
+        totalUnitsSold += qty;
+        orderBottles += qty;
       });
+
+      if (pMethod === 'cod_advance' || pProvider === 'hand_cash' || pMethod === 'cash_on_delivery') {
+        codRevenue += rev;
+        codOrdersCount++;
+        codBottles += orderBottles;
+      } else if (pProvider === 'nagad') {
+        nagadRevenue += rev;
+        nagadOrdersCount++;
+        nagadBottles += orderBottles;
+      } else {
+        bkashRevenue += rev;
+        bkashOrdersCount++;
+        bkashBottles += orderBottles;
+      }
     });
+
+    // Channel Cash-out Fees on total revenue (bKash 1.10%, Nagad 0.85%, COD 1.00%)
+    const bkashCashoutFee = Math.round(bkashRevenue * 0.011 * 100) / 100;
+    const nagadCashoutFee = Math.round(nagadRevenue * 0.0085 * 100) / 100;
+    const codCashoutFee = Math.round(codRevenue * 0.01 * 100) / 100;
+    const totalCashoutFees = Math.round((bkashCashoutFee + nagadCashoutFee + codCashoutFee) * 100) / 100;
+    totalGatewayFees = totalCashoutFees;
+
+    const segmentStats = {
+      bkash: { key: 'bkash', name: 'bKash (Send Money)', orderCount: bkashOrdersCount, bottlesSold: bkashBottles, grossRevenue: bkashRevenue, rate: 1.10, cashoutFee: bkashCashoutFee, netRevenue: Math.max(0, Math.round((bkashRevenue - bkashCashoutFee) * 100) / 100) },
+      nagad: { key: 'nagad', name: 'Nagad (Send Money)', orderCount: nagadOrdersCount, bottlesSold: nagadBottles, grossRevenue: nagadRevenue, rate: 0.85, cashoutFee: nagadCashoutFee, netRevenue: Math.max(0, Math.round((nagadRevenue - nagadCashoutFee) * 100) / 100) },
+      cod: { key: 'cash_on_delivery', name: 'Cash on Delivery (Courier COD)', orderCount: codOrdersCount, bottlesSold: codBottles, grossRevenue: codRevenue, rate: 1.00, cashoutFee: codCashoutFee, netRevenue: Math.max(0, Math.round((codRevenue - codCashoutFee) * 100) / 100) },
+      totalCashoutFees
+    };
 
     const totalGrossRevenue = totalProductRevenue + totalDeliveryCollected;
 
@@ -123,7 +167,8 @@ class FinancialService {
       totalAllExpenses,
       expensesByCategory,
       netProfit,
-      fundDistribution
+      fundDistribution,
+      segmentStats
     };
   }
 

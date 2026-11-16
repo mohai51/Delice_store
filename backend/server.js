@@ -51,7 +51,10 @@ app.use(express.urlencoded({ extended: true }));
 const frontendPath = path.join(__dirname, '..', 'frontend');
 app.use((req, res, next) => {
   const urlPath = req.path || '';
-  if (urlPath.match(/\.(png|jpg|jpeg|webp|svg|gif|ico|woff2?|ttf|eot)$/i)) {
+  if (urlPath.startsWith('/admin') || urlPath.includes('admin.')) {
+    // Admin scripts, styles and views must NEVER be cached by browser
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  } else if (urlPath.match(/\.(png|jpg|jpeg|webp|svg|gif|ico|woff2?|ttf|eot)$/i)) {
     // 30 days cache for static images and web fonts
     res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
   } else if (urlPath.match(/\.(css|js)$/i)) {

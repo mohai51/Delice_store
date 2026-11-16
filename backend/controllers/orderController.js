@@ -470,7 +470,17 @@ exports.getAllOrders = async (req, res, next) => {
       let query = {};
       if (status && status !== 'all') query.orderStatus = status;
       if (paymentStatus && paymentStatus !== 'all') query.paymentStatus = paymentStatus;
-      if (paymentMethod && paymentMethod !== 'all') query.paymentMethod = paymentMethod;
+      if (paymentMethod && paymentMethod !== 'all') {
+        if (paymentMethod === 'bkash') {
+          query.$or = [{ paymentProvider: 'bkash' }, { paymentProvider: { $exists: false } }];
+        } else if (paymentMethod === 'nagad') {
+          query.paymentProvider = 'nagad';
+        } else if (paymentMethod === 'cod_advance' || paymentMethod === 'cash_on_delivery') {
+          query.$or = [{ paymentMethod: 'cod_advance' }, { paymentProvider: 'hand_cash' }];
+        } else {
+          query.paymentMethod = paymentMethod;
+        }
+      }
       if (search) {
         query.$or = [
           { orderNumber: new RegExp(search, 'i') },
@@ -524,7 +534,15 @@ exports.getAllOrders = async (req, res, next) => {
       orders = orders.filter(o => o.paymentStatus === paymentStatus);
     }
     if (paymentMethod && paymentMethod !== 'all') {
-      orders = orders.filter(o => o.paymentMethod === paymentMethod);
+      if (paymentMethod === 'bkash') {
+        orders = orders.filter(o => o.paymentProvider === 'bkash' || !o.paymentProvider);
+      } else if (paymentMethod === 'nagad') {
+        orders = orders.filter(o => o.paymentProvider === 'nagad');
+      } else if (paymentMethod === 'cod_advance' || paymentMethod === 'cash_on_delivery') {
+        orders = orders.filter(o => o.paymentMethod === 'cod_advance' || o.paymentProvider === 'hand_cash');
+      } else {
+        orders = orders.filter(o => o.paymentMethod === paymentMethod);
+      }
     }
     if (search) {
       const s = search.toLowerCase();

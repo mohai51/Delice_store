@@ -166,8 +166,58 @@ async function loadOverview() {
     document.getElementById('statTotalExpenses').textContent = `৳${stats.totalAllExpenses || 0}`;
     document.getElementById('statNetProfit').textContent = `৳${stats.netProfit || 0}`;
 
-    // Connect with DÉLICE Capital Recovery & Profit Engine
+    // Render Payment Channel Breakdown Widget on Overview
+    const ovSegmentsGrid = document.getElementById('ovSegmentsGrid');
+    const ovTotalCashoutBadge = document.getElementById('ovTotalCashoutBadge');
     const dp = data.deliceProfit;
+    const segs = dp?.segments || (stats.segmentStats ? [stats.segmentStats.bkash, stats.segmentStats.nagad, stats.segmentStats.cod] : []);
+
+    if (ovTotalCashoutBadge) {
+      const totalFees = dp?.summary?.totalCashoutFees ?? stats.segmentStats?.totalCashoutFees ?? 0;
+      ovTotalCashoutBadge.textContent = `৳${totalFees.toFixed(2)}`;
+    }
+
+    if (ovSegmentsGrid && Array.isArray(segs)) {
+      ovSegmentsGrid.innerHTML = segs.map(seg => {
+        const segBorderColor = seg.key === 'bkash' ? '#E2136E' : (seg.key === 'nagad' ? '#EA580C' : '#059669');
+        const segBgLight = seg.key === 'bkash' ? '#FDF2F7' : (seg.key === 'nagad' ? '#FFF7ED' : '#ECFDF5');
+        return `
+          <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-top:3.5px solid ${segBorderColor}; border-radius:8px; padding:1.15rem; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+                <h4 style="margin:0; font-size:0.98rem; color:#4A102A; display:flex; align-items:center; gap:0.4rem; font-weight:700;">
+                  <span style="display:inline-block; width:9px; height:9px; border-radius:50%; background:${segBorderColor};"></span>
+                  ${seg.name}
+                </h4>
+                <span style="background:${segBgLight}; color:${segBorderColor}; border:1px solid ${segBorderColor}33; padding:0.15rem 0.5rem; border-radius:9999px; font-size:0.72rem; font-weight:700;">
+                  ${seg.rate}% Fee
+                </span>
+              </div>
+              <div style="background:#FFFFFF; border:1px solid #E5E7EB; border-radius:6px; padding:0.6rem 0.75rem; margin-bottom:0.65rem;">
+                <div style="font-size:0.7rem; color:#6B7280; text-transform:uppercase; font-weight:600;">Confirmed Transactions</div>
+                <div style="font-size:1.25rem; font-weight:800; color:#181619;">
+                  ${seg.orderCount} orders <small style="font-size:0.75rem; font-weight:500; color:#6B7280;">(${seg.bottlesSold} btls)</small>
+                </div>
+              </div>
+              <div style="font-size:0.8rem; color:#6B7280; margin-bottom:0.35rem; display:flex; justify-content:space-between;">
+                <span>Gross Collections:</span>
+                <strong style="color:#181619;">৳${seg.grossRevenue.toFixed(2)}</strong>
+              </div>
+              <div style="font-size:0.8rem; color:#B91C1C; margin-bottom:0.5rem; display:flex; justify-content:space-between;">
+                <span>Fee (${seg.rate}% on Total):</span>
+                <strong>-৳${seg.cashoutFee.toFixed(2)}</strong>
+              </div>
+            </div>
+            <div style="border-top:1px dashed #E0D4C3; padding-top:0.5rem; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:0.75rem; color:#059669; font-weight:700; text-transform:uppercase;">Net Inflow</span>
+              <strong style="font-size:1.15rem; color:#059669; font-weight:800;">৳${seg.netRevenue.toFixed(2)}</strong>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Connect with DÉLICE Capital Recovery & Profit Engine
     if (dp && dp.summary) {
       const s = dp.summary;
       const elRepaid = document.getElementById('overviewRepaidVal');
@@ -234,6 +284,55 @@ async function loadOrders() {
     const res = await fetchWithAuth(`/api/orders?status=${status}&paymentStatus=${paymentStatus}&paymentMethod=${paymentMethod}&search=${encodeURIComponent(search)}`);
     const data = await res.json();
     currentOrders = data.orders || [];
+
+    // Render Channel Summary Pill Bar in Orders Management View
+    const channelSummaryBar = document.getElementById('ordersChannelSummaryBar');
+    if (channelSummaryBar && Array.isArray(currentOrders)) {
+      const counts = { bkash: 0, nagad: 0, cod: 0 };
+      const bottles = { bkash: 0, nagad: 0, cod: 0 };
+      const revs = { bkash: 0, nagad: 0, cod: 0 };
+      currentOrders.forEach(o => {
+        if (o.paymentStatus === 'paid' || o.orderStatus === 'delivered') {
+          const m = String(o.paymentMethod || '').toLowerCase();
+          const p = String(o.paymentProvider || '').toLowerCase();
+          const sub = (o.productSubtotal || 0);
+          const bQty = (o.items || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
+          if (m === 'cod_advance' || p === 'hand_cash' || m === 'cash_on_delivery') {
+            counts.cod++;
+            bottles.cod += bQty;
+            revs.cod += sub;
+          } else if (p === 'nagad') {
+            counts.nagad++;
+            bottles.nagad += bQty;
+            revs.nagad += sub;
+          } else {
+            counts.bkash++;
+            bottles.bkash += bQty;
+            revs.bkash += sub;
+          }
+        }
+      });
+      const bkashFee = Math.round(revs.bkash * 0.011 * 100) / 100;
+      const nagadFee = Math.round(revs.nagad * 0.0085 * 100) / 100;
+      const codFee = Math.round(revs.cod * 0.01 * 100) / 100;
+      const totalFees = Math.round((bkashFee + nagadFee + codFee) * 100) / 100;
+
+      channelSummaryBar.innerHTML = `
+        <span style="font-size:0.8rem; font-weight:700; color:#4A102A;">Channel Volumes:</span>
+        <span class="badge" style="background:#FDF2F7; color:#E2136E; border:1px solid #E2136E44; padding:4px 10px; border-radius:9999px; font-size:0.78rem;">
+          <strong>bKash:</strong> ${counts.bkash} orders (${bottles.bkash} btls) &bull; ৳${revs.bkash.toFixed(2)} &bull; Fee (1.10%): -৳${bkashFee.toFixed(2)}
+        </span>
+        <span class="badge" style="background:#FFF7ED; color:#EA580C; border:1px solid #EA580C44; padding:4px 10px; border-radius:9999px; font-size:0.78rem;">
+          <strong>Nagad:</strong> ${counts.nagad} orders (${bottles.nagad} btls) &bull; ৳${revs.nagad.toFixed(2)} &bull; Fee (0.85%): -৳${nagadFee.toFixed(2)}
+        </span>
+        <span class="badge" style="background:#ECFDF5; color:#059669; border:1px solid #05966944; padding:4px 10px; border-radius:9999px; font-size:0.78rem;">
+          <strong>COD:</strong> ${counts.cod} orders (${bottles.cod} btls) &bull; ৳${revs.cod.toFixed(2)} &bull; Fee (1.00%): -৳${codFee.toFixed(2)}
+        </span>
+        <span class="badge" style="background:#FAF6F0; color:#4A102A; border:1px solid #E0D4C3; padding:4px 10px; border-radius:9999px; font-size:0.78rem; font-weight:700;">
+          Total Cash-out Deducted: <strong style="color:#B91C1C;">-৳${totalFees.toFixed(2)}</strong>
+        </span>
+      `;
+    }
 
     const tbody = document.getElementById('ordersTableBody');
     if (!tbody) return;
@@ -1646,38 +1745,48 @@ async function loadDeliceProfit() {
 
     if (segContainer && Array.isArray(result.data.segments)) {
       segContainer.innerHTML = result.data.segments.map(seg => {
-        const segBorderColor = seg.key === 'bkash' ? '#E2136E' : (seg.key === 'nagad' ? '#F7941D' : '#059669');
-        const segBgLight = seg.key === 'bkash' ? '#FDF2F7' : (seg.key === 'nagad' ? '#FFF7ED' : '#F0FDF4');
+        const segBorderColor = seg.key === 'bkash' ? '#E2136E' : (seg.key === 'nagad' ? '#EA580C' : '#059669');
+        const segBgLight = seg.key === 'bkash' ? '#FDF2F7' : (seg.key === 'nagad' ? '#FFF7ED' : '#ECFDF5');
         return `
-          <div class="delice-segment-card" style="background:#FFFFFF; border:1px solid #E0D4C3; border-top:4px solid ${segBorderColor}; border-radius:8px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+          <div class="delice-segment-card" style="background:#FFFFFF; border:1px solid #E0D4C3; border-top:4px solid ${segBorderColor}; border-radius:8px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 3px 10px rgba(0,0,0,0.03);">
             <div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-                <h4 style="margin:0; font-size:1.02rem; color:#4A102A; display:flex; align-items:center; gap:0.45rem; font-weight:700;">
+                <h4 style="margin:0; font-size:1.05rem; color:#4A102A; display:flex; align-items:center; gap:0.45rem; font-weight:800;">
                   <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${segBorderColor};"></span>
                   ${seg.name}
                 </h4>
-                <span style="background:${segBgLight}; color:${segBorderColor}; border:1px solid ${segBorderColor}33; padding:0.18rem 0.55rem; border-radius:9999px; font-size:0.75rem; font-weight:700;">
+                <span style="background:${segBgLight}; color:${segBorderColor}; border:1px solid ${segBorderColor}44; padding:0.2rem 0.6rem; border-radius:9999px; font-size:0.75rem; font-weight:800;">
                   ${seg.rate}% Fee
                 </span>
               </div>
-              <div style="margin-bottom:1rem;">
-                <div style="font-size:0.72rem; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Gross Collections</div>
-                <div style="font-size:1.35rem; font-weight:700; color:#181619;">৳${seg.grossRevenue.toFixed(2)}</div>
-              </div>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1rem; font-size:0.8rem;">
-                <div style="background:#F9FAFB; padding:0.5rem 0.65rem; border-radius:4px; border:1px solid #F3F4F6;">
-                  <div style="font-size:0.68rem; color:#6B7280; text-transform:uppercase;">Volume</div>
-                  <div style="font-weight:700; color:#181619;">${seg.orderCount} orders (${seg.bottlesSold} btls)</div>
+
+              <!-- CONFIRMED TRANSACTIONS COUNT -->
+              <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.65rem 0.85rem; margin-bottom:0.75rem;">
+                <div style="font-size:0.7rem; color:#6B7280; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">Confirmed Transactions</div>
+                <div style="font-size:1.25rem; font-weight:800; color:#4A102A; margin-top:0.15rem;">
+                  ${seg.orderCount} orders <span style="font-size:0.8rem; font-weight:600; color:#6B7280;">(${seg.bottlesSold} bottles)</span>
                 </div>
-                <div style="background:#FEF2F2; padding:0.5rem 0.65rem; border-radius:4px; border:1px solid #FEE2E2;">
-                  <div style="font-size:0.68rem; color:#991B1B; text-transform:uppercase;">Fee (${seg.rate}%)</div>
-                  <div style="font-weight:700; color:#B91C1C;">-৳${seg.cashoutFee.toFixed(2)}</div>
+              </div>
+
+              <!-- FINANCIAL BREAKDOWN -->
+              <div style="background:#FFFFFF; border:1px solid #E5E7EB; border-radius:6px; padding:0.65rem 0.85rem; margin-bottom:0.75rem; font-size:0.82rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
+                  <span style="color:#6B7280;">Total Gross Collections:</span>
+                  <strong style="color:#181619; font-size:0.95rem;">৳${seg.grossRevenue.toFixed(2)}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; color:#B91C1C; margin-bottom:0.35rem;">
+                  <span>Cash-out (${seg.rate}% on Total):</span>
+                  <strong style="font-size:0.95rem;">-৳${seg.cashoutFee.toFixed(2)}</strong>
+                </div>
+                <div style="border-top:1px dashed #E5E7EB; padding-top:0.35rem; display:flex; justify-content:space-between; align-items:center; font-size:0.88rem;">
+                  <span style="font-weight:700; color:#059669;">Net Channel Inflow:</span>
+                  <strong style="color:#059669; font-size:1.05rem;">৳${seg.netRevenue.toFixed(2)}</strong>
                 </div>
               </div>
             </div>
-            <div style="background:#FAF6F0; border:1px solid #E0D4C3; border-radius:6px; padding:0.65rem 0.85rem; display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:0.75rem; color:#6B7280; text-transform:uppercase; font-weight:600;">Net Inflow</span>
-              <span style="font-size:1.15rem; font-weight:700; color:#15803D;">৳${seg.netRevenue.toFixed(2)}</span>
+
+            <div style="background:${segBgLight}; border:1px solid ${segBorderColor}33; border-radius:6px; padding:0.5rem 0.75rem; text-align:center; font-size:0.75rem; color:${segBorderColor}; font-weight:600;">
+              100% of Net Profit feeds into 6 Brand Funds
             </div>
           </div>
         `;
@@ -1779,6 +1888,7 @@ async function loadDeliceAllocations() {
   try {
     const dateRange = document.getElementById('dpFilterDateRange')?.value || 'all';
     const prodFilter = document.getElementById('dpFilterProduct')?.value || 'all';
+    const segFilter = document.getElementById('dpFilterSegment')?.value || 'all';
     const searchVal = document.getElementById('dpFilterSearch')?.value.trim() || '';
 
     let startDate = '';
@@ -1807,6 +1917,7 @@ async function loadDeliceAllocations() {
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
     if (prodFilter && prodFilter !== 'all') params.append('productId', prodFilter);
+    if (segFilter && segFilter !== 'all') params.append('segment', segFilter);
     if (searchVal) params.append('search', searchVal);
 
     const res = await fetchWithAuth(`/api/admin/delice-profit/allocations?${params.toString()}`);
@@ -1820,7 +1931,7 @@ async function loadDeliceAllocations() {
     if (currentDeliceAllocations.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="11" style="text-align:center; padding:2.5rem; color:#6B7280;">
+          <td colspan="12" style="text-align:center; padding:2.5rem; color:#6B7280;">
             No sale allocations recorded yet for this criteria. Allocations appear automatically as soon as an order is marked paid or delivered.
           </td>
         </tr>
@@ -1838,6 +1949,13 @@ async function loadDeliceAllocations() {
         ? '<span class="badge-status reversal">Reversal</span>'
         : '<span class="badge-status paid">Confirmed</span>';
 
+      const segKey = alloc.paymentSegment || (alloc.paymentProvider === 'nagad' ? 'nagad' : (alloc.paymentMethod === 'cod_advance' ? 'cash_on_delivery' : 'bkash'));
+      const segBadge = segKey === 'nagad'
+        ? '<span class="badge" style="background:#FFF7ED; color:#EA580C; border:1px solid #EA580C44; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:12px;">Nagad</span>'
+        : (segKey === 'cash_on_delivery'
+          ? '<span class="badge" style="background:#ECFDF5; color:#059669; border:1px solid #05966944; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:12px;">COD</span>'
+          : '<span class="badge" style="background:#FDF2F7; color:#E2136E; border:1px solid #E2136E44; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:12px;">bKash</span>');
+
       return `
         <tr style="${rowStyle}">
           <td style="font-size:0.8rem; color:#6B7280;">${dateStr}</td>
@@ -1848,6 +1966,7 @@ async function loadDeliceAllocations() {
             <div style="font-weight:600;">${alloc.customerName}</div>
             <small style="color:#6B7280;">${alloc.customerPhone || ''}</small>
           </td>
+          <td>${segBadge}</td>
           <td>
             <div style="font-weight:600; color:#181619;">${alloc.productName}</div>
             <small style="color:#6B7280;">ID: ${alloc.productId}</small>
@@ -2176,6 +2295,8 @@ async function openDeliceSaleBreakdown(allocId) {
 
   const f = alloc.fundAllocations || {};
   const e = alloc.employeeBreakdown || [];
+  const segKey = alloc.paymentSegment || (alloc.paymentProvider === 'nagad' ? 'nagad' : (alloc.paymentMethod === 'cod_advance' ? 'cash_on_delivery' : 'bkash'));
+  const segName = segKey === 'nagad' ? 'Nagad (0.85% Cash-out)' : (segKey === 'cash_on_delivery' ? 'Cash on Delivery (1.00% Handling Fee)' : 'bKash (1.10% Cash-out)');
 
   container.innerHTML = `
     <div style="background:#FAF6F0; border-radius:6px; padding:1rem; margin-bottom:1.25rem; font-size:0.85rem;">
@@ -2183,6 +2304,7 @@ async function openDeliceSaleBreakdown(allocId) {
         <div><strong>Order:</strong> #${alloc.orderNumber}</div>
         <div><strong>Date:</strong> ${new Date(alloc.createdAt).toLocaleString()}</div>
         <div><strong>Customer:</strong> ${alloc.customerName} (${alloc.customerPhone || 'N/A'})</div>
+        <div><strong>Payment Channel:</strong> <span style="font-weight:700; color:#4A102A;">${segName}</span></div>
         <div><strong>Fragrance:</strong> ${alloc.productName}</div>
         <div><strong>Bottles Sold:</strong> ${alloc.bottlesSold} bottle(s)</div>
         <div><strong>Selling Price / Bottle:</strong> ৳${alloc.unitSellingPrice.toFixed(2)}</div>
@@ -2274,6 +2396,11 @@ async function openDeliceSaleBreakdown(allocId) {
           </div>
         `).join('')}
       </div>
+    </div>
+
+    <!-- CHANNEL CASH-OUT DEDUCTION RULE NOTE -->
+    <div style="background:#FAF6F0; border-left:3px solid #C5A46D; padding:0.75rem 1rem; border-radius:0 4px 4px 0; margin-top:1.25rem; font-size:0.8rem; color:#4A102A; line-height:1.5;">
+      <strong>Channel Cash-out Fee Rule:</strong> Cash-out fee is calculated on <em>total channel revenue</em> (${segName}) and deducted from gross profit before fund distribution.
     </div>
   `;
 

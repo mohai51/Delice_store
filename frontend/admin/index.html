@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto:ital,wght@0,400;0,500;0,700;0,900;1,400;1,500;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=6.7.0">
-  <link rel="stylesheet" href="/admin/admin.css?v=6.7.0">
+  <link rel="stylesheet" href="/css/style.css?v=7.1.0">
+  <link rel="stylesheet" href="/admin/admin.css?v=7.1.0">
 </head>
 <body class="admin-body">
 
@@ -173,6 +173,24 @@
             </div>
           </div>
 
+          <!-- PAYMENT CHANNEL BREAKDOWN WIDGET (LIVE TRANSACTIONS & CASH-OUT) -->
+          <div style="background:#FFFFFF; border:1px solid var(--admin-border); border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;">
+              <div>
+                <span style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:#C5A46D; font-weight:700;">Payment Channels &amp; Fee Deductions</span>
+                <h3 style="font-size:1.15rem; color:#4A102A; margin:0.2rem 0 0;">Payment Channel Collections &amp; Cash-out Charges</h3>
+                <small style="color:#6B7280;">Live count of confirmed transactions &amp; cash-out charges deducted on total channel collections.</small>
+              </div>
+              <div style="background:#FAF6F0; border:1px solid #E0D4C3; padding:0.35rem 0.75rem; border-radius:6px; font-size:0.8rem; color:#4A102A; font-weight:600;">
+                Total Cash-out Deductions: <strong id="ovTotalCashoutBadge" style="color:#B91C1C;">৳0.00</strong>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1rem;" id="ovSegmentsGrid">
+              <!-- Dynamically populated by admin.js -->
+            </div>
+          </div>
+
           <!-- DÉLICE CAPITAL RECOVERY & PROFIT STATUS WIDGET (CONNECTED TO TAB 5) -->
           <div style="background:linear-gradient(135deg, #4A102A 0%, #2A0817 100%); color:#F6F0E8; border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:2rem; border:1px solid rgba(197, 164, 109, 0.4); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.25rem; box-shadow:0 6px 18px rgba(74, 16, 42, 0.15);">
             <div style="flex:1; min-width:280px;">
@@ -194,7 +212,7 @@
 
             <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
               <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(197, 164, 109, 0.3); border-radius:6px; padding:0.6rem 0.9rem; text-align:center;">
-                <div style="font-size:0.7rem; color:#C5A46D; text-transform:uppercase;">Distributable Profit</div>
+                <div style="font-size:0.7rem; color:#C5A46D; text-transform:uppercase;">Net Profit (After Fees)</div>
                 <div id="overviewProfitVal" style="font-size:1.15rem; font-weight:700; color:#FFF;">৳0.00</div>
               </div>
               <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(197, 164, 109, 0.3); border-radius:6px; padding:0.6rem 0.9rem; text-align:center;">
@@ -202,7 +220,7 @@
                 <div id="overviewSalaryVal" style="font-size:1.15rem; font-weight:700; color:#FFF;">৳0.00</div>
               </div>
               <button class="btn btn-primary" style="background:#C5A46D; color:#181619; font-weight:700; font-size:0.8rem; padding:0.65rem 1rem; border:none;" onclick="switchTab('delice-profit')">
-                View 11. Profit Engine &rarr;
+                View 4. Profit Engine &rarr;
               </button>
             </div>
           </div>
@@ -274,14 +292,20 @@
                   <option value="failed">Failed / Invalid</option>
                   <option value="refunded">Refunded</option>
                 </select>
-                <select id="orderPaymentMethodFilter" class="form-control" style="width:130px; padding:0.4rem 0.8rem; font-size:0.85rem;" onchange="loadOrders()">
-                  <option value="all">All Methods</option>
-                  <option value="full_online">100% Online</option>
+                <select id="orderPaymentMethodFilter" class="form-control" style="width:145px; padding:0.4rem 0.8rem; font-size:0.85rem;" onchange="loadOrders()">
+                  <option value="all">All Channels</option>
+                  <option value="bkash">bKash (Send Money)</option>
+                  <option value="nagad">Nagad (Send Money)</option>
                   <option value="cod_advance">Cash on Delivery</option>
                 </select>
                 <button class="btn btn-primary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="loadOrders()">Filter</button>
                 <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.4rem 0.8rem;" onclick="exportCourierCSV()">📥 Export Courier CSV</button>
               </div>
+            </div>
+
+            <!-- PAYMENT CHANNEL SUMMARY PILL BAR -->
+            <div id="ordersChannelSummaryBar" style="display:flex; gap:0.75rem; flex-wrap:wrap; padding:0.75rem 1.25rem; background:#FAF6F0; border-bottom:1px solid var(--admin-border); align-items:center;">
+              <!-- Populated by admin.js -->
             </div>
             <div class="table-responsive">
               <table class="admin-table">
@@ -570,6 +594,16 @@
                 </select>
               </div>
 
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <label style="font-size:0.8rem; font-weight:600; color:#4A102A;">Channel:</label>
+                <select id="dpFilterSegment" class="form-control" style="width:auto; padding:0.35rem 0.75rem; font-size:0.8rem;" onchange="handleDeliceFilterChange()">
+                  <option value="all">All Channels</option>
+                  <option value="bkash">bKash (1.10%)</option>
+                  <option value="nagad">Nagad (0.85%)</option>
+                  <option value="cash_on_delivery">Cash on Delivery (1.00%)</option>
+                </select>
+              </div>
+
               <div style="display:flex; gap:0.5rem; align-items:center; flex-grow:1; max-width:320px;">
                 <input type="text" id="dpFilterSearch" class="form-control" placeholder="Search Order # or Customer..." style="padding:0.35rem 0.75rem; font-size:0.8rem;">
                 <button class="btn btn-secondary" style="padding:0.35rem 0.75rem; font-size:0.8rem;" onclick="handleDeliceFilterChange()">Search</button>
@@ -584,6 +618,7 @@
                     <th>Date &amp; Time</th>
                     <th>Order #</th>
                     <th>Customer</th>
+                    <th>Channel</th>
                     <th>Product</th>
                     <th>Bottles</th>
                     <th>Unit Price</th>
@@ -1224,6 +1259,6 @@
     </div>
   </div>
 
-  <script src="/admin/admin.js?v=6.7.0"></script>
+  <script src="/admin/admin.js?v=7.1.0"></script>
 </body>
 </html>

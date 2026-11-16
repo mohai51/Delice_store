@@ -17,11 +17,12 @@ exports.getDashboard = async (req, res, next) => {
  */
 exports.getAllocations = async (req, res, next) => {
   try {
-    const { startDate, endDate, productId, search, limit } = req.query;
+    const { startDate, endDate, productId, segment, search, limit } = req.query;
     const allocations = await deliceProfitService.getAllocations({
       startDate,
       endDate,
       productId,
+      segment,
       search,
       limit
     });

@@ -971,10 +971,11 @@ class DeliceProfitService {
   /**
    * Get filtered allocations list
    */
-  async getAllocations({ startDate, endDate, productId, search, limit = 100 }) {
+  async getAllocations({ startDate, endDate, productId, segment, search, limit = 100 }) {
     try { await this.reconcileWithOrders(); } catch (_) {}
     let query = {};
     if (productId && productId !== 'all') query.productId = productId;
+    if (segment && segment !== 'all') query.paymentSegment = segment;
     if (startDate || endDate) {
       query.createdAt = {};
       if (startDate) query.createdAt.$gte = new Date(startDate);
@@ -1002,6 +1003,7 @@ class DeliceProfitService {
 
     let list = memoryStore.deliceProfitAllocations || [];
     if (productId && productId !== 'all') list = list.filter(a => a.productId === productId);
+    if (segment && segment !== 'all') list = list.filter(a => a.paymentSegment === segment);
     if (search) {
       const s = search.toLowerCase();
       list = list.filter(a =>
