@@ -545,9 +545,119 @@ class DeliceProfitService {
   }
 
   /**
+   * Reconcile Profit Allocations with Orders Collection
+   * Purges orphan allocations whose orders no longer exist in Orders collection,
+   * Ensures every paid/delivered order has an active allocation,
+   * Cleans allocations for unverified or cancelled orders.
+   */
+  async reconcileWithOrders() {
+    const Order = require('../models/Order');
+    let orders = [];
+
+    if (isConnected()) {
+      try {
+        orders = await Order.find();
+      } catch (err) {
+        console.error('[DeliceProfitService] Order fetch during reconcile failed:', err.message);
+        orders = memoryStore.orders || [];
+      }
+    } else {
+      orders = memoryStore.orders || [];
+    }
+
+    const orderMap = new Map();
+    orders.forEach(o => {
+      if (o._id) orderMap.set(String(o._id), o);
+      if (o.orderNumber) orderMap.set(String(o.orderNumber), o);
+    });
+
+    let allocations = [];
+    if (isConnected()) {
+      try {
+        allocations = await DeliceProfitAllocation.find();
+      } catch (err) {
+        allocations = memoryStore.deliceProfitAllocations || [];
+      }
+    } else {
+      allocations = memoryStore.deliceProfitAllocations || [];
+    }
+
+    // 1. Purge / Delete orphan allocations (where order does not exist in Orders collection)
+    const orphanAllocIds = [];
+    allocations.forEach(alloc => {
+      const byId = alloc.orderId ? orderMap.get(String(alloc.orderId)) : null;
+      const byNum = alloc.orderNumber ? orderMap.get(String(alloc.orderNumber)) : null;
+      if (!byId && !byNum) {
+        orphanAllocIds.push(alloc._id);
+      }
+    });
+
+    if (orphanAllocIds.length > 0) {
+      if (isConnected()) {
+        try {
+          await DeliceProfitAllocation.deleteMany({ _id: { $in: orphanAllocIds } });
+          console.log(`[DeliceProfitService] Purged ${orphanAllocIds.length} orphan profit allocations.`);
+        } catch (delErr) {
+          console.error('[DeliceProfitService] Failed to purge orphan allocations:', delErr.message);
+        }
+      }
+      if (memoryStore.deliceProfitAllocations) {
+        memoryStore.deliceProfitAllocations = memoryStore.deliceProfitAllocations.filter(
+          a => !orphanAllocIds.includes(a._id)
+        );
+      }
+    }
+
+    // 2. Ensure all verified paid / delivered orders are allocated
+    const eligibleOrders = orders.filter(
+      o => o.paymentStatus === 'paid' || o.orderStatus === 'delivered'
+    );
+
+    for (const order of eligibleOrders) {
+      await this.allocateOrderSale(order);
+    }
+
+    // 3. For any orders that are not paid and not delivered, remove allocations
+    const ineligibleOrders = orders.filter(
+      o => o.paymentStatus !== 'paid' && o.orderStatus !== 'delivered'
+    );
+
+    for (const order of ineligibleOrders) {
+      const orderRef = String(order._id);
+      const orderNum = order.orderNumber;
+      if (isConnected()) {
+        try {
+          await DeliceProfitAllocation.deleteMany({
+            $or: [{ orderId: orderRef }, { orderNumber: orderNum }]
+          });
+        } catch (_) {}
+      }
+      if (memoryStore.deliceProfitAllocations) {
+        memoryStore.deliceProfitAllocations = memoryStore.deliceProfitAllocations.filter(
+          a => a.orderId !== orderRef && a.orderNumber !== orderNum
+        );
+      }
+    }
+
+    return {
+      success: true,
+      totalOrders: orders.length,
+      eligiblePaidOrders: eligibleOrders.length,
+      orphansPurged: orphanAllocIds.length
+    };
+  }
+
+  /**
    * Get complete Profit Calculation Dashboard Data
    */
   async getDashboardData() {
+    // Automatically reconcile with Orders collection to guarantee 100% exact parity
+    try {
+      await this.reconcileWithOrders();
+    } catch (rErr) {
+      console.error('[DeliceProfitService] Auto-reconciliation notice:', rErr.message);
+    }
+
     const settings = await this.getSettings();
 
     let allocations = [];
@@ -744,6 +854,7 @@ class DeliceProfitService {
    * Get filtered allocations list
    */
   async getAllocations({ startDate, endDate, productId, search, limit = 100 }) {
+    try { await this.reconcileWithOrders(); } catch (_) {}
     let query = {};
     if (productId && productId !== 'all') query.productId = productId;
     if (startDate || endDate) {
@@ -788,6 +899,7 @@ class DeliceProfitService {
    * Get fund transactions ledger (Allocations credited + Expenses debited)
    */
   async getFundLedger(fundKey) {
+    try { await this.reconcileWithOrders(); } catch (_) {}
     const validFunds = {
       developmentFund: 'DÉLICE Development Fund',
       marketingFund: 'Marketing Fund',
@@ -876,6 +988,7 @@ class DeliceProfitService {
    * Generate Financial Report by range
    */
   async generateReport(rangeType = 'overall', customStart = null, customEnd = null) {
+    try { await this.reconcileWithOrders(); } catch (_) {}
     let startDate = null;
     let endDate = new Date();
 

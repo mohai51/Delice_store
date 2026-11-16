@@ -120,3 +120,22 @@ exports.getReport = async (req, res, next) => {
     next(err);
   }
 };
+
+/**
+ * Force manual reconciliation and sync between Orders Management and Profit Allocations
+ * POST /api/admin/delice-profit/sync-orders
+ */
+exports.syncOrders = async (req, res, next) => {
+  try {
+    const reconciliation = await deliceProfitService.reconcileWithOrders();
+    const dashboard = await deliceProfitService.getDashboardData();
+    res.json({
+      success: true,
+      message: 'Orders Management and DÉLICE Profit Calculation successfully synchronized.',
+      reconciliation,
+      summary: dashboard.summary
+    });
+  } catch (err) {
+    next(err);
+  }
+};

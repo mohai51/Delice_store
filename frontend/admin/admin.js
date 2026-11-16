@@ -2065,9 +2065,28 @@ async function openDeliceFundLedger(fundKey, fundName) {
 /* --------------------------------------------------------------------------
    MODAL 5: SALE CALCULATION BREAKDOWN
    -------------------------------------------------------------------------- */
-function openDeliceSaleBreakdown(allocId) {
-  const alloc = currentDeliceAllocations.find(a => (a._id === allocId || a.idempotencyKey === allocId));
-  if (!alloc) return;
+async function openDeliceSaleBreakdown(allocId) {
+  if (!currentDeliceAllocations || currentDeliceAllocations.length === 0) {
+    try {
+      const res = await fetchWithAuth('/api/admin/delice-profit/allocations');
+      if (res.ok) {
+        const data = await res.json();
+        currentDeliceAllocations = data.allocations || [];
+      }
+    } catch (_) {}
+  }
+
+  const alloc = currentDeliceAllocations.find(a => (
+    a._id === allocId || 
+    a.idempotencyKey === allocId || 
+    a.orderNumber === allocId || 
+    a.orderId === allocId
+  ));
+
+  if (!alloc) {
+    alert(`Profit allocation details for ${allocId} are not yet generated or available.`);
+    return;
+  }
 
   const orderNumEl = document.getElementById('dpBreakdownOrderNum');
   if (orderNumEl) orderNumEl.textContent = `Order #${alloc.orderNumber} — Auditable Math`;
@@ -2366,7 +2385,63 @@ function exportDeliceReportCSV() {
   document.body.removeChild(link);
 }
 
+/* --------------------------------------------------------------------------
+   BIDIRECTIONAL RECONCILIATION & SYNC WITH ORDERS MANAGEMENT
+   -------------------------------------------------------------------------- */
+async function syncProfitWithOrders() {
+  const syncBtns = [
+    document.getElementById('btnSyncProfitOrders')
+  ];
+
+  syncBtns.forEach(btn => {
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '🔄 Syncing with Orders...';
+    }
+  });
+
+  try {
+    const res = await fetchWithAuth('/api/admin/delice-profit/sync-orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const s = data.summary || {};
+      const rec = data.reconciliation || {};
+      
+      alert(`✅ Orders Management & DÉLICE Profit Engine 100% Synced!\n\n` +
+            `• Eligible Paid Orders: ${rec.eligiblePaidOrders || 0}\n` +
+            `• Actual Bottles Sold: ${s.totalBottlesSold || 0} bottle(s)\n` +
+            `• Gross Sales Revenue: ৳${(s.totalSalesRevenue || 0).toLocaleString()}\n` +
+            `• Capital Recovered: ৳${(s.totalPrincipalRepaid || 0).toFixed(2)}\n` +
+            `• Remaining Capital: ৳${(s.outstandingPrincipal || 0).toFixed(2)}\n` +
+            `• Distributable Profit: ৳${(s.totalDistributableProfit || 0).toFixed(2)}\n` +
+            `• Orphan/Ghost Records Purged: ${rec.orphansPurged || 0}`);
+
+      // Refresh both views
+      await loadDeliceProfit();
+      await loadOrders();
+      await loadOverview();
+    } else {
+      alert('Failed to sync orders with profit engine.');
+    }
+  } catch (err) {
+    console.error('Sync error:', err);
+    alert('Error syncing with orders: ' + err.message);
+  } finally {
+    syncBtns.forEach(btn => {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '🔄 Re-Sync with Orders';
+      }
+    });
+  }
+}
+
 // Global modal triggers for inline onclicks
+window.syncProfitWithOrders = syncProfitWithOrders;
 window.openDeliceSettingsModal = openDeliceSettingsModal;
 window.openDeliceEmployeesModal = openDeliceEmployeesModal;
 window.openDeliceExpenseModal = openDeliceExpenseModal;

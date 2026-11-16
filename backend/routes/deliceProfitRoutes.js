@@ -7,6 +7,7 @@ const { protectAdmin } = require('../middleware/authMiddleware');
 router.use(protectAdmin);
 
 router.get('/dashboard', deliceProfitController.getDashboard);
+router.post('/sync-orders', deliceProfitController.syncOrders);
 router.get('/allocations', deliceProfitController.getAllocations);
 router.get('/funds/:fundKey', deliceProfitController.getFundLedger);
 router.post('/funds/:fundKey/expense', deliceProfitController.recordFundExpense);

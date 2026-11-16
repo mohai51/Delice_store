@@ -92,8 +92,20 @@ class FinancialService {
 
     const totalOrdersCount = isConnected() ? await Order.countDocuments().catch(() => memoryStore.orders.length) : memoryStore.orders.length;
     const paidOrdersCount = paidOrders.length;
-    const pendingOrdersCount = memoryStore.orders.filter(o => o.paymentStatus === 'pending').length;
-    const deliveredOrdersCount = memoryStore.orders.filter(o => o.orderStatus === 'delivered').length;
+    let pendingOrdersCount = 0;
+    let deliveredOrdersCount = 0;
+    if (isConnected()) {
+      try {
+        pendingOrdersCount = await Order.countDocuments({ paymentStatus: { $in: ['pending', 'awaiting_verification'] } });
+        deliveredOrdersCount = await Order.countDocuments({ orderStatus: 'delivered' });
+      } catch (_) {
+        pendingOrdersCount = memoryStore.orders.filter(o => o.paymentStatus === 'pending' || o.paymentStatus === 'awaiting_verification').length;
+        deliveredOrdersCount = memoryStore.orders.filter(o => o.orderStatus === 'delivered').length;
+      }
+    } else {
+      pendingOrdersCount = memoryStore.orders.filter(o => o.paymentStatus === 'pending' || o.paymentStatus === 'awaiting_verification').length;
+      deliveredOrdersCount = memoryStore.orders.filter(o => o.orderStatus === 'delivered').length;
+    }
 
     return {
       totalOrdersCount,

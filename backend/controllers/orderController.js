@@ -432,6 +432,13 @@ exports.createOrder = async (req, res, next) => {
       }
     }
 
+    // Trigger DÉLICE Profit Calculation if order is already paid or delivered
+    try {
+      if (order.paymentStatus === 'paid' || order.orderStatus === 'delivered') {
+        await deliceProfitService.allocateOrderSale(order);
+      }
+    } catch (_) {}
+
     res.status(201).json({
       success: true,
       order: {
@@ -780,9 +787,10 @@ exports.updateOrderStatus = async (req, res, next) => {
     try {
       if (order.paymentStatus === 'paid' || order.orderStatus === 'delivered') {
         await deliceProfitService.allocateOrderSale(order);
-      } else if (order.orderStatus === 'cancelled' || order.paymentStatus === 'refunded') {
-        await deliceProfitService.reverseOrderSale(order, `Order ${order.orderStatus || order.paymentStatus}`);
+      } else {
+        await deliceProfitService.reverseOrderSale(order, `Order status: ${order.orderStatus} / ${order.paymentStatus}`);
       }
+      await deliceProfitService.reconcileWithOrders();
     } catch (allocErr) {
       console.error('[DÉLICE Profit Hook Error]', allocErr.message);
     }
