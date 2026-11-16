@@ -16,12 +16,12 @@ const DEFAULT_PRODUCTS = [
     description: 'An ode to youthful romance and blooming grace. Tender centifolia rose petals and velvety peonies blend with sparkling fresh bergamot and a delicate white musk base. Soft, sweet, and endlessly romantic.',
     occasions: ['Campus & Everyday', 'Romantic Dates', 'Spring Outings', 'Daytime Events'],
     mood: 'romantic',
-    image: '/assets/images/uploads/delice_Bottle-1_1794420148574.png',
+    image: '/assets/images/uploads/delice_Bottle-1_1794420148574.webp',
     images: [
-      '/assets/images/uploads/delice_Bottle-1_1794420148574.png',
+      '/assets/images/uploads/delice_Bottle-1_1794420148574.webp',
       '/assets/images/bloom-box.svg',
       '/assets/images/bloom.svg',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png'
+      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.webp'
     ],
     stock: 120,
     badge: 'Opening Offer'
@@ -36,12 +36,12 @@ const DEFAULT_PRODUCTS = [
     description: 'Crafted for the modern gentleman who leads with effortless charisma. Crisp Italian bergamot and neroli meet spicy black pepper, aromatic cardamom, and a commanding smoked cedarwood and vetiver foundation.',
     occasions: ['Executive Workdays', 'Active Motion', 'Outdoor Demands', 'Signatures'],
     mood: 'energetic',
-    image: '/assets/images/uploads/delice_Bottle-2_1794420107446.png',
+    image: '/assets/images/uploads/delice_Bottle-2_1794420107446.webp',
     images: [
-      '/assets/images/uploads/delice_Bottle-2_1794420107446.png',
+      '/assets/images/uploads/delice_Bottle-2_1794420107446.webp',
       '/assets/images/momentum-box.svg',
       '/assets/images/momentum.svg',
-      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png'
+      '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.webp'
     ],
     stock: 100,
     badge: 'Opening Offer'
@@ -56,12 +56,12 @@ const DEFAULT_PRODUCTS = [
     description: 'A mysterious journey into midnight opulence and regal sensuality. Rich noble oud wood is enlivened with spicy saffron, glowing pink peppercorns, and juicy dark plum, melting into deep velvet amber and smoky warmth.',
     occasions: ['Evening Soirées', 'Intimate Dates', 'Formal Nights', 'Special Occasions'],
     mood: 'evening',
-    image: '/assets/images/uploads/delice_Bottle-3_1794420022409.png',
+    image: '/assets/images/uploads/delice_Bottle-3_1794420022409.webp',
     images: [
-      '/assets/images/uploads/delice_Bottle-3_1794420022409.png',
+      '/assets/images/uploads/delice_Bottle-3_1794420022409.webp',
       '/assets/images/enigma-box.svg',
       '/assets/images/enigma.svg',
-      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
+      '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.webp'
     ],
     stock: 90,
     badge: 'Opening Offer'
@@ -249,17 +249,20 @@ async function loadHeroSlides() {
     ${slidesData.map((s, idx) => {
       const targetProdId = s.productId || 'delice-bloom';
       const defaultBanners = [
-        '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.png',
-        '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.png',
-        '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.png'
+        '/assets/images/uploads/delice_DLICEinburgundyshadows_1794416567005.webp',
+        '/assets/images/uploads/delice_DLICE_MysteryinBurgundyLight_1794416616204.webp',
+        '/assets/images/uploads/delice_DLICE_MysteryinBurgundyShadows_1794416637826.webp'
       ];
-      const bannerImg = (s.image && !s.image.endsWith('.svg')) ? s.image : (defaultBanners[idx % defaultBanners.length] || s.image);
+      let bannerImg = (s.image && !s.image.endsWith('.svg')) ? s.image : (defaultBanners[idx % defaultBanners.length] || s.image);
+      if (bannerImg && !bannerImg.endsWith('.svg')) {
+        bannerImg = bannerImg.replace(/\.(png|jpg|jpeg)$/i, '.webp');
+      }
       const linkUrl = targetProdId ? `/checkout.html?buyNow=${targetProdId}` : '#collection';
 
       return `
         <div class="hero-slide ${idx === 0 ? 'active' : ''}" data-slide="${idx}">
           <a href="${linkUrl}" class="hero-banner-link" aria-label="${s.title || 'DÉLICE Fragrance'}">
-            <img src="${bannerImg}" alt="${s.title || 'DÉLICE Fragrance'} • ৳${s.offerPrice || 799}" class="hero-banner-img">
+            <img src="${bannerImg}" alt="${s.title || 'DÉLICE Fragrance'} • ৳${s.offerPrice || 799}" class="hero-banner-img" ${idx === 0 ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">
           </a>
         </div>
       `;
@@ -972,8 +975,8 @@ window.moodImageIndex = 0;
 const MOOD_ATMOSPHERE_CONFIG = {
   'romantic': {
     badge: 'Parisian Floral Romance',
-    image: '/assets/images/scent-guide-bloom-model.jpg',
-    fallback: '/assets/images/scent-guide-bloom.jpg',
+    image: '/assets/images/scent-guide-bloom-model.webp',
+    fallback: '/assets/images/scent-guide-bloom.webp',
     alt: 'DÉLICE BLOOM — Parisian Haute Couture Floral Romance',
     tagline: 'HAUTE PARFUMERIE &bull; SOFT, SWEET &amp; ROMANTIC',
     accords: 'Tender Peony &bull; Grasse Rose &bull; Calabrian Bergamot &bull; White Musk',
@@ -982,8 +985,8 @@ const MOOD_ATMOSPHERE_CONFIG = {
   },
   'energetic': {
     badge: 'Executive Distinction',
-    image: '/assets/images/scent-guide-momentum-model.jpg',
-    fallback: '/assets/images/scent-guide-momentum.jpg',
+    image: '/assets/images/scent-guide-momentum-model.webp',
+    fallback: '/assets/images/scent-guide-momentum.webp',
     alt: 'DÉLICE MOMENTUM — Executive Distinction & Charismatic Motion',
     tagline: 'BRITISH LUXURY HERITAGE &bull; BOLD &amp; CONFIDENT',
     accords: 'Italian Bergamot &bull; Neroli &bull; Cracked Black Pepper &bull; Smoked Cedarwood',
@@ -992,13 +995,12 @@ const MOOD_ATMOSPHERE_CONFIG = {
   },
   'evening': {
     badge: 'Midnight Royalty',
-    image: '/assets/images/scent-guide-enigma-model.jpg',
-    fallback: '/assets/images/scent-guide-enigma.jpg',
+    image: '/assets/images/scent-guide-enigma-model.webp',
+    fallback: '/assets/images/scent-guide-enigma.webp',
     alt: 'DÉLICE ENIGMA — Midnight Velvet Royalty & Seductive Oud',
     tagline: 'ROYAL ORIENTAL OPULENCE &bull; SOPHISTICATED &amp; INTIMATE',
     accords: 'Noble Midnight Oud &bull; Royal Saffron &bull; Dark Plum &bull; Golden Amber',
-    story: 'A hypnotic journey into midnight opulence and regal sensuality. Noble midnight oud wood is ignited with sparkling saffron, fiery pink peppercorns, and juicy dark plum, melting seamlessly into deep velvet amber and warm smoky woods. Seductive, mysterious, and unforgettable.',
-    shortStory: 'Noble midnight oud ignited with royal saffron, rich dark plum, and deep velvet amber.'
+    story: 'A hypnotic journey into midnight opulence and regal sensuality. Noble midnight oud wood is ignited with sparkling saffron, fiery pink peppercorns, and juicy dark plum, melting seamlessly into deep velvet amber and warm smoky woods. Seductive, mysterious, and unforgettable.'
   }
 };
 
@@ -1154,12 +1156,12 @@ window.closeModal = closeModal;
    ========================================================================== */
 window.storyPhotos = [
   {
-    src: '/assets/images/d1.jpg',
+    src: '/assets/images/d1.webp',
     badge: 'Crafting The Essence',
     caption: 'Sayod Sulayman Sukria, Mohaiminul Islam, Abdullah Basar Tarif & Zayed Iqbal Munna during formulation trials.'
   },
   {
-    src: '/assets/images/d2.jpg',
+    src: '/assets/images/d2.webp',
     badge: 'The Founders • 4 Friends',
     caption: 'Four friends united by one relentless mission: authentic luxury fragrances crafted for Bangladesh.'
   }

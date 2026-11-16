@@ -297,7 +297,7 @@ async function loadOrders() {
               ${isHandCash
                 ? `<span class="provider-pill" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-weight:700;">🤝 Hand Cash</span>`
                 : `<span class="provider-pill ${provLower}">
-                    <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
+                    <img src="/assets/images/${provLower}-logo.webp" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
                     ${provider}
                   </span>`
               }
@@ -520,7 +520,7 @@ function viewOrderModal(orderId) {
           ${isHandCash 
             ? `<span class="provider-pill" style="background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; font-weight:700;">🤝 Hand Cash at ${order.deliveryHub || 'Campus'}</span>`
             : `<span class="provider-pill ${provLower}">
-                 <img src="/assets/images/${provLower}-logo.png" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
+                 <img src="/assets/images/${provLower}-logo.webp" alt="${provider}" style="width:14px; height:14px; object-fit:contain; vertical-align:middle; margin-right:3px;">
                  ${provider} (Send Money)
                </span>`
           }
@@ -910,8 +910,8 @@ function openProductModal() {
 
   // 4 Default Image Slots
   if (document.getElementById('prodImage1')) {
-    document.getElementById('prodImage1').value = '/assets/images/uploads/delice_Bottle-1_1794420148574.png';
-    document.getElementById('prodFilePreview1').src = '/assets/images/uploads/delice_Bottle-1_1794420148574.png';
+    document.getElementById('prodImage1').value = '/assets/images/uploads/delice_Bottle-1_1794420148574.webp';
+    document.getElementById('prodFilePreview1').src = '/assets/images/uploads/delice_Bottle-1_1794420148574.webp';
   }
   if (document.getElementById('prodImage2')) {
     document.getElementById('prodImage2').value = '/assets/images/bloom-box.svg';

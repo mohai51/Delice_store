@@ -47,16 +47,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve Frontend Static Files (No-cache in development so code updates reflect immediately)
+// Serve Frontend Static Files with Intelligent Asset Caching
 const frontendPath = path.join(__dirname, '..', 'frontend');
 app.use((req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.setHeader('Surrogate-Control', 'no-store');
+  const urlPath = req.path || '';
+  if (urlPath.match(/\.(png|jpg|jpeg|webp|svg|gif|ico|woff2?|ttf|eot)$/i)) {
+    // 30 days cache for static images and web fonts
+    res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+  } else if (urlPath.match(/\.(css|js)$/i)) {
+    // 1 day cache for styles and scripts
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+  } else {
+    // HTML pages remain fresh so updates reflect immediately
+    res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+  }
   next();
 });
-app.use(express.static(frontendPath, { etag: false, maxAge: 0, lastModified: false }));
+app.use(express.static(frontendPath, { etag: true, maxAge: '30d' }));
 
 // Database Readiness Middleware (Ensures connection is established before API processing, critical for Vercel Serverless)
 app.use(async (req, res, next) => {
