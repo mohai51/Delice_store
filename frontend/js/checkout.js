@@ -517,4 +517,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // Restore button if user navigates back via bfcache (Safari/Chrome back button)
+  window.addEventListener('pageshow', () => {
+    const submitBtn = document.getElementById('paySubmitBtn');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('is-loading');
+    }
+  });
 });
