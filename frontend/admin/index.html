@@ -249,7 +249,7 @@
                 <small style="color:#6B7280; font-size:0.78rem;">Live synced with storefront checkout (100% Online vs Cash on Delivery with Advance Fee)</small>
               </div>
               <div style="display:flex; gap:0.6rem; flex-wrap:wrap; align-items:center;">
-                <input type="text" id="orderSearchInput" class="form-control" placeholder="Search order ID, phone, TrxID, name, district..." style="width:240px; padding:0.4rem 0.8rem; font-size:0.85rem;" onkeyup="if(event.key==='Enter') loadOrders()">
+                <input type="text" id="orderSearchInput" class="form-control" placeholder="Search order ID, phone, sender, name, district..." style="width:240px; padding:0.4rem 0.8rem; font-size:0.85rem;" onkeyup="if(event.key==='Enter') loadOrders()">
                 <select id="orderStatusFilter" class="form-control" style="width:150px; padding:0.4rem 0.8rem; font-size:0.85rem;" onchange="loadOrders()">
                   <option value="all">All Fulfillment</option>
                   <option value="awaiting_verification">Awaiting Verification</option>
@@ -282,7 +282,7 @@
                     <th>Customer &amp; Destination</th>
                     <th>Fragrance Editions (30ml)</th>
                     <th>Payment Method</th>
-                    <th>Send Money &amp; TrxID</th>
+                    <th>Sender Mobile (Verify)</th>
                     <th>Collection Math</th>
                     <th>Profit &amp; Recovery</th>
                     <th>Payment Status</th>

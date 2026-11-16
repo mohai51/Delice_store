@@ -351,9 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const codNoticeLine = document.getElementById('codNoticeLine');
     const codCashDueAmount = document.getElementById('codCashDueAmount');
     const senderInput = document.getElementById('senderNumber');
-    const trxInput = document.getElementById('transactionId');
     const labelSender = document.getElementById('labelSenderNumber');
-    const labelTrx = document.getElementById('labelTransactionId');
     const sendMoneySection = document.getElementById('sendMoneyDetailsSection');
     const campusCodHandoverBox = document.getElementById('campusCodHandoverBox');
     const campusCodCashDue = document.getElementById('campusCodCashDue');
@@ -369,7 +367,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (campusCodHubName) campusCodHubName.textContent = selectedCampusHub;
 
       if (senderInput) senderInput.required = false;
-      if (trxInput) trxInput.required = false;
 
       if (payBtn) payBtn.innerHTML = `<span id="btnPayText">Confirm Order • Pay ৳${subtotal} Hand to Hand at ${selectedCampusHub}</span>`;
     } else {
@@ -378,9 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (campusCodHandoverBox) campusCodHandoverBox.style.display = 'none';
 
       if (senderInput) senderInput.required = true;
-      if (trxInput) trxInput.required = true;
-      if (labelSender) labelSender.textContent = 'Sender Number *';
-      if (labelTrx) labelTrx.textContent = 'Transaction ID (TrxID) *';
+      if (labelSender) labelSender.textContent = 'Sender Mobile Number (যে বিকাশ/নগদ নাম্বার থেকে টাকা পাঠিয়েছেন) *';
 
       if (selectedPaymentMethod === 'full_online') {
         if (bannerLabel) bannerLabel.textContent = isFreeHub ? 'Payable Now (100% Online • Free Hub):' : 'Payable Now (100% Online):';
@@ -416,8 +411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const phone = document.getElementById('phone').value.trim();
       const district = document.getElementById('districtSelect').value.trim();
       const address = document.getElementById('deliveryAddress').value.trim();
-      const senderNumber = document.getElementById('senderNumber').value.trim();
-      const transactionId = document.getElementById('transactionId').value.trim();
+      const senderNumber = (document.getElementById('senderNumber')?.value || '').trim();
 
       if (!fullName) {
         alert('Please enter your full name.');
@@ -451,25 +445,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       const districtVal = (document.getElementById('districtSelect')?.value || '').trim();
       const districtHub = districtVal.startsWith('Campus-') ? districtVal.replace('Campus-', '').toUpperCase() : '';
 
-      const activeCampusHub = radioHub || domHub || districtHub || (selectedCampusHub ? selectedCampusHub.trim().toUpperCase() : '');
+      const isDhakaOrCampus = districtVal.startsWith('Campus-') || districtVal.toLowerCase() === 'dhaka';
+      const activeCampusHub = isDhakaOrCampus ? (radioHub || domHub || districtHub || (selectedCampusHub ? selectedCampusHub.trim().toUpperCase() : '')) : '';
       const isFreeHubCOD = (Boolean(activeCampusHub) && selectedPaymentMethod === 'cod_advance');
 
       let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
-      let trxIdClean = transactionId ? transactionId.replace(/[^A-Za-z0-9]/g, '').toUpperCase() : '';
 
       if (isFreeHubCOD) {
         if (!cleanedSender) cleanedSender = cleanedPhone;
-        if (!trxIdClean) trxIdClean = `CAMPUS-COD-${Date.now().toString().slice(-6)}`;
       } else {
         if (!bdPhoneRegex.test(cleanedSender)) {
-          alert('Please enter the 11-digit sender mobile number.');
+          alert('Please enter the 11-digit bKash/Nagad sender mobile number from which payment was made.');
           document.getElementById('senderNumber').focus();
-          return;
-        }
-
-        if (!trxIdClean || !/^[A-Z0-9]{8,12}$/.test(trxIdClean)) {
-          alert('Please enter a valid 8 to 12 character alphanumeric Transaction ID (TrxID).');
-          document.getElementById('transactionId').focus();
           return;
         }
       }
@@ -493,7 +480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             address,
             orderNotes: ''
           },
-          deliveryArea: activeCampusHub ? 'campusHub' : selectedDeliveryArea,
+          deliveryArea: activeCampusHub ? 'campusHub' : (districtVal.toLowerCase() === 'dhaka' ? 'insideDhaka' : 'outsideDhaka'),
           deliveryHub: activeCampusHub || '',
           items: checkoutItems.map(item => ({
             id: item.id,
@@ -502,8 +489,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           })),
           paymentMethod: selectedPaymentMethod,
           paymentProvider: isFreeHubCOD ? 'hand_cash' : selectedProvider,
-          senderNumber: cleanedSender,
-          transactionId: trxIdClean
+          senderNumber: cleanedSender
         };
 
         const response = await fetch('/api/orders', {

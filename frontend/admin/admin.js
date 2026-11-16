@@ -307,13 +307,17 @@ async function loadOrders() {
             </span>
           </td>
           <td>
-            <div>
-              <code class="trxid-code" onclick="window.copyAdminText('${o.transactionId}', this)" title="Click to copy TrxID">${o.transactionId}</code>
-              <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${o.transactionId}', this)">Copy</button>
-            </div>
-            <small style="color:#4A102A; font-weight:600; display:block; margin-top:0.3rem;">
-              Sender: <strong>${o.senderNumber || o.customer?.phone}</strong>
-            </small>
+            ${isHandCash ? `
+              <span style="font-size:0.8rem; color:#059669; font-weight:700;">🤝 Hand Cash</span>
+            ` : `
+              <div>
+                <strong style="color:#4A102A; font-size:0.95rem; font-family:monospace;">${o.senderNumber || o.customer?.phone}</strong>
+                <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${o.senderNumber || o.customer?.phone}', this)">Copy</button>
+              </div>
+              <small style="color:#6B7280; display:block; margin-top:0.25rem;">
+                ${provider} Sender
+              </small>
+            `}
           </td>
           <td>
             <div style="font-size:0.78rem; color:#6B7280;">Total: <strong>৳${o.totalPayable}</strong></div>
@@ -435,7 +439,7 @@ Cash to Collect: ৳${cashDue}
 Delivery Zone: ${order.deliveryHub ? `Campus Hub: ${order.deliveryHub} (FREE Delivery ৳0)` : (order.deliveryArea === 'insideDhaka' ? 'Inside Dhaka (৳60)' : 'Outside Dhaka (৳120)')}
 Payment Status: ${(order.paymentStatus || 'AWAITING_VERIFICATION').toUpperCase()}
 Payment Method: ${isHandCash ? `Campus Hand-to-Hand Delivery (${order.deliveryHub || 'Campus Hub'})` : (isCOD ? 'Cash on Delivery (Advance Fee Paid)' : '100% Online Payment')}
-Provider / Payment Mode: ${isHandCash ? `Hand Cash at ${order.deliveryHub || 'Campus'} (No advance fee)` : `${(order.paymentProvider || 'bkash').toUpperCase()} - ${order.transactionId}`}`;
+Provider / Payment Mode: ${isHandCash ? `Hand Cash at ${order.deliveryHub || 'Campus'} (No advance fee)` : `${(order.paymentProvider || 'bkash').toUpperCase()} (Sender: ${order.senderNumber || order.customer.phone})`}`;
 
   window.copyAdminText(text, btn);
 };
@@ -530,17 +534,17 @@ function viewOrderModal(orderId) {
         <div class="box-row">
           <span>Customer Mobile / Contact:</span>
           <div>
-            <strong style="color:#4A102A; font-size:0.95rem;">${order.senderNumber || order.customer.phone}</strong>
-            <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.senderNumber || order.customer.phone}', this)">Copy</button>
+            <strong style="color:#4A102A; font-size:0.95rem;">${order.customer?.phone || ''}</strong>
+            <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.customer?.phone || ''}', this)">Copy</button>
           </div>
         </div>
         <div class="box-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
-          <span>Transaction ID (TrxID):</span>
+          <span>bKash / Nagad Sender Mobile (Verify):</span>
           <div>
             ${isHandCash 
-              ? `<span style="font-size:0.85rem; color:#059669; font-weight:700;">Hand-to-Hand Delivery (No online TrxID)</span>`
-              : `<code class="trxid-large">${order.transactionId}</code>
-                 <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.transactionId}', this)">Copy</button>`
+              ? `<span style="font-size:0.85rem; color:#059669; font-weight:700;">Hand-to-Hand Delivery (No advance payment)</span>`
+              : `<strong style="color:#4A102A; font-size:1.05rem; font-family:monospace;">${order.senderNumber || order.customer?.phone}</strong>
+                 <button type="button" class="btn-copy-sm" onclick="window.copyAdminText('${order.senderNumber || order.customer?.phone}', this)">Copy</button>`
             }
           </div>
         </div>
@@ -695,9 +699,9 @@ function viewOrderModal(orderId) {
         <div class="form-group">
           <label class="form-label">Payment Verification Status</label>
           <select id="modalPaymentStatus" class="form-control">
-            <option value="awaiting_verification" ${order.paymentStatus === 'awaiting_verification' ? 'selected' : ''}>Awaiting TrxID Verification</option>
+            <option value="awaiting_verification" ${order.paymentStatus === 'awaiting_verification' ? 'selected' : ''}>Awaiting Payment Verification</option>
             <option value="paid" ${order.paymentStatus === 'paid' ? 'selected' : ''}>Paid &amp; Verified</option>
-            <option value="failed" ${order.paymentStatus === 'failed' ? 'selected' : ''}>Failed / Invalid TrxID</option>
+            <option value="failed" ${order.paymentStatus === 'failed' ? 'selected' : ''}>Payment Not Received</option>
             <option value="refunded" ${order.paymentStatus === 'refunded' ? 'selected' : ''}>Refunded</option>
           </select>
         </div>

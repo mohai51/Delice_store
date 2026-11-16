@@ -47,8 +47,9 @@ const orderSchema = new mongoose.Schema({
   },
   transactionId: {
     type: String,
-    unique: true,
-    required: true,
+    default: function() {
+      return `TXN-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    },
     index: true
   },
   customer: {

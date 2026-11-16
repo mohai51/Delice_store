@@ -295,13 +295,9 @@
             </div>
 
             <div class="form-row-compact" id="paymentInputsRow">
-              <div class="form-group-compact">
-                <label class="form-label" for="senderNumber" id="labelSenderNumber">Sender Number *</label>
-                <input type="tel" id="senderNumber" class="form-control" placeholder="01XXXXXXXXX" pattern="^01[3-9]\d{8}$" inputmode="numeric" required>
-              </div>
-              <div class="form-group-compact">
-                <label class="form-label" for="transactionId" id="labelTransactionId">Transaction ID (TrxID) *</label>
-                <input type="text" id="transactionId" class="form-control" placeholder="TrxID" required style="text-transform:uppercase; font-family:monospace; font-weight:700;">
+              <div class="form-group-compact" style="flex:1;">
+                <label class="form-label" for="senderNumber" id="labelSenderNumber">Sender Mobile Number (যে বিকাশ/নগদ নাম্বার থেকে টাকা পাঠিয়েছেন) *</label>
+                <input type="tel" id="senderNumber" class="form-control" placeholder="01XXXXXXXXX" pattern="^01[3-9]\d{8}$" inputmode="numeric" required autocomplete="tel">
               </div>
             </div>
           </div>

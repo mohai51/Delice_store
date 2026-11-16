@@ -100,9 +100,8 @@ async function runTests() {
       });
       assert(invalidCheckout.statusCode === 400, 'Rejects invalid phone number with HTTP 400');
 
-      // TEST 4: Successful Order Placement via bKash Send Money
+      // TEST 4: Successful Order Placement via bKash Send Money (No TrxID required, auto-generated)
       // Customer tries to tamper with price in request (client sends ৳100 instead of ৳799)
-      const testTrxId = 'BKASH' + Date.now().toString().slice(-6);
       const validCheckout = await request('POST', '/api/orders', {
         customer: {
           fullName: 'Samiul Karim',
@@ -115,7 +114,7 @@ async function runTests() {
         paymentMethod: 'full_online',
         paymentProvider: 'bkash',
         senderNumber: '01712345678',
-        transactionId: testTrxId,
+        // No transactionId sent - storefront removes TrxID
         items: [{ id: 'delice-bloom', quantity: 2, price: 100 }] // Price tampering test
       });
 
@@ -123,30 +122,35 @@ async function runTests() {
       assert(validCheckout.data.success === true, 'Order placement returns success: true');
       // Subtotal should be 799 * 2 = 1598, Delivery = 60, Total = 1658 (ignoring the tampered 100!)
       assert(validCheckout.data.order.totalPayable === 1658, `Server-side price verification enforced: ৳1658 (received ${validCheckout.data.order.totalPayable})`);
-      assert(validCheckout.data.order.transactionId === testTrxId, `Transaction ID saved: ${testTrxId}`);
+      assert(Boolean(validCheckout.data.order.transactionId), `Auto-generated Transaction Reference saved: ${validCheckout.data.order.transactionId}`);
 
-      // TEST 5: Public Receipt Retrieval by Transaction ID
-      const receiptRes = await request('GET', `/api/orders/by-transaction/${testTrxId}`);
-      assert(receiptRes.statusCode === 200, 'Receipt accessible by transaction ID');
-      assert(receiptRes.data.orderNumber === validCheckout.data.order.orderNumber, 'Receipt matches order number');
+      const savedOrderNumber = validCheckout.data.order.orderNumber;
+      const savedTranId = validCheckout.data.order.transactionId;
+
+      // TEST 5: Public Receipt Retrieval by Order Number or Transaction Reference
+      const receiptRes = await request('GET', `/api/orders/by-transaction/${savedOrderNumber}`);
+      assert(receiptRes.statusCode === 200, 'Receipt accessible by Order Number');
+      assert(receiptRes.data.orderNumber === savedOrderNumber, 'Receipt matches order number');
       assert(receiptRes.data.paymentStatus === 'awaiting_verification', 'Order status set to awaiting_verification');
 
-      // TEST 6: Prevention of Duplicate Transaction ID
-      const dupOrder = await request('POST', '/api/orders', {
+      // TEST 6: Smooth Outside-Dhaka Courier Delivery (Zero Rejections for Non-Dhaka Districts)
+      const outsideDhakaOrder = await request('POST', '/api/orders', {
         customer: {
-          fullName: 'Another User',
+          fullName: 'Chittagong Customer',
           phone: '01812345678',
-          district: 'Chittagong',
-          address: 'GEC Circle'
+          district: 'Chattogram',
+          address: 'Near BRAC bank branch, GEC Circle'
         },
         deliveryArea: 'outsideDhaka',
+        deliveryHub: '',
         paymentMethod: 'full_online',
-        paymentProvider: 'bkash',
+        paymentProvider: 'nagad',
         senderNumber: '01812345678',
-        transactionId: testTrxId, // Duplicate!
         items: [{ id: 'delice-bloom', quantity: 1 }]
       });
-      assert(dupOrder.statusCode === 400, 'Rejects duplicate Transaction ID with HTTP 400');
+      assert(outsideDhakaOrder.statusCode === 201, 'Outside Dhaka customer order succeeds with HTTP 201 (no 400 rejection)');
+      assert(outsideDhakaOrder.data.order.deliveryCharge === 120, 'Outside Dhaka delivery charge is correctly ৳120');
+      assert(outsideDhakaOrder.data.order.deliveryHub === '', 'Campus Hub cleared for non-Dhaka district');
 
       console.log(`\n--- Verification Summary: ${passCount} Passed, ${failCount} Failed ---`);
       server.close();

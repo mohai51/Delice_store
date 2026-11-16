@@ -28,7 +28,13 @@ function maskPhoneNumber(phone) {
  */
 exports.createOrder = async (req, res, next) => {
   try {
-    // 0. Fail-fast in production if database is disconnected (Prevent split-brain volatile RAM orders)
+    // 0. Ensure database connection is active (vital for Vercel serverless cold starts)
+    if (!isConnected()) {
+      try {
+        const connectDB = require('../config/db');
+        await connectDB();
+      } catch (_) {}
+    }
     if (process.env.NODE_ENV === 'production' && !isConnected()) {
       return res.status(503).json({
         success: false,
@@ -57,44 +63,43 @@ exports.createOrder = async (req, res, next) => {
     // 2. Validate Payment Details & Campus Delivery Hub
     const VALID_CAMPUS_HUBS = ['UIU', 'NSU', 'IUB', 'AIUB', 'BRACU', 'EWU'];
     let chosenHub = (deliveryHub && typeof deliveryHub === 'string') ? deliveryHub.trim().toUpperCase() : '';
+    const customerDist = (customer.district || '').trim().toLowerCase();
+    const isDhaka = (customerDist === 'dhaka');
 
-    const isExplicitCampusArea = (deliveryArea === 'campusHub');
-    const isHubTrx = Boolean(transactionId && (transactionId.toUpperCase().startsWith('HUB-COD-') || transactionId.toUpperCase().startsWith('CAMPUS-COD-')));
-    const isHandCashProvider = (paymentProvider === 'hand_cash');
+    let isCampusHub = false;
+    // Campus Hub free delivery (৳0) is strictly for Dhaka campus locations
+    if (isDhaka) {
+      const isExplicitCampusArea = (deliveryArea === 'campusHub');
+      const isHubTrx = Boolean(transactionId && (transactionId.toUpperCase().startsWith('HUB-COD-') || transactionId.toUpperCase().startsWith('CAMPUS-COD-')));
+      const isHandCashProvider = (paymentProvider === 'hand_cash');
 
-    // Auto-detect hub if client omitted deliveryHub field or passed it in district/address
-    if (!chosenHub) {
-      const combinedText = `${customer.district || ''} ${customer.address || ''} ${customer.orderNotes || ''}`.toUpperCase();
-      const matched = VALID_CAMPUS_HUBS.find(h => {
-        const regex = new RegExp(`(^|[^A-Z])${h}([^A-Z]|$)`, 'i');
-        return regex.test(combinedText);
-      });
-      if (matched) chosenHub = matched;
-    }
-
-    if (!chosenHub && (isExplicitCampusArea || isHubTrx || isHandCashProvider)) {
-      chosenHub = 'UIU';
-    }
-
-    const isCampusHub = Boolean(chosenHub && VALID_CAMPUS_HUBS.includes(chosenHub)) || isExplicitCampusArea || isHubTrx || isHandCashProvider;
-    if (isCampusHub && !chosenHub) {
-      chosenHub = 'UIU';
-    }
-
-    // Validate Campus Hub District: All campus hubs are strictly located within Dhaka district
-    if (isCampusHub) {
-      const customerDist = (customer.district || '').trim().toLowerCase();
-      if (customerDist !== 'dhaka') {
-        return res.status(400).json({
-          success: false,
-          error: 'Campus hub delivery is only available within Dhaka district.'
+      // Auto-detect hub if client passed it in address or notes
+      if (!chosenHub) {
+        const combinedText = `${customer.address || ''} ${customer.orderNotes || ''}`.toUpperCase();
+        const matched = VALID_CAMPUS_HUBS.find(h => {
+          const regex = new RegExp(`(^|[^A-Z])${h}([^A-Z]|$)`, 'i');
+          return regex.test(combinedText);
         });
+        if (matched) chosenHub = matched;
       }
+
+      if (!chosenHub && (isExplicitCampusArea || isHubTrx || isHandCashProvider)) {
+        chosenHub = 'UIU';
+      }
+
+      isCampusHub = Boolean(chosenHub && VALID_CAMPUS_HUBS.includes(chosenHub)) || isExplicitCampusArea || isHubTrx || isHandCashProvider;
+      if (isCampusHub && !chosenHub) {
+        chosenHub = 'UIU';
+      }
+    } else {
+      // Outside Dhaka: smoothly route through regular courier (৳120 delivery) without throwing error
+      chosenHub = '';
+      isCampusHub = false;
     }
 
     const validMethods = ['full_online', 'cod_advance'];
     const pMethod = validMethods.includes(paymentMethod) ? paymentMethod : 'full_online';
-    const isFreeCampusCOD = (isCampusHub && (pMethod === 'cod_advance' || isHandCashProvider || isHubTrx));
+    const isFreeCampusCOD = (isCampusHub && (pMethod === 'cod_advance' || paymentProvider === 'hand_cash'));
     const pProvider = isFreeCampusCOD ? 'hand_cash' : ((paymentProvider === 'nagad') ? 'nagad' : (paymentProvider === 'hand_cash' ? 'hand_cash' : 'bkash'));
 
     let cleanedSender = senderNumber ? senderNumber.replace(/[\s-]/g, '').trim() : '';
@@ -105,6 +110,7 @@ exports.createOrder = async (req, res, next) => {
       if (!cleanedSender) cleanedSender = cleanedPhone;
       if (!trxId) trxId = `CAMPUS-COD-${Date.now().toString().slice(-6)}`;
     } else {
+      // Customer verification via bKash/Nagad Sender Mobile Number
       if (!cleanedSender || !/^01[3-9]\d{8}$/.test(cleanedSender)) {
         return res.status(400).json({
           success: false,
@@ -112,33 +118,21 @@ exports.createOrder = async (req, res, next) => {
         });
       }
 
-      if (!trxId || !/^[A-Z0-9]{8,12}$/.test(trxId)) {
-        return res.status(400).json({
-          success: false,
-          error: 'Please provide a valid 8 to 12 character alphanumeric Transaction ID (TrxID).'
-        });
+      // If customer did not enter TrxID (removed from UI), auto-generate internal transaction reference
+      if (!trxId) {
+        trxId = `TXN-${cleanedSender.slice(-4)}-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
       }
     }
 
-    // Check for duplicate TrxID
-    if (isConnected()) {
+    // Safety check for duplicate TrxID (only if custom TrxID was provided)
+    if (transactionId && isConnected()) {
       try {
         const existingOrder = await Order.findOne({ transactionId: trxId });
         if (existingOrder) {
-          return res.status(400).json({
-            success: false,
-            error: `Transaction ID "${trxId}" has already been submitted for Order #${existingOrder.orderNumber}.`
-          });
+          // If collision occurs with an explicit custom TrxID, append random salt instead of failing
+          trxId = `${trxId}-${Math.floor(1000 + Math.random() * 9000)}`;
         }
       } catch (e) {}
-    } else if (memoryStore && memoryStore.orders) {
-      const existingOrder = memoryStore.orders.find(o => o.transactionId === trxId);
-      if (existingOrder) {
-        return res.status(400).json({
-          success: false,
-          error: `Transaction ID "${trxId}" has already been submitted for Order #${existingOrder.orderNumber}.`
-        });
-      }
     }
 
     if (!items || !Array.isArray(items) || items.length === 0) {
@@ -586,7 +580,7 @@ exports.getOrderByTransactionId = async (req, res, next) => {
   try {
     const { tranId } = req.params;
     if (!tranId || typeof tranId !== 'string') {
-      return res.status(400).json({ success: false, error: 'Valid Transaction ID is required.' });
+      return res.status(400).json({ success: false, error: 'Valid Order ID or Transaction Reference is required.' });
     }
 
     const cleanTranId = tranId.replace(/[^A-Za-z0-9-]/g, '').trim().toUpperCase();
@@ -594,16 +588,22 @@ exports.getOrderByTransactionId = async (req, res, next) => {
 
     if (isConnected()) {
       try {
-        order = await Order.findOne({ transactionId: cleanTranId }).lean();
+        order = await Order.findOne({
+          $or: [
+            { transactionId: cleanTranId },
+            { orderNumber: cleanTranId }
+          ]
+        }).lean();
       } catch (e) {}
     }
     if (!order) {
       order = memoryStore.orders.find(o => 
-        o.transactionId && o.transactionId.toUpperCase() === cleanTranId
+        (o.transactionId && o.transactionId.toUpperCase() === cleanTranId) ||
+        (o.orderNumber && o.orderNumber.toUpperCase() === cleanTranId)
       );
     }
     if (!order) {
-      return res.status(404).json({ success: false, error: 'Order not found for this Transaction ID.' });
+      return res.status(404).json({ success: false, error: 'Order not found for this Reference or Order ID.' });
     }
 
     const maskedPhone = maskPhoneNumber(order.customer?.phone);

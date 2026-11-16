@@ -292,7 +292,7 @@
                   <strong style="color:#B91C1C; font-size:1.08rem;">৳${cashDue}</strong>
                 </div>
               ` : isCOD ? `
-                <!-- Regular Home Delivery COD (With actual Advance Fee & actual TrxID) -->
+                <!-- Regular Home Delivery COD (With actual Advance Fee) -->
                 <div class="confirm-row">
                   <span>Payment Method:</span>
                   <strong>Cash on Delivery (Advance Fee Paid)</strong>
@@ -303,11 +303,7 @@
                 </div>
                 <div class="confirm-row">
                   <span>Sender Mobile Number:</span>
-                  <code>${order.senderNumber || order.customer?.phone || 'N/A'}</code>
-                </div>
-                <div class="confirm-row">
-                  <span>Transaction ID (TrxID):</span>
-                  <code class="trxid-badge">${order.transactionId || 'N/A'}</code>
+                  <code style="font-size:0.95rem; font-weight:700; color:#4A102A;">${order.senderNumber || order.customer?.phone || 'N/A'}</code>
                 </div>
                 <div class="confirm-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
                   <span>Advance Delivery Fee Paid:</span>
@@ -318,7 +314,7 @@
                   <strong style="color:#B91C1C; font-size:1.08rem;">৳${cashDue}</strong>
                 </div>
               ` : `
-                <!-- 100% Online Payment (With actual TrxID & ৳0 Due) -->
+                <!-- 100% Online Payment (With actual Sender Number & ৳0 Due) -->
                 <div class="confirm-row">
                   <span>Payment Method:</span>
                   <strong>100% Online Payment ${isCampusHub ? `(Campus Hub Delivery)` : ''}</strong>
@@ -329,11 +325,7 @@
                 </div>
                 <div class="confirm-row">
                   <span>Sender Mobile Number:</span>
-                  <code>${order.senderNumber || order.customer?.phone || 'N/A'}</code>
-                </div>
-                <div class="confirm-row">
-                  <span>Transaction ID (TrxID):</span>
-                  <code class="trxid-badge">${order.transactionId || 'N/A'}</code>
+                  <code style="font-size:0.95rem; font-weight:700; color:#4A102A;">${order.senderNumber || order.customer?.phone || 'N/A'}</code>
                 </div>
                 <div class="confirm-row" style="margin-top:0.4rem; padding-top:0.4rem; border-top:1px dashed #E0D4C3;">
                   <span>Total Paid Online:</span>
